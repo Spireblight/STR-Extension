@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Config Page</title>
+</head>
+<body style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+    <div id="app"></div>
+    <script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
+    <!-- If you use any external libraries, such as jQuery, you must include
+      them as part of your extension.  Twitch does not allow extensions to link
+      to external libraries. -->
+    <script src="jquery-3.3.1.min.js" type="text/javascript"></script>
+    <script src="config.js" type="text/javascript"></script>
+    <h2>SlayTheRelics Configuration Page</h2>
+    <form>
+      <div>In order to use SlayTheRelics you must generate a secret key that you enter into the SlayTheRelics Exporter mod, 
+        this is used as a security measure that prevents other people from being able to update the data on your stream using the mod.</div>
+      <br>
+      <div>Status: <span id='backend_status'>Waiting for server...</span></div>
+      SlayTheRelics Secret Key <input type="text" name="streamer_secret" id="text_streamer_secret" readonly>
+      <input type="button" value="Generate" onclick="generateRandomSecret()">
+      <br>
+      <input type="button" value="Save Secret" onclick="saveSecret()">
+      <br>
+    </form>
+    <div id="userId"></div>
+</body>
+</html>

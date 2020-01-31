@@ -1,0 +1,31 @@
+<html>
+    <body>
+        <script>
+            function sendRequest() {
+
+                var xhttp_ebs = new XMLHttpRequest()
+                xhttp_ebs.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        console.log('success')
+                        console.log(this.responseText)
+                    }
+                }
+                xhttp_ebs.open('post', 'https://localhost:8080')
+                xhttp_ebs.setRequestHeader("Content-Type", "application/json")
+
+                var msg = {
+                    'msg_type': 'streamer_exists',
+                    'streamer': {
+                        'login': 'northernlion'
+                    }
+                }
+                xhttp_ebs.send(JSON.stringify(msg))
+            }
+        </script>
+        <form method="POST" action="https://localhost:8080/">
+            Streamer ID <input type="text" name="streamer_login"><br>
+            Streamer Secret <input type="text" name="streamer_secret"><br>
+            <input type="button" value="add streamer to database" onclick="sendRequest()">
+        </form>
+    </body>
+</html>

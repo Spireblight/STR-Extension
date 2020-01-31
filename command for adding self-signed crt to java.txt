@@ -1,0 +1,1 @@
+keytool –import –noprompt –trustcacerts –alias SelfSigned1 -file E:\Programming\twitchext\SlayTheRelics\slay-the-relics\conf\.crt -keystore "E:\Gaming\SteamLibrary\steamapps\common\SlayTheSpire\lib\security\cacerts" -storepass changeit

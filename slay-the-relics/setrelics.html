@@ -1,0 +1,123 @@
+<html>
+    <body>
+        <script>
+            function sendRequest() {
+
+                var xhttp_ebs = new XMLHttpRequest()
+                xhttp_ebs.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        console.log('success')
+                        console.log(this.responseText)
+                    }
+                }
+                xhttp_ebs.open('post', 'https://localhost:8080')
+                xhttp_ebs.setRequestHeader("Content-Type", "application/json")
+                
+                var relics = [
+                    {
+                        'name': 'Cracked Orb',
+                        'description': 'At the beginning of combat, channel 1 lightning'
+                    },
+                    {
+                        'name': 'Akabeko',
+                        'description': 'What a nice little thing'
+                    },
+                    {
+                        'name': 'Cracked Orb',
+                        'description': 'At the beginning of combat, channel 1 lightning'
+                    },
+                    {
+                        'name': 'Akabeko',
+                        'description': 'What a nice little thing'
+                    },
+                    {
+                        'name': 'Cracked Orb',
+                        'description': 'At the beginning of combat, channel 1 lightning'
+                    },
+                    {
+                        'name': 'Akabeko',
+                        'description': 'What a nice little thing'
+                    },
+                    {
+                        'name': 'Cracked Orb',
+                        'description': 'At the beginning of combat, channel 1 lightning'
+                    },
+                    {
+                        'name': 'Akabeko',
+                        'description': 'What a nice little thing'
+                    },
+                    {
+                        'name': 'Cracked Orb',
+                        'description': 'At the beginning of combat, channel 1 lightning'
+                    },
+                    {
+                        'name': 'Akabeko',
+                        'description': 'What a nice little thing'
+                    },
+                    {
+                        'name': 'Cracked Orb',
+                        'description': 'At the beginning of combat, channel 1 lightning'
+                    },
+                    {
+                        'name': 'Akabeko',
+                        'description': 'What a nice little thing'
+                    },
+                    {
+                        'name': 'Cracked Orb',
+                        'description': 'At the beginning of combat, channel 1 lightning'
+                    },
+                    {
+                        'name': 'Akabeko',
+                        'description': 'What a nice little thing'
+                    },
+                    {
+                        'name': 'Cracked Orb',
+                        'description': 'At the beginning of combat, channel 1 lightning'
+                    },
+                    {
+                        'name': 'Akabeko',
+                        'description': 'What a nice little thing'
+                    },
+                    {
+                        'name': 'Cracked Orb',
+                        'description': 'At the beginning of combat, channel 1 lightning'
+                    },
+                    {
+                        'name': 'Akabeko',
+                        'description': 'What a nice little thing'
+                    },
+                    {
+                        'name': 'Cracked Orb',
+                        'description': 'At the beginning of combat, channel 1 lightning'
+                    },
+                    {
+                        'name': 'Akabeko',
+                        'description': 'What a nice little thing'
+                    },
+                    {
+                        'name': 'Cracked Orb',
+                        'description': 'At the beginning of combat, channel 1 lightning'
+                    },
+                    {
+                        'name': 'Akabeko',
+                        'description': 'What a nice little thing'
+                    },
+                ]
+
+                var msg = {
+                    'msg_type': 'set_relics',
+                    'streamer': {
+                        'login': 'terrencemhs',
+                        'secret': 'r8fca2xomlzbioztxmij',
+                    },
+                    'relics': relics
+                }
+                xhttp_ebs.send(JSON.stringify(msg))
+
+            }
+        </script>
+        <form method="POST" action="https://localhost:8080/">
+            <input type="button" value="set_relics" onclick="sendRequest()">
+        </form>
+    </body>
+</html>

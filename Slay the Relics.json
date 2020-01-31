@@ -1,0 +1,112 @@
+{
+  "allowHttpBackend": false,
+  "backendCommand": "node backend -c \"7dgfio8rek8dhju8628riism3fd11p\" -s \"wLCHUfG3tyxXomF5qizLKR0elpB4IDEMJ6RyRBzd9RI=\" -o \"32044102\"",
+  "backendFolderName": "slay-the-relics\\backend",
+  "certificateExceptions": [
+    {
+      "isAllowed": true,
+      "isEphemeral": false,
+      "isOrigin": true,
+      "value": "https://localhost:8080"
+    }
+  ],
+  "extensionViews": [
+    {
+      "id": "3",
+      "label": "conf baalorlord",
+      "channelId": "41253053",
+      "configurationAnchor": "video_overlay",
+      "displayChannelName": "terrencemhs",
+      "type": "config",
+      "features": {
+        "isBitsEnabled": false,
+        "isChatEnabled": false,
+        "isSubscriptionStatusAvailable": false
+      },
+      "linked": true,
+      "linkedUserId": "265737932",
+      "mode": "config",
+      "isPopout": false,
+      "role": "Broadcaster",
+      "orientation": "Portrait",
+      "frameSize": {
+        "width": 1280,
+        "height": 720
+      }
+    },
+    {
+      "id": "4",
+      "label": "jorbs",
+      "channelId": "24687283",
+      "configurationAnchor": "video_overlay",
+      "displayChannelName": "jorbs",
+      "type": "video_overlay",
+      "features": {
+        "isBitsEnabled": false,
+        "isChatEnabled": false,
+        "isSubscriptionStatusAvailable": false
+      },
+      "linked": false,
+      "linkedUserId": "",
+      "mode": "viewer",
+      "isPopout": false,
+      "role": "Logged-In Viewer",
+      "orientation": "Portrait",
+      "frameSize": {
+        "width": 1280,
+        "height": 720
+      }
+    }
+  ],
+  "frontendCommand": "",
+  "frontendFolderName": "slay-the-relics\\public",
+  "manifest": {
+    "anchor": "video_overlay",
+    "assetUrls": [],
+    "authorName": "Adam Volny",
+    "bitsEnabled": false,
+    "canInstall": true,
+    "configUrl": "https://localhost:8080/config.html",
+    "configurationLocation": "none",
+    "description": "Allows viewers to see what relic does without asking in the chat or the streamer, hopefully making for a nicer experience for everyone.",
+    "eulaTosUrl": "",
+    "hasChatSupport": false,
+    "iconUrl": "",
+    "iconUrls": {},
+    "id": "7dgfio8rek8dhju8628riism3fd11p",
+    "installationCount": -42,
+    "liveConfigUrl": "",
+    "name": "Slay the Relics",
+    "panelHeight": 0,
+    "privacyPolicyUrl": "",
+    "requestIdentityLink": false,
+    "requiredBroadcasterAbilities": [],
+    "screenshotUrls": [],
+    "sku": "",
+    "state": "Testing",
+    "subscriptionsSupportLevel": "none",
+    "summary": "When mousing over relics, shows the relic tooltips.",
+    "supportEmail": "adam.volny@gmail.com",
+    "vendorCode": "",
+    "version": "0.0.1",
+    "viewerSummary": "",
+    "viewerUrl": "",
+    "viewerUrls": {
+      "videoOverlay": "https://localhost:8080/video_overlay.html"
+    },
+    "views": {
+      "videoOverlay": {
+        "viewerUrl": "https://localhost:8080/video_overlay.html",
+        "canLinkExternalContent": false
+      },
+      "config": {
+        "viewerUrl": "https://localhost:8080/config.html",
+        "canLinkExternalContent": false
+      }
+    },
+    "whitelistedConfigUrls": [],
+    "whitelistedPanelUrls": []
+  },
+  "name": "Slay the Relics",
+  "version": 1
+}

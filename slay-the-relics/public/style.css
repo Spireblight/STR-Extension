@@ -1,0 +1,9 @@
+div.item_placeholder {
+    position: fixed;
+    top: 6.111%;
+    left: 1.4%;
+    width: 3.75%;
+    height: 6.666%;
+    box-sizing: border-box;
+    border: 2px solid #000000;
+}
