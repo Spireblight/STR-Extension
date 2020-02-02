@@ -1,18 +1,17 @@
 {
-  "name": "extension-hello-world",
+  "name": "slay-the-relics",
   "version": "1.0.0",
-  "description": "Simple Hello World Twitch Extension",
+  "description": "Backend for Twitch Extension",
   "main": "index.js",
   "scripts": {
     "cert": "node bin/generate_cert.js server",
-    "start": "node services/backend"
+    "start": "node backend/backend"
   },
   "keywords": [
     "twitch",
     "extension"
   ],
-  "author": "Emily Rose <amorelandra@twitch.tv>",
-  "license": "Apache-2.0",
+  "author": "Adam Volný <adam.volny@gmail.com>",
   "dependencies": {
     "body-parser": "^1.19.0",
     "boom": "^7.2.0",

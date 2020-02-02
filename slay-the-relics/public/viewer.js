@@ -24,7 +24,9 @@ function receiveMessage(msg) {
     var msg_type = msg.msg_type
 
     if (msg_type == MSG_TYPE_SET_RELICS) {
-        setRelics(msg.relics)
+        if (JSON.stringify(last_relics) != JSON.stringify(msg.relics)) {
+            setRelics(msg.relics)
+        }
     } else {
         log('unrecognized msg_type: ' + msg_type)
     }
@@ -53,14 +55,14 @@ function setRelics(relics) {
         var max_x_tooltip = ((stream_width * MAX_RIGHT) - TOOLTIP_WIDTH) / stream_width
         var x_tooltip = Math.min(x_placeholder, max_x_tooltip)
 
-        console.log(i, 'stream width', stream_width, 'x_placeholder', x_placeholder, 'max_x_tooltip', max_x_tooltip)
+        // console.log(i, 'stream width', stream_width, 'x_placeholder', x_placeholder, 'max_x_tooltip', max_x_tooltip)
 
         html = html.concat(createItemHTML(x_placeholder, x_tooltip, item.name, item.description, i))
     }
 
     items.innerHTML = html
 
-    console.log('setting inner html to: ' + html)
+    // console.log('setting inner html to: ' + html)
 
     function createItemHTML(x_placeholder, x_tooltip, name, description, id) {
         var html = '<div class="item_placeholder" style="left: ' + x_placeholder + '%" ' // title="' + name + ': ' + description + '"
@@ -111,15 +113,16 @@ function hideTooltip(id) {
 
 
 function log(msg) {
-    twitch.rig.log(msg)
     console.log(msg)
+    twitch.rig.log(msg)
 }
 
 
 $(function() {
 
-    console.log('initialized')
+    // console.log('initialized')
 
+    // detect stream resizing (like normal, theatre, fullscreen mode transitions)
     new ResizeSensor($('#items'), function() {
         console.log('stream resized')
         setRelics(last_relics);
@@ -127,12 +130,13 @@ $(function() {
 
     // listen for incoming broadcast message from our EBS
     twitch.listen('broadcast', function (target, contentType, message) {
-        console.log('received a broadcast message: ' + message)
+        // console.log('received a broadcast message: ' + message)
 
         receiveMessage(message);
     });
 
-    $('#items').on('mousemove', function(e) {
+    $('#items').on('mousemove', function(e) { // tooltip follows mouse
+
         if (current_tooltip_id) {
             var left = e.pageX + 46
             var top = e.pageY + 7 // - 15
@@ -154,6 +158,6 @@ $(function() {
     });
 
     // TESTING RELICS
-    // var relics = [{"name": "Cracked Core", "description": "At the start of each combat, #yChannel #b1 #yLightning."}, {"name": "Dolly's Mirror", "description": "Upon pickup, obtain an additional copy of a card in your deck."}, {"name": "Smiling Mask", "description": "The Merchant's card removal service now always costs #b50 #yGold."}, {"name": "Orichalcum", "description": "If you end your turn without #yBlock, gain #b6 #yBlock."}, {"name": "Toy Ornithopter", "description": "Whenever you use a potion, heal #b5 HP."}, {"name": "Ink Bottle", "description": "Whenever you play #b10 cards, draw #b1 card."}, {"name": "Omamori", "description": "Negate the next #b2 #rCurses you obtain."}]
-    // setRelics(relics)
+    var relics = [{"name": "Cracked Core", "description": "At the start of each combat, #yChannel #b1 #yLightning."}, {"name": "Dolly's Mirror", "description": "Upon pickup, obtain an additional copy of a card in your deck."}, {"name": "Smiling Mask", "description": "The Merchant's card removal service now always costs #b50 #yGold."}, {"name": "Orichalcum", "description": "If you end your turn without #yBlock, gain #b6 #yBlock."}, {"name": "Toy Ornithopter", "description": "Whenever you use a potion, heal #b5 HP."}, {"name": "Ink Bottle", "description": "Whenever you play #b10 cards, draw #b1 card."}, {"name": "Omamori", "description": "Negate the next #b2 #rCurses you obtain."}]
+    setRelics(relics)
 });
