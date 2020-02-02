@@ -34,11 +34,15 @@ ext.
   option('-s, --secret <secret>', 'Extension secret').
   option('-c, --client-id <client_id>', 'Extension client ID').
   option('-o, --owner-id <owner_id>', 'Extension owner ID').
+  option('-p, --cert-private-key-path <private_key_path>').
+  option('-u, --cert-public-key-path <public_key_path>').
   parse(process.argv);
 
 const ownerId = getOption('ownerId', 'EXT_OWNER_ID');
 const secret = Buffer.from(getOption('secret', 'EXT_SECRET'), 'base64');
 const clientId = getOption('clientId', 'EXT_CLIENT_ID');
+const privateKeyPath = getOption('certPrivateKeyPath', 'EXT_PRIVATE_KEY_PATH');
+const publicKeyPath = getOption('certPublicKeyPath', 'EXT_PUBLIC_KEY_PATH');
 
 streamers.init()
 
@@ -99,8 +103,8 @@ app.post('/', function (req, res) {
 })
 
 https.createServer({
-    key: fs.readFileSync('../conf/.key'),
-    cert: fs.readFileSync('../conf/.crt'),
+    key: fs.readFileSync(privateKeyPath),
+    cert: fs.readFileSync(publicKeyPath),
 }, app).listen(PORT)
 
 
