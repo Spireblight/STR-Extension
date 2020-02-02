@@ -38,11 +38,28 @@ ext.
   option('-u, --cert-public-key-path <public_key_path>').
   parse(process.argv);
 
+
+const STRINGS = {
+  secretEnv: usingValue('secret'),
+  clientIdEnv: usingValue('client-id'),
+  ownerIdEnv: usingValue('owner-id'),
+  certPrivateKeyPath: usingValue('cert-private-key-path'),
+  certPublicKeyPath: usingValue('cert-public-key-path'),
+  serverStarted: 'Server running at %s',
+  secretMissing: missingValue('secret', 'EXT_SECRET'),
+  clientIdMissing: missingValue('client ID', 'EXT_CLIENT_ID'),
+  ownerIdMissing: missingValue('owner ID', 'EXT_OWNER_ID'),
+  certPrivateKeyPathMissing: missingValue('certificate private key path', 'EXT_PRIVATE_KEY_PATH'),
+  certPublicKeyPathMissing: missingValue('certificate public key path', 'EXT_PUBLIC_KEY_PATH')
+};
+
+
 const ownerId = getOption('ownerId', 'EXT_OWNER_ID');
 const secret = Buffer.from(getOption('secret', 'EXT_SECRET'), 'base64');
 const clientId = getOption('clientId', 'EXT_CLIENT_ID');
 const privateKeyPath = getOption('certPrivateKeyPath', 'EXT_PRIVATE_KEY_PATH');
 const publicKeyPath = getOption('certPublicKeyPath', 'EXT_PUBLIC_KEY_PATH');
+
 
 streamers.init()
 
@@ -171,3 +188,12 @@ function getOption(optionName, environmentName) {
     console.log(`Using "${option}" for ${optionName}`);
     return option;
   }
+
+function usingValue(name) {
+  return `Using environment variable for ${name}`;
+}
+
+function missingValue(name, variable) {
+  const option = name.charAt(0);
+  return `Extension ${name} required.\nUse argument "-${option} <${name}>" or environment variable "${variable}".`;
+}
