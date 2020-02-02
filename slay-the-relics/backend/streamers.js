@@ -2,7 +2,7 @@ const fs = require('fs');
 const parse = require('csv-parse/lib/sync');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
-const STREAMERS_FILE = 'streamers.csv'
+const STREAMERS_FILE = 'backend/streamers.csv'
 
 exports.streamers = {
     list: [],
