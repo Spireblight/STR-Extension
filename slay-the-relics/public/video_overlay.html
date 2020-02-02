@@ -2,10 +2,13 @@
 <html>
 <head>
     <title>Viewer Page</title>
+    <link href="https://fonts.googleapis.com/css?family=Kreon:400,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
     <div id="app" class="full-height"></div>
+    <script src="ResizeSensor.js"></script>
+    <script src="ElementQueries.js"></script>
     <script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
     <!-- If you use any external libraries, such as jQuery, you must include
       them as part of your extension.  Twitch does not allow extensions to link
@@ -15,7 +18,7 @@
     <script>console.log('hey there!')</script>
     <!-- <h2>Hello, World!</h2>
     <p>Would you care to cycle a color?</p> -->
-    <div id="items" width="100%" height="100%" ></div>
+    <div id="items" width="100%" height="100%"></div>
     <!-- <div class="item_placeholder" title="Be kind to yourself :)"></div>
     <div class="item_placeholder" title="Be kind to yourself :)" style="left: 4.8%"></div>
     <div class="item_placeholder" title="Be kind to yourself :)" style="left: 8.2%"></div>

@@ -12,34 +12,11 @@
   ],
   "extensionViews": [
     {
-      "id": "3",
-      "label": "conf baalorlord",
-      "channelId": "41253053",
-      "configurationAnchor": "video_overlay",
-      "displayChannelName": "terrencemhs",
-      "type": "config",
-      "features": {
-        "isBitsEnabled": false,
-        "isChatEnabled": false,
-        "isSubscriptionStatusAvailable": false
-      },
-      "linked": true,
-      "linkedUserId": "265737932",
-      "mode": "config",
-      "isPopout": false,
-      "role": "Broadcaster",
-      "orientation": "Portrait",
-      "frameSize": {
-        "width": 1280,
-        "height": 720
-      }
-    },
-    {
-      "id": "4",
-      "label": "jorbs",
+      "id": "1",
+      "label": "test view",
       "channelId": "24687283",
       "configurationAnchor": "video_overlay",
-      "displayChannelName": "jorbs",
+      "displayChannelName": "esty8nine",
       "type": "video_overlay",
       "features": {
         "isBitsEnabled": false,
@@ -50,7 +27,7 @@
       "linkedUserId": "",
       "mode": "viewer",
       "isPopout": false,
-      "role": "Logged-In Viewer",
+      "role": "Broadcaster",
       "orientation": "Portrait",
       "frameSize": {
         "width": 1280,
