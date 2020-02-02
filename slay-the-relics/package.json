@@ -4,8 +4,7 @@
   "description": "Backend for Twitch Extension",
   "main": "index.js",
   "scripts": {
-    "cert": "node bin/generate_cert.js server",
-    "start": "node backend/backend"
+    "start": "node backend/backend.js"
   },
   "keywords": [
     "twitch",
