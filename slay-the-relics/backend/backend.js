@@ -98,14 +98,16 @@ app.post('/', function (req, res) {
         }
     } else if (msg_type == MSG_TYPE_SET_RELICS) {
         const relics = req.body.relics
-        console.log('set relics for ' + login + ': ' + JSON.stringify(relics))
+        const relics_page_id = req.body.relics_page_id
+        console.log('set relics for ' + login + ': pageid: ' + relics_page_id + ', relics: ' + JSON.stringify(relics))
 
         if (streamers.isStreamerValid(login, secret)) {
             console.log('valid streamer secret')
 
             var msg = {
                 'msg_type': MSG_TYPE_SET_RELICS,
-                'relics': relics
+                'relics': relics,
+                'relics_page_id': relics_page_id
             }
 
             sendBroadcast(streamers.getChannelId(login), JSON.stringify(msg))
