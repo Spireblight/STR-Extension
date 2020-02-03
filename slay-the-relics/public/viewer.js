@@ -44,8 +44,9 @@ function setRelics(relics) {
     last_relics = relics
 
     var items = document.getElementById('items')
-    
-    var html = ''
+    while (items.lastChild) { // clear the items div
+        items.removeChild(items.lastChild)
+    }
 
     for (let i = 0; i < relics.length && i < MAX_DISPLAY_ITEMS; i++) {
         const item = relics[i];
@@ -54,25 +55,26 @@ function setRelics(relics) {
         var stream_width = $('#items').width()
         var max_x_tooltip = ((stream_width * MAX_RIGHT) - TOOLTIP_WIDTH) / stream_width
         var x_tooltip = Math.min(x_placeholder, max_x_tooltip)
+        
+        createItem(items, x_placeholder, x_tooltip, item.name, item.description, i)
 
-        // console.log(i, 'stream width', stream_width, 'x_placeholder', x_placeholder, 'max_x_tooltip', max_x_tooltip)
-
-        html = html.concat(createItemHTML(x_placeholder, x_tooltip, item.name, item.description, i))
     }
 
-    items.innerHTML = html
+    function createItem(parent, x_placeholder, x_tooltip, name, description, id) {
+        var placeholder = document.createElement('div')
+        placeholder.className = 'item_placeholder'
+        placeholder.style = 'left: ' + x_placeholder + '%'
+        placeholder.onmouseenter = function() {showTooltip('tooltip_' + id)}
+        placeholder.onmouseout = function() {hideTooltip('tooltip_' + id)}
 
-    // console.log('setting inner html to: ' + html)
+        var tooltip = document.createElement('div')
+        tooltip.className = 'tooltip'
+        tooltip.id = 'tooltip_' + id
+        tooltip.style = 'left: ' + x_tooltip + '%'
+        tooltip.innerHTML = '<div class="tooltip_header">' + name + '</div><div>' + replaceColorCodes(description) + '</div>'
 
-    function createItemHTML(x_placeholder, x_tooltip, name, description, id) {
-        var html = '<div class="item_placeholder" style="left: ' + x_placeholder + '%" ' // title="' + name + ': ' + description + '"
-        html = html.concat('onmouseover="showTooltip(\'tooltip_' + id + '\')" ')
-        html = html.concat('onmouseout="hideTooltip(\'tooltip_' + id + '\')"></div>')
-        html = html.concat('<div class="tooltip" id="tooltip_' + id + '" style="left: ' + x_tooltip + '%">')
-        html = html.concat('<div class="tooltip_header">' + name + '</div>')
-        html = html.concat('<div>' + replaceColorCodes(description) + '</div>')
-        html = html.concat('</div>');
-        return html
+        parent.appendChild(placeholder)
+        parent.appendChild(tooltip)
 
         function replaceColorCodes(text) {
             var parts = text.split(' ')
@@ -120,14 +122,6 @@ function log(msg) {
 
 $(function() {
 
-    // console.log('initialized')
-
-    // detect stream resizing (like normal, theatre, fullscreen mode transitions)
-    new ResizeSensor($('#items'), function() {
-        console.log('stream resized')
-        setRelics(last_relics);
-    });
-
     // listen for incoming broadcast message from our EBS
     twitch.listen('broadcast', function (target, contentType, message) {
         // console.log('received a broadcast message: ' + message)
@@ -137,7 +131,7 @@ $(function() {
 
     $('#items').on('mousemove', function(e) { // tooltip follows mouse
 
-        if (current_tooltip_id) {
+        if (current_tooltip_id != null) {
             var left = e.pageX + 46
             var top = e.pageY + 7 // - 15
             var stream_width = $('#items').width()
@@ -148,7 +142,7 @@ $(function() {
                 top = e.pageY + 7 // + 3
             }
 
-            console.log('left', left, 'stream_width', stream_width, 'max_left', max_left)
+            // console.log('left', left, 'stream_width', stream_width, 'max_left', max_left)
 
             $('#' + current_tooltip_id).css({
                 left:  left + 'px',
@@ -158,6 +152,6 @@ $(function() {
     });
 
     // TESTING RELICS
-    var relics = [{"name": "Cracked Core", "description": "At the start of each combat, #yChannel #b1 #yLightning."}, {"name": "Dolly's Mirror", "description": "Upon pickup, obtain an additional copy of a card in your deck."}, {"name": "Smiling Mask", "description": "The Merchant's card removal service now always costs #b50 #yGold."}, {"name": "Orichalcum", "description": "If you end your turn without #yBlock, gain #b6 #yBlock."}, {"name": "Toy Ornithopter", "description": "Whenever you use a potion, heal #b5 HP."}, {"name": "Ink Bottle", "description": "Whenever you play #b10 cards, draw #b1 card."}, {"name": "Omamori", "description": "Negate the next #b2 #rCurses you obtain."}]
-    setRelics(relics)
+    // var relics = [{"name": "Cracked Core", "description": "At the start of each combat, #yChannel #b1 #yLightning."}, {"name": "Dolly's Mirror", "description": "Upon pickup, obtain an additional copy of a card in your deck."}, {"name": "Smiling Mask", "description": "The Merchant's card removal service now always costs #b50 #yGold."}, {"name": "Orichalcum", "description": "If you end your turn without #yBlock, gain #b6 #yBlock."}, {"name": "Toy Ornithopter", "description": "Whenever you use a potion, heal #b5 HP."}, {"name": "Ink Bottle", "description": "Whenever you play #b10 cards, draw #b1 card."}, {"name": "Omamori", "description": "Negate the next #b2 #rCurses you obtain."}]
+    // setRelics(relics)
 });
