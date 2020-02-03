@@ -1,7 +1,7 @@
 
 var twitch = window.Twitch.ext;
 var last_relics = []
-var last_relics_page_id = undefined
+var last_is_relics_multipage = "false"
 var current_tooltip_id = -1
 
 const MSG_TYPE_SET_RELICS = "set_relics"
@@ -23,8 +23,8 @@ function receiveMessage(msg) {
     var msg_type = msg.msg_type
 
     if (msg_type == MSG_TYPE_SET_RELICS) {
-        if (JSON.stringify(last_relics) != JSON.stringify(msg.relics) || last_relics_page_id != msg.relics_page_id) {
-            setRelics(msg.relics, msg.relics_page_id)
+        if (JSON.stringify(last_relics) != JSON.stringify(msg.relics) || last_is_relics_multipage != msg.is_relics_multipage) {
+            setRelics(msg.relics, msg.is_relics_multipage)
         }
     } else {
         log('unrecognized msg_type: ' + msg_type)
@@ -38,20 +38,22 @@ const MAX_DISPLAY_ITEMS = 25 //count
 const MAX_RIGHT = 99.0 //%
 const TOOLTIP_WIDTH = 315 //px
 
-function setRelics(relics, relics_page_id) {
+function setRelics(relics, is_relics_multipage) {
+    console.log('set relics, is multipage: ' + is_relics_multipage + ' relics: ' + JSON.stringify(relics))
+
     current_tooltip_id = Math.min(relics.length, current_tooltip_id)
     last_relics = relics
-    last_relics_page_id = relics_page_id
+    last_is_relics_multipage = is_relics_multipage
 
     var items = document.getElementById('items')
     while (items.lastChild) { // clear the items div
         items.removeChild(items.lastChild)
     }
 
-    for (let i = 0; i < relics.length - relics_page_id * MAX_DISPLAY_ITEMS && i < MAX_DISPLAY_ITEMS; i++) {
-        const item = relics[i + relics_page_id * MAX_DISPLAY_ITEMS];
+    for (let i = 0; i < relics.length; i++) {
+        const item = relics[i];
         
-        var x_placeholder = ITEM_LEFT + i * ITEM_WIDTH + (relics.length > 25 ? 1 : 0) * ITEM_OFFSET_LARGE
+        var x_placeholder = ITEM_LEFT + i * ITEM_WIDTH + (is_relics_multipage == "true" ? 1 : 0) * ITEM_OFFSET_LARGE
         var stream_width = $('#items').width()
         var max_x_tooltip = ((stream_width * MAX_RIGHT) - TOOLTIP_WIDTH) / stream_width
         var x_tooltip = Math.min(x_placeholder, max_x_tooltip)
@@ -158,7 +160,7 @@ $(function() {
 
     // TESTING RELICS
     var relics = [{"name": "Cracked Core", "description": "At the start of each combat, #yChannel #b1 #yLightning."}, {"name": "Dolly's Mirror", "description": "Upon pickup, obtain an additional copy of a card in your deck."}, {"name": "Smiling Mask", "description": "The Merchant's card removal service now always costs #b50 #yGold."}, {"name": "Orichalcum", "description": "If you end your turn without #yBlock, gain #b6 #yBlock."}, {"name": "Toy Ornithopter", "description": "Whenever you use a potion, heal #b5 HP."}, {"name": "Ink Bottle", "description": "Whenever you play #b10 cards, draw #b1 card."}, {"name": "Omamori", "description": "Negate the next #b2 #rCurses you obtain."}]
-    setRelics(relics)
+    setRelics(relics, "false")
 
     console.log('init done!')
 });

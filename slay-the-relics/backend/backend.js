@@ -98,8 +98,8 @@ app.post('/', function (req, res) {
         }
     } else if (msg_type == MSG_TYPE_SET_RELICS) {
         const relics = req.body.relics
-        const relics_page_id = req.body.relics_page_id
-        console.log('set relics for ' + login + ': pageid: ' + relics_page_id + ', relics: ' + JSON.stringify(relics))
+        const is_relics_multipage = req.body.is_relics_multipage
+        console.log('set relics for ' + login + ': are relics multipage: ' + is_relics_multipage + ', relics: ' + JSON.stringify(relics))
 
         if (streamers.isStreamerValid(login, secret)) {
             console.log('valid streamer secret')
@@ -107,7 +107,7 @@ app.post('/', function (req, res) {
             var msg = {
                 'msg_type': MSG_TYPE_SET_RELICS,
                 'relics': relics,
-                'relics_page_id': relics_page_id
+                'is_relics_multipage': is_relics_multipage
             }
 
             sendBroadcast(streamers.getChannelId(login), JSON.stringify(msg))
