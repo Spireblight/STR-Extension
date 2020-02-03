@@ -2,15 +2,18 @@
     <body>
         <script>
             function sendRequest() {
-
+                
+                console.log('sending request')
                 var xhttp_ebs = new XMLHttpRequest()
                 xhttp_ebs.onreadystatechange = function () {
                     if (this.readyState == 4 && this.status == 200) {
                         console.log('success')
                         console.log(this.responseText)
+                    } else {
+                        console.log('ready state', this.readyState, 'status code', this.status, 'status text', this.statusText)
                     }
                 }
-                xhttp_ebs.open('post', 'https://localhost:8080')
+                xhttp_ebs.open('post', 'https://slaytherelics.xyz:8080')
                 xhttp_ebs.setRequestHeader("Content-Type", "application/json")
                 
                 var relics = [

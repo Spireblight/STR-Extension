@@ -36,6 +36,7 @@ ext.
   option('-o, --owner-id <owner_id>', 'Extension owner ID').
   option('-p, --cert-private-key-path <private_key_path>').
   option('-u, --cert-public-key-path <public_key_path>').
+  option('-a, --cert-ca-paths <ca_key_paths>', "").
   parse(process.argv);
 
 
@@ -45,12 +46,14 @@ const STRINGS = {
   ownerIdEnv: usingValue('owner-id'),
   certPrivateKeyPath: usingValue('cert-private-key-path'),
   certPublicKeyPath: usingValue('cert-public-key-path'),
+  certCaPaths: usingValue('cert-ca-paths'),
   serverStarted: 'Server running at %s',
   secretMissing: missingValue('secret', 'EXT_SECRET'),
   clientIdMissing: missingValue('client ID', 'EXT_CLIENT_ID'),
   ownerIdMissing: missingValue('owner ID', 'EXT_OWNER_ID'),
   certPrivateKeyPathMissing: missingValue('certificate private key path', 'EXT_PRIVATE_KEY_PATH'),
-  certPublicKeyPathMissing: missingValue('certificate public key path', 'EXT_PUBLIC_KEY_PATH')
+  certPublicKeyPathMissing: missingValue('certificate public key path', 'EXT_PUBLIC_KEY_PATH'),
+  certCaPaths: missingValue('certificate CA paths', 'EXT_CA_PATHS')
 };
 
 
@@ -59,6 +62,7 @@ const secret = Buffer.from(getOption('secret', 'EXT_SECRET'), 'base64');
 const clientId = getOption('clientId', 'EXT_CLIENT_ID');
 const privateKeyPath = getOption('certPrivateKeyPath', 'EXT_PRIVATE_KEY_PATH');
 const publicKeyPath = getOption('certPublicKeyPath', 'EXT_PUBLIC_KEY_PATH');
+const caPaths = getOption('certCaPaths', 'EXT_CA_PATHS');
 
 
 streamers.init()
@@ -119,9 +123,25 @@ app.post('/', function (req, res) {
     // res.send(JSON.stringify(streamers))
 })
 
+
+function getCaPaths(caPaths) {
+  if (caPaths == 'null') {
+    return []
+  } else {
+    var paths = []
+    for (let i = 0; i < caPaths.length; i++) {
+      const path = caPaths[i];
+      paths.push(fs.readFileSync(path))
+    }
+    return paths
+  }
+}
+
+
 https.createServer({
     key: fs.readFileSync(privateKeyPath),
     cert: fs.readFileSync(publicKeyPath),
+    ca: getCaPaths(caPaths)
 }, app).listen(PORT)
 
 
