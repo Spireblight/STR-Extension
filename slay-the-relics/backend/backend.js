@@ -128,12 +128,13 @@ function getCaPaths(caPaths) {
   if (caPaths == 'null') {
     return []
   } else {
-    var paths = []
-    for (let i = 0; i < caPaths.length; i++) {
-      const path = caPaths[i];
-      paths.push(fs.readFileSync(path))
+    var certs = []
+    var paths = caPaths.split(',')
+    for (let i = 0; i < paths.length; i++) {
+      const path = paths[i];
+      certs.push(fs.readFileSync(path))
     }
-    return paths
+    return certs
   }
 }
 
