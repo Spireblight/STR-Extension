@@ -217,6 +217,3 @@ function missingValue(name, variable) {
   const option = name.charAt(0);
   return `Extension ${name} required.\nUse argument "-${option} <${name}>" or environment variable "${variable}".`;
 }
-
-
-throw Error('this is an uncaught exception')
