@@ -2,8 +2,8 @@ let token, userId, channelId, login;
 
 const twitch = window.Twitch.ext;
 
-// const BACKEND_URL = 'https://localhost:8080'
-const BACKEND_URL = 'https://slaytherelics.xyz:8080'
+const BACKEND_URL = 'https://localhost:8080'
+// const BACKEND_URL = 'https://slaytherelics.xyz:8080'
 
 const MSG_TYPE_SET_RELICS = "set_relics"
 const MSG_TYPE_ADD_STREAMER = "add_streamer"
@@ -14,9 +14,9 @@ const RESPONSE_TRUE = "true"
 const RESPONSE_FALSE = "false"
 
 const TEXT_STREAMER_EXISTS = "Streamer with this login already exists in this extension. Saving a new secret will overwrite the existing secret."
-const TEXT_STREAMER_NOT_EXISTS = "This login is not yet registered with this extension. Click Generate and copy the secret into the SlayTheRelics Exporter mod configuration (inside Slay The Spire) then click 'Save Secret'"
-const TEXT_STREAMER_ADD_SUCCESS = "New streamer succesfully added! Don't forget to copy your secret to the SlayTheRelics Exporter configuration, you won't see the secret code here next time (but you can generate a new one at any time, so don't worry)."
-const TEXT_STREAMER_ADD_FAILURE = "Something went wrong, send this message to the developer."
+const TEXT_STREAMER_NOT_EXISTS = "This login is not yet registered with this extension. Click Generate and copy the secret into the slaytherelics_config.txt file then click 'Save Secret'"
+const TEXT_STREAMER_ADD_SUCCESS = "Streamer secret succesfully saved!"
+const TEXT_STREAMER_ADD_FAILURE = "Something went wrong, send this message to the developer (adam@slaytherelics.xyz)."
 
 const COLOR_STREAMER_EXISTS = 'green'
 const COLOR_STREAMER_NOT_EXISTS = 'black'
@@ -60,14 +60,14 @@ function getChannelName(clientId, channelId) {
   var xhttp = new XMLHttpRequest();
 
   xhttp.onreadystatechange = function() {
-    document.getElementById('userId').innerText = this.readyState + ' ' + this.status + ' ' + this.responseText
+    // document.getElementById('userId').innerText = this.readyState + ' ' + this.status + ' ' + this.responseText
 
     if (this.readyState == 4 && this.status == 200) {
 
       var json = JSON.parse(this.responseText)
 
       login = json['data'][0]['login']
-      document.getElementById('userId').innerText = login
+      // document.getElementById('userId').innerText = login
 
       setStatus('channel name acquired', 'black')
 
@@ -147,3 +147,8 @@ function saveSecret() {
   }
   xhttp.send(JSON.stringify(msg))
 }
+
+$(function() {
+  document.getElementById("btn_generate").onclick = generateRandomSecret
+  document.getElementById("btn_save").onclick = saveSecret
+})

@@ -1,0 +1,19 @@
+.backdrop {
+    background-color: white;
+    padding: 20px;
+}
+
+.console_text {
+    font-family:"Courier New", Courier, monospace;
+    line-height: 1.2;
+}
+
+li {
+    /* margin-top: 10px; */
+    line-height: 1.5;
+}
+
+
+.secret-form {
+    line-height: 1.5;
+}

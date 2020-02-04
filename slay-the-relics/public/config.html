@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Config Page</title>
+    <link rel="stylesheet" href=config_style.css>
 </head>
 <body style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
     <div id="app"></div>
@@ -11,18 +12,48 @@
       to external libraries. -->
     <script src="jquery-3.3.1.min.js" type="text/javascript"></script>
     <script src="config.js" type="text/javascript"></script>
-    <h2>SlayTheRelics Configuration Page</h2>
-    <form>
-      <div>In order to use SlayTheRelics you must generate a secret key that you enter into the SlayTheRelics Exporter mod, 
-        this is used as a security measure that prevents other people from being able to update the data on your stream using the mod.</div>
-      <br>
-      <div>Status: <span id='backend_status'>Waiting for server...</span></div>
-      SlayTheRelics Secret Key <input type="text" name="streamer_secret" id="text_streamer_secret" readonly>
-      <input type="button" value="Generate" onclick="generateRandomSecret()">
-      <br>
-      <input type="button" value="Save Secret" onclick="saveSecret()">
-      <br>
-    </form>
-    <div id="userId"></div>
+    <div class="backdrop">
+      <h2>SlayTheRelics Configuration Page</h2>
+        Here is how to setup this extension:
+        <ul class="list">
+          <li>Go to your Steam Library on the Slay the Spire page</li>
+          <li>Open the Workshop tab</li>
+          <li>Find and install these mods:
+            <ul>
+              <li>ModTheSpire</li>
+              <li>BaseMod</li>
+              <li>SlayTheRelics Exporter</li>
+            </ul>
+          </li>
+          <li>Look at the form below this list and click Generate, to create your secret key</li>
+          <li>Click Save to have your secret saved in this extension associated with your channel</li>
+          <li>Open the Slay the Spire folder on your disk (PathToYourSteamLibrary/steamapps/common/SlayTheSpire)
+            <ul>
+              <li>Sreate a file in this folder named slaytherelics_config.txt (so that it's in the same folder as the SlayTheSpire.exe)</li>
+              <li>
+                Write your login and copy the generated secret in the following format (replace &lt;your_login&gt; and &lt;your_generated_secret&gt; with your credentials):
+                <div class="console_text">
+                  login:&lt;your_login&gt;<br>
+                  secret:&lt;your_generated_secret&gt;
+                </div>
+              </li>
+              <li>Save the file</li>
+            </ul>
+          </li>
+          <li>Open your Steam Library, select Slay the Spire and click play</li>
+          <li>A popup will ask whether to play with mods, select to play with mods</li>
+          <li>A mod launcher window appears, make sure that you have BaseMod and SlayTheRelics Exporter mods selected and hit Play</li>
+          <li>You're good to go! Your game will now be able to send data to this extension.</li>
+        </ul>
+        <br>
+      <form class="secret-form">
+        <div>Status: <span id='backend_status'>Waiting for server...</span></div>
+        SlayTheRelics Secret Key <input type="text" name="streamer_secret" id="text_streamer_secret" readonly>
+        <input type="button" value="Generate" id="btn_generate">
+        <br>
+        <input type="button" value="Save Secret" id="btn_save">
+        <br>
+      </form>
+    </div>
 </body>
 </html>
