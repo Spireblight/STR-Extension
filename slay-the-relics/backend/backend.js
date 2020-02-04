@@ -8,6 +8,8 @@ const cors = require('cors')
 const ext = require('commander')
 const jsonwebtoken = require('jsonwebtoken');
 const request = require('request')
+const logging = require('./logging')
+const logger = logging.logger
 
 ////////////// CONSTANTS
 const PORT = 8080
@@ -70,10 +72,10 @@ streamers.init()
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 app.use(bodyParser.json()); // support json encoded bodies
-
+app.use(logging.request_logger)
+app.use(logging.error_logger)
 
 app.post('/', function (req, res) {
-    console.log('received POST request ' + JSON.stringify(req.body))
 
     const msg_type = req.body.msg_type
     const login = req.body.streamer.login
@@ -81,28 +83,23 @@ app.post('/', function (req, res) {
     const channel_id = req.body.streamer.channel_id
 
     if (msg_type == MSG_TYPE_ADD_STREAMER) {
-        console.log('add streamer ' + login + ' secret ' + secret)
         streamers.addStreamer(login, channel_id, secret)
         streamers.save()
 
         res.status(201).send(RESPONSE_SUCCESS)
     } else if (msg_type == MSG_TYPE_STREAMER_EXISTS) {
-        console.log('streamer exists? ' + login)
         
         if (streamers.isStreamerPresent(login)) {
-            console.log('true')
             res.status(200).send(RESPONSE_TRUE)
         } else {
-            console.log('false')
             res.status(200).send(RESPONSE_FALSE)
         }
     } else if (msg_type == MSG_TYPE_SET_RELICS) {
         const relics = req.body.relics
         const is_relics_multipage = req.body.is_relics_multipage
-        console.log('set relics for ' + login + ': are relics multipage: ' + is_relics_multipage + ', relics: ' + JSON.stringify(relics))
+        logger.info('backend.post.set_relics', {login: login, is_relics_multipage: is_relics_multipage, relics: JSON.stringify(relics)})
 
         if (streamers.isStreamerValid(login, secret)) {
-            console.log('valid streamer secret')
 
             var msg = {
                 'msg_type': MSG_TYPE_SET_RELICS,
@@ -114,15 +111,14 @@ app.post('/', function (req, res) {
 
             res.status(200).send(RESPONSE_SUCCESS)
         } else {
-            console.log('invalid streamer secret ' + secret)
+            logger.warn('backend.post.is_streamer_valid.false', logging.request_info(req))
             res.status(401).send(RESPONSE_INVALID_SECRET)
         }
     } else {
-        console.log('msg_type "' + msg_type + '" not recognized')
+        logger.warn('backend.post.invalid_msg_type.' + msg_type, logging.request_info(req))
+
         res.status(400).send('msg_type "' + msg_type + '" not recognized')
     }
-
-    // res.send(JSON.stringify(streamers))
 })
 
 
@@ -164,7 +160,8 @@ function sendBroadcast(channelId, message) {
     });
   
     // Send the broadcast request to the Twitch API.
-    console.log('sending a broadcast Channel-ID:' + channelId + ' msg: ' + JSON.stringify(message))
+    logger.http('backend.pubsub.broadcast', {channelId: channelId, message: JSON.stringify(message)})
+
     request(
       `https://api.twitch.tv/extensions/message/${channelId}`,
       {
@@ -174,9 +171,9 @@ function sendBroadcast(channelId, message) {
       }
       , (err, res) => {
         if (err) {
-            console.log('sendBroadcast error', channelId, err);
+          logger.warn('backend.pubsub.error', {channelId: channelId, error: err, statusCode: res.statusCode})
         } else {
-            console.log('pubsub response statusCode: ' + res.statusCode)
+          logger.http('backend.pubsub.success')
         }
       });
   }
@@ -202,13 +199,13 @@ function getOption(optionName, environmentName) {
       if (ext[optionName]) {
         return ext[optionName];
       } else if (process.env[environmentName]) {
-        console.log(STRINGS[optionName + 'Env']);
+        logger.info(STRINGS[optionName + 'Env'])
         return process.env[environmentName];
       }
-      console.log(STRINGS[optionName + 'Missing']);
+      logger.info(STRINGS[optionName + 'Missing'])
       process.exit(1);
     })();
-    console.log(`Using "${option}" for ${optionName}`);
+    logger.info('Using "${option}" for ${optionName}')
     return option;
   }
 
@@ -220,3 +217,6 @@ function missingValue(name, variable) {
   const option = name.charAt(0);
   return `Extension ${name} required.\nUse argument "-${option} <${name}>" or environment variable "${variable}".`;
 }
+
+
+throw Error('this is an uncaught exception')

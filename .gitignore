@@ -1,5 +1,8 @@
 slay-the-relics/node_modules/
 slay-the-relics/conf/
 slay-the-relics/tmp/
+slay-the-relics/logs/
+slay-the-relics/data/
+slay-the-relics/backend/streamers.csv
 Slay\ the\ Relics.json
 node_modules

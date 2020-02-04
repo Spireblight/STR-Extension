@@ -1,8 +1,10 @@
 const fs = require('fs');
 const parse = require('csv-parse/lib/sync');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+const logging = require('./logging')
+const logger = logging.logger
 
-const STREAMERS_FILE = 'backend/streamers.csv'
+const STREAMERS_FILE = 'data/streamers.csv'
 
 exports.streamers = {
     list: [],
@@ -14,8 +16,7 @@ exports.streamers = {
             columns: true
         })
         
-        console.log('streamers initialized');
-        console.log(JSON.stringify(this.list))
+        logger.info("streamers.initialized", {streamers: JSON.stringify(this.list)})
     },
 
     save: function() {
@@ -29,6 +30,7 @@ exports.streamers = {
         })
 
         csvWriter.writeRecords(this.list)
+        logger.info("streamers.saved")
     },
 
     isStreamerPresent: function (login) {
@@ -46,6 +48,7 @@ exports.streamers = {
     },
 
     addStreamer: function (login, channel_id, secret) {
+        logger.info("streamers.added", {login: login})
         this.removeStreamer(login)
         this.list.push({
             login: login, 
@@ -69,9 +72,7 @@ exports.streamers = {
     },
 
     isStreamerValid: function (login, secret) {
-        console.log(login + ' ' + secret)
         for (e of this.list) {
-            console.log(e.login + ' ' + e.secret)
             if (e.login == login && e.secret.toString() == secret.toString()) {
                 return true
             }

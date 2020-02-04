@@ -6,17 +6,6 @@ var current_tooltip_id = -1
 
 const MSG_TYPE_SET_RELICS = "set_relics"
 
-// twitch.onContext(function(context) {
-//     // twitch.rig.log(context);
-// });
-
-// twitch.onAuthorized(function(auth) {
-//     // save our credentials
-//     // token = auth.token;
-//     // tuid = auth.userId;
-// });
-
-
 function receiveMessage(msg) {
     var msg = JSON.parse(msg)
 
@@ -39,7 +28,7 @@ const MAX_RIGHT = 99.0 //%
 const TOOLTIP_WIDTH = 315 //px
 
 function setRelics(relics, is_relics_multipage) {
-    console.log('set relics, is multipage: ' + is_relics_multipage + ' relics: ' + JSON.stringify(relics))
+    // console.log('set relics, is multipage: ' + is_relics_multipage + ' relics: ' + JSON.stringify(relics))
 
     current_tooltip_id = Math.min(relics.length, current_tooltip_id)
     last_relics = relics
