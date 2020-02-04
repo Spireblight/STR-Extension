@@ -1,1 +1,1 @@
-npm install express csv-parse csv-writer body-parser cors jsonwebtoken commander request
+npm install --save express csv-parse csv-writer body-parser cors jsonwebtoken commander request winston winston-daily-rotate-file
