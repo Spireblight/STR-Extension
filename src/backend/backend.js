@@ -11,6 +11,7 @@ const request = require('request')
 const logging = require('./logging')
 const logger = logging.logger
 
+
 ////////////// CONSTANTS
 const PORT = 8080
 
@@ -32,7 +33,7 @@ const channelCooldownMs = 1000;             // maximum broadcast rate per channe
 
 
 ext.
-  version(require('package.json').version).
+  version('1.0.0').
   option('-s, --secret <secret>', 'Extension secret').
   option('-c, --client-id <client_id>', 'Extension client ID').
   option('-o, --owner-id <owner_id>', 'Extension owner ID').
