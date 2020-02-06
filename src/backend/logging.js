@@ -1,5 +1,6 @@
 const {transports, format, createLogger} = require('winston')
 require('winston-daily-rotate-file')
+require('process')
 
 const json_format = format.combine(
     format.timestamp('YYYY-MM-DD HH:mm:ss.SSS ZZ'),
@@ -60,11 +61,14 @@ function request_info(req) {
     }
     req.body.streamer
     if (req.body) {
-        fields['body'] = req.body
+        if (!process.env.NODE_ENV || process.env.NODE_ENV != "production") {
+            fields['body'] = req.body
+        }
 
         if (req.body.msg_type) {
             fields['msg_type'] = req.body.msg_type
         }
+        
         if (req.body.streamer) {
             fields['login'] = req.body.streamer.login
         }
