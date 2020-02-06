@@ -2,18 +2,22 @@
 var twitch = window.Twitch.ext;
 var last_relics = []
 var last_is_relics_multipage = "false"
+var last_character = ""
 var current_tooltip_id = -1
 
 const MSG_TYPE_SET_RELICS = "set_relics"
 
-function receiveMessage(msg) {
-    var msg = JSON.parse(msg)
+const CHARACTERS = ["Ironclad", "TheSilent", "Defect", "Watcher"]
 
-    var msg_type = msg.msg_type
+function receiveMessage(broadcast) {
+    var broadcast = JSON.parse(broadcast)
+
+    var msg_type = broadcast.msg_type
+    var msg = broadcast.message
 
     if (msg_type == MSG_TYPE_SET_RELICS) {
-        if (JSON.stringify(last_relics) != JSON.stringify(msg.relics) || last_is_relics_multipage != msg.is_relics_multipage) {
-            setRelics(msg.relics, msg.is_relics_multipage)
+        if (JSON.stringify(last_relics) != JSON.stringify(msg.relics) || last_is_relics_multipage != msg.is_relics_multipage || last_character != msg.character) {
+            setRelics(msg.relics, msg.is_relics_multipage, msg.character)
         }
     } else {
         log('unrecognized msg_type: ' + msg_type)
@@ -27,12 +31,26 @@ const MAX_DISPLAY_ITEMS = 25 //count
 const MAX_RIGHT = 99.0 //%
 const TOOLTIP_WIDTH = 315 //px
 
-function setRelics(relics, is_relics_multipage) {
+
+function sanitizeCharacter(character) {
+    for (const char of CHARACTERS) {
+        if (character == char) {
+            return character
+        }
+    }
+    // in case the character is not recognized, use Ironclad mana symbol
+    return CHARACTERS[0]
+}
+
+
+function setRelics(relics, is_relics_multipage, character) {
     // console.log('set relics, is multipage: ' + is_relics_multipage + ' relics: ' + JSON.stringify(relics))
 
+    character = sanitizeCharacter(character)
     current_tooltip_id = Math.min(relics.length, current_tooltip_id)
     last_relics = relics
     last_is_relics_multipage = is_relics_multipage
+    last_character = character
 
     var items = document.getElementById('items')
     while (items.lastChild) { // clear the items div
@@ -47,10 +65,10 @@ function setRelics(relics, is_relics_multipage) {
         var max_x_tooltip = ((stream_width * MAX_RIGHT) - TOOLTIP_WIDTH) / stream_width
         var x_tooltip = Math.min(x_placeholder, max_x_tooltip)
         
-        createItem(items, x_placeholder, x_tooltip, item.name, item.description, i)
+        createItem(items, x_placeholder, x_tooltip, item.name, item.description, character, i)
     }
 
-    function createItem(parent, x_placeholder, x_tooltip, name, description, id) {
+    function createItem(parent, x_placeholder, x_tooltip, name, description, character, id) {
         var placeholder = document.createElement('div')
         placeholder.className = 'item_placeholder'
         placeholder.style = 'left: ' + x_placeholder + '%'
@@ -61,7 +79,7 @@ function setRelics(relics, is_relics_multipage) {
         tooltip.className = 'tooltip'
         tooltip.id = 'tooltip_' + id
         tooltip.style = 'left: ' + x_tooltip + '%'
-        tooltip.innerHTML = '<div class="tooltip_header">' + name + '</div><div>' + replaceColorCodes(description) + '</div>'
+        tooltip.innerHTML = '<div class="tooltip_header">' + name + '</div><div>' + replaceManaSymbols(replaceColorCodes(description), character) + '</div>'
 
         parent.appendChild(placeholder)
         parent.appendChild(tooltip)
@@ -83,6 +101,21 @@ function setRelics(relics, is_relics_multipage) {
     
                     var text = part.substring(2)
                     parts[i] = '<span class="' + text_class + '">' + text + '</span>'
+                }
+            }
+
+            return parts.join(' ')
+        }
+
+        function replaceManaSymbols(text, character) {
+            var parts = text.split(' ')
+
+            for (let i = 0; i < parts.length; i++) {
+                const part = parts[i];
+                
+                if (part == '[E]') {
+                    var imgPath = "img/orb" + character + ".png"
+                    parts[i] = '<img style="vertical-align:top" src="' + imgPath + '" alt="[E]">'
                 }
             }
 
@@ -148,7 +181,7 @@ $(function() {
     $('#items').on('mousemove', moveTooltip);
 
     // TESTING RELICS
-    var relics = [{"name": "Cracked Core", "description": "At the start of each combat, #yChannel #b1 #yLightning."}, {"name": "Dolly's Mirror", "description": "Upon pickup, obtain an additional copy of a card in your deck."}, {"name": "Smiling Mask", "description": "The Merchant's card removal service now always costs #b50 #yGold."}, {"name": "Orichalcum", "description": "If you end your turn without #yBlock, gain #b6 #yBlock."}, {"name": "Toy Ornithopter", "description": "Whenever you use a potion, heal #b5 HP."}, {"name": "Ink Bottle", "description": "Whenever you play #b10 cards, draw #b1 card."}, {"name": "Omamori", "description": "Negate the next #b2 #rCurses you obtain."}]
+    var relics = [{"name": "Cracked Core", "description": "At the start of each combat, #yChannel #b1 #yLightning."}, {"name": "Dolly's Mirror", "description": "Upon pickup, obtain an additional copy of a card in your deck."}, {"name": "Smiling Mask", "description": "The Merchant's card removal service now always costs #b50 #yGold."}, {"name": "Orichalcum", "description": "If you end your turn without #yBlock, gain #b6 #yBlock."}, {"name": "Coffee Dripper", "description": "Gain [E] at the start of your turn. You can no longer #yRest at Rest Sites."}, {"name": "Toy Ornithopter", "description": "Whenever you use a potion, heal #b5 HP."}, {"name": "Ink Bottle", "description": "Whenever you play #b10 cards, draw #b1 card."}, {"name": "Omamori", "description": "Negate the next #b2 #rCurses you obtain."}]
     setRelics(relics, "false")
 
     console.log('init done!')

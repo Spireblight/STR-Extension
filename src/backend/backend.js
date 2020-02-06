@@ -82,6 +82,7 @@ app.post('/', function (req, res) {
     const login = req.body.streamer.login
     const secret = req.body.streamer.secret
     const channel_id = req.body.streamer.channel_id
+    const message = req.body.message
 
     if (msg_type == MSG_TYPE_ADD_STREAMER) {
         streamers.addStreamer(login, channel_id, secret)
@@ -96,16 +97,13 @@ app.post('/', function (req, res) {
             res.status(200).send(RESPONSE_FALSE)
         }
     } else if (msg_type == MSG_TYPE_SET_RELICS) {
-        const relics = req.body.relics
-        const is_relics_multipage = req.body.is_relics_multipage
-        logger.info('backend.post.set_relics', {login: login, is_relics_multipage: is_relics_multipage, relics: JSON.stringify(relics)})
+        logger.info('backend.post.set_relics', {login: login, message: JSON.stringify(message)})
 
         if (streamers.isStreamerValid(login, secret)) {
 
             var msg = {
-                'msg_type': MSG_TYPE_SET_RELICS,
-                'relics': relics,
-                'is_relics_multipage': is_relics_multipage
+                'msg_type': msg_type,
+                'message': message
             }
 
             sendBroadcast(streamers.getChannelId(login), JSON.stringify(msg))
