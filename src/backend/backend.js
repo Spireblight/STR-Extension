@@ -13,7 +13,7 @@ const logger = logging.logger
 
 
 ////////////// CONSTANTS
-const PORT = 8080
+// const PORT = 8080
 
 const BEARER_PREFIX = 'Bearer ';             // HTTP authorization headers have this prefix
 
@@ -40,6 +40,7 @@ ext.
   option('-p, --cert-private-key-path <private_key_path>').
   option('-u, --cert-public-key-path <public_key_path>').
   option('-a, --cert-ca-paths <ca_key_paths>', "").
+  option('-r, --port <port>', "").
   parse(process.argv);
 
 
@@ -50,13 +51,15 @@ const STRINGS = {
   certPrivateKeyPath: usingValue('cert-private-key-path'),
   certPublicKeyPath: usingValue('cert-public-key-path'),
   certCaPaths: usingValue('cert-ca-paths'),
+  port: usingValue('port'),
   serverStarted: 'Server running at %s',
   secretMissing: missingValue('secret', 'EXT_SECRET'),
   clientIdMissing: missingValue('client ID', 'EXT_CLIENT_ID'),
   ownerIdMissing: missingValue('owner ID', 'EXT_OWNER_ID'),
   certPrivateKeyPathMissing: missingValue('certificate private key path', 'EXT_PRIVATE_KEY_PATH'),
   certPublicKeyPathMissing: missingValue('certificate public key path', 'EXT_PUBLIC_KEY_PATH'),
-  certCaPaths: missingValue('certificate CA paths', 'EXT_CA_PATHS')
+  certCaPathsMissing: missingValue('certificate CA paths', 'EXT_CA_PATHS'),
+  portMissing: missingValue('port', 'PORT')
 };
 
 
@@ -66,6 +69,7 @@ const clientId = getOption('clientId', 'EXT_CLIENT_ID');
 const privateKeyPath = getOption('certPrivateKeyPath', 'EXT_PRIVATE_KEY_PATH');
 const publicKeyPath = getOption('certPublicKeyPath', 'EXT_PUBLIC_KEY_PATH');
 const caPaths = getOption('certCaPaths', 'EXT_CA_PATHS');
+const port = getOption('port', 'PORT');
 
 
 streamers.init()
@@ -140,7 +144,7 @@ https.createServer({
     key: fs.readFileSync(privateKeyPath),
     cert: fs.readFileSync(publicKeyPath),
     ca: getCaPaths(caPaths)
-}, app).listen(PORT)
+}, app).listen(port)
 
 
 function sendBroadcast(channelId, message) {
