@@ -2,8 +2,8 @@ let token, userId, channelId, login;
 
 const twitch = window.Twitch.ext;
 
-// const BACKEND_URL = 'https://localhost:8080'
-const BACKEND_URL = 'https://slaytherelics.xyz:8080'
+const BACKEND_URL = 'https://localhost:8080'
+// const BACKEND_URL = 'https://slaytherelics.xyz:8080'
 
 const MSG_TYPE_SET_RELICS = "set_relics"
 const MSG_TYPE_ADD_STREAMER = "add_streamer"
@@ -42,6 +42,7 @@ twitch.onAuthorized((auth) => {
 function generateRandomSecret() {
   var secret = randomStr(20)
   document.getElementById("text_streamer_secret").setAttribute("value", secret)
+  document.getElementById("config_file").innerHTML = "login:" + login + "<br>secret:" + secret
 }
 
 

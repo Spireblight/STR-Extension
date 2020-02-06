@@ -6,13 +6,17 @@
 .console_text {
     font-family:"Courier New", Courier, monospace;
     line-height: 1.2;
+    background-color: rgb(200, 200, 200);
+    border: 1px solid black;
+    min-width: 100px;
+    padding: 8px;
+    width: 400px;
 }
 
 li {
     /* margin-top: 10px; */
     line-height: 1.5;
 }
-
 
 .secret-form {
     line-height: 1.5;
