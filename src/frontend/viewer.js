@@ -4,12 +4,14 @@ var last_relics = []
 var last_is_relics_multipage = "false"
 var last_character = ""
 var current_tooltip_id = -1
+var last_broadcast_secs = new Date() / 1000
 
 const MSG_TYPE_SET_RELICS = "set_relics"
 
 const CHARACTERS = ["Ironclad", "TheSilent", "Defect", "Watcher"]
 
 function receiveMessage(broadcast) {
+    last_broadcast_secs = new Date() / 1000
     var broadcast = JSON.parse(broadcast)
 
     var msg_type = broadcast.msg_type
@@ -31,6 +33,7 @@ const MAX_DISPLAY_ITEMS = 25 //count
 const MAX_RIGHT = 99.0 //%
 const TOOLTIP_WIDTH = 315 //px
 
+const SECS_NOBROADCAST_REMOVE_CONTENT = 70
 
 function sanitizeCharacter(character) {
     for (const char of CHARACTERS) {
@@ -167,6 +170,16 @@ function log(msg) {
 }
 
 
+// checks for inactivity from Slay the Relics Exporter -> when inactive for long enough, essentially hide the extension
+function checkIfSourceActive() {
+    var seconds = new Date() / 1000;
+
+    if (seconds - last_broadcast_secs > SECS_NOBROADCAST_REMOVE_CONTENT) {
+        setRelics([], false, "")
+    }
+}
+
+
 $(function() {
 
     console.log('hello there!')
@@ -185,4 +198,6 @@ $(function() {
     setRelics(relics, "false")
 
     console.log('init done!')
+
+    window.setInterval(checkIfSourceActive, 5000);
 });
