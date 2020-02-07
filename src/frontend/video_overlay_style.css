@@ -63,3 +63,11 @@ div.tooltip_header {
 .text_red {
     color: rgb(255, 101, 99);
 }
+
+.text_green {
+    color: rgb(127, 255, 0);
+}
+
+.text_other {
+    color: rgb(200, 90, 200);
+}

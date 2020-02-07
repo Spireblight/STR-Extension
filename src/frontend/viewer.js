@@ -100,6 +100,8 @@ function setRelics(relics, is_relics_multipage, character) {
                         case 'y': text_class = 'text_yellow'; break;
                         case 'b': text_class = 'text_blue'; break;
                         case 'r': text_class = 'text_red'; break;
+                        case 'g': text_class = 'text_green'; break;
+                        default:  text_class = 'text_other'; break;
                     }
     
                     var text = part.substring(2)
@@ -194,8 +196,8 @@ $(function() {
     $('#items').on('mousemove', moveTooltip);
 
     // TESTING RELICS
-    var relics = [{"name": "Cracked Core", "description": "At the start of each combat, #yChannel #b1 #yLightning."}, {"name": "Dolly's Mirror", "description": "Upon pickup, obtain an additional copy of a card in your deck."}, {"name": "Smiling Mask", "description": "The Merchant's card removal service now always costs #b50 #yGold."}, {"name": "Orichalcum", "description": "If you end your turn without #yBlock, gain #b6 #yBlock."}, {"name": "Coffee Dripper", "description": "Gain [E] at the start of your turn. You can no longer #yRest at Rest Sites."}, {"name": "Toy Ornithopter", "description": "Whenever you use a potion, heal #b5 HP."}, {"name": "Ink Bottle", "description": "Whenever you play #b10 cards, draw #b1 card."}, {"name": "Omamori", "description": "Negate the next #b2 #rCurses you obtain."}]
-    setRelics(relics, "false")
+    // var relics = [{"name": "Cracked Core", "description": "At the start of each combat, #yChannel #b1 #yLightning."}, {"name": "Dolly's Mirror", "description": "Upon pickup, obtain an additional copy of a card in your deck."}, {"name": "Smiling Mask", "description": "The Merchant's card removal service now always costs #b50 #yGold."}, {"name": "Orichalcum", "description": "If you end your turn without #yBlock, gain #b6 #yBlock."}, {"name": "Coffee Dripper", "description": "Gain [E] at the start of your turn. You can no longer #yRest at Rest Sites."}, {"name": "Toy Ornithopter", "description": "Whenever you use a potion, heal #b5 HP."}, {"name": "Ink Bottle", "description": "Whenever you play #b10 cards, draw #b1 card."}, {"name": "Omamori", "description": "Negate the next #b2 #rCurses you obtain."}]
+    // setRelics(relics, "false")
 
     console.log('init done!')
 
