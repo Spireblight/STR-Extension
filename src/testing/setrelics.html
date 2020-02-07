@@ -14,6 +14,7 @@
                     }
                 }
                 xhttp_ebs.open('post', 'https://slaytherelics.xyz:8080')
+                // xhttp_ebs.open('post', 'https://localhost:8080')
                 xhttp_ebs.setRequestHeader("Content-Type", "application/json")
                 
                 var relics = [
@@ -105,15 +106,23 @@
                         'name': 'Akabeko',
                         'description': 'What a nice little thing'
                     },
+                    {
+                        'name': '"The Bucket"',
+                        'description': 'This is the bucket'
+                    }
                 ]
 
                 var msg = {
                     'msg_type': 'set_relics',
                     'streamer': {
-                        'login': 'terrencemhs',
-                        'secret': 'r8fca2xomlzbioztxmij',
+                        'login': 'lordaddy',
+                        'secret': '4b4gc4eqb6jr9bnplruf',
                     },
-                    'relics': relics
+                    'message': {
+                        relics: relics,
+                        character: "TheSilent",
+                        is_relics_multipage: false
+                    }
                 }
                 xhttp_ebs.send(JSON.stringify(msg))
 
