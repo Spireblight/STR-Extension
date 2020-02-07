@@ -83,7 +83,7 @@ app.use(logging.error_logger)
 app.post('/', function (req, res) {
 
     const msg_type = req.body.msg_type
-    const login = req.body.streamer.login
+    const login = req.body.streamer.login.toLowerCase()
     const secret = req.body.streamer.secret
     const channel_id = req.body.streamer.channel_id
     const message = req.body.message
@@ -101,7 +101,6 @@ app.post('/', function (req, res) {
             res.status(200).send(RESPONSE_FALSE)
         }
     } else if (msg_type == MSG_TYPE_SET_RELICS) {
-        logger.info('backend.post.set_relics', {login: login, message: JSON.stringify(message)})
 
         if (streamers.isStreamerValid(login, secret)) {
 
@@ -110,15 +109,15 @@ app.post('/', function (req, res) {
                 'message': message
             }
 
-            sendBroadcast(streamers.getChannelId(login), JSON.stringify(msg))
+            sendBroadcast(login, streamers.getChannelId(login), JSON.stringify(msg))
 
             res.status(200).send(RESPONSE_SUCCESS)
         } else {
-            logger.warn('backend.post.is_streamer_valid.false', logging.request_info(req))
+            logger.warn('backend.post.is_streamer_valid.false', logging.request_info(req, true))
             res.status(401).send(RESPONSE_INVALID_SECRET)
         }
     } else {
-        logger.warn('backend.post.invalid_msg_type.' + msg_type, logging.request_info(req))
+        logger.warn('backend.post.invalid_msg_type.' + msg_type, logging.request_info(req, true))
 
         res.status(400).send('msg_type "' + msg_type + '" not recognized')
     }
@@ -147,7 +146,7 @@ https.createServer({
 }, app).listen(port)
 
 
-function sendBroadcast(channelId, message) {
+function sendBroadcast(login, channelId, message) {
     // Set the HTTP headers required by the Twitch API.
     const headers = {
       'Client-ID': clientId,
@@ -163,7 +162,7 @@ function sendBroadcast(channelId, message) {
     });
   
     // Send the broadcast request to the Twitch API.
-    logger.http('backend.pubsub.broadcast', {channelId: channelId, message: JSON.stringify(message)})
+    logger.http('backend.pubsub.broadcast', {login: login, channelId: channelId})
 
     request(
       `https://api.twitch.tv/extensions/message/${channelId}`,

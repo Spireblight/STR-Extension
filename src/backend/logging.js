@@ -55,22 +55,27 @@ const logger = createLogger({
 })
 
 
-function request_info(req) {
-    var fields = {
-        IP: req.header('x-forwarded-for') || req.connection.remoteAddress,
-    }
-    req.body.streamer
+function request_info(req, log_body) {
+
+    var fields = {}
+
+    // fields['IP'] = req.header('x-forwarded-for') || req.connection.remoteAddress
+    
     if (req.body) {
-        if (!process.env.NODE_ENV || process.env.NODE_ENV != "production") {
+        if (!process.env.NODE_ENV || process.env.NODE_ENV != "production" || log_body) {
             fields['body'] = req.body
         }
 
         if (req.body.msg_type) {
             fields['msg_type'] = req.body.msg_type
         }
-        
+
         if (req.body.streamer) {
             fields['login'] = req.body.streamer.login
+        }
+
+        if (req.body.meta) {
+            fields['meta'] = req.body.meta
         }
     }
 
@@ -79,7 +84,7 @@ function request_info(req) {
 
 // middleware for logging all requests
 function log_request(req, res, done) {
-    logger.http("backend." + req.method, request_info(req))
+    logger.http("backend." + req.method.toLowerCase(), request_info(req))
     done()
 }
 
