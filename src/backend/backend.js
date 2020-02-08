@@ -218,17 +218,3 @@ https.createServer({
   cert: fs.readFileSync(publicKeyPath),
   ca: getCaPaths(caPaths)
 }, app).listen(port)
-
-
-if (process.env.NODE_ENV == "production") {
-  logger.info("providing static content")
-
-  app_static = express()
-  app_static.use('/legal', express.static('src/static/legal'))
-
-  https.createServer({
-    key: fs.readFileSync(privateKeyPath),
-    cert: fs.readFileSync(publicKeyPath),
-    ca: getCaPaths(caPaths)
-  }, app_static).listen(443)
-}
