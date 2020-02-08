@@ -1,6 +1,6 @@
 const bodyParser = require('body-parser')
 const streamers = require('./streamers').streamers
-const app = require('express')()
+const express = require('express')
 const https = require('https')
 // const winston = require('winston')
 const fs = require('fs')
@@ -10,7 +10,7 @@ const jsonwebtoken = require('jsonwebtoken');
 const request = require('request')
 const logging = require('./logging')
 const logger = logging.logger
-
+const app = express()
 
 ////////////// CONSTANTS
 // const PORT = 8080
@@ -139,13 +139,6 @@ function getCaPaths(caPaths) {
 }
 
 
-https.createServer({
-    key: fs.readFileSync(privateKeyPath),
-    cert: fs.readFileSync(publicKeyPath),
-    ca: getCaPaths(caPaths)
-}, app).listen(port)
-
-
 function sendBroadcast(login, channelId, message) {
     // Set the HTTP headers required by the Twitch API.
     const headers = {
@@ -218,4 +211,24 @@ function usingValue(name) {
 function missingValue(name, variable) {
   const option = name.charAt(0);
   return `Extension ${name} required.\nUse argument "-${option} <${name}>" or environment variable "${variable}".`;
+}
+
+https.createServer({
+  key: fs.readFileSync(privateKeyPath),
+  cert: fs.readFileSync(publicKeyPath),
+  ca: getCaPaths(caPaths)
+}, app).listen(port)
+
+
+if (process.env.NODE_ENV == "production") {
+  logger.info("providing static content")
+
+  app_static = express()
+  app_static.use('/legal', express.static('src/static/legal'))
+
+  https.createServer({
+    key: fs.readFileSync(privateKeyPath),
+    cert: fs.readFileSync(publicKeyPath),
+    ca: getCaPaths(caPaths)
+  }, app_static).listen(443)
 }
