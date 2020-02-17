@@ -17,7 +17,7 @@ const app = express()
 
 const BEARER_PREFIX = 'Bearer ';             // HTTP authorization headers have this prefix
 
-const MSG_TYPE_SET_RELICS = "set_relics"
+const MSG_TYPE_SET_CONTENT = "set_content"
 const MSG_TYPE_ADD_STREAMER = "add_streamer"
 const MSG_TYPE_STREAMER_EXISTS = "streamer_exists"
 
@@ -100,7 +100,7 @@ app.post('/', function (req, res) {
         } else {
             res.status(200).send(RESPONSE_FALSE)
         }
-    } else if (msg_type == MSG_TYPE_SET_RELICS) {
+    } else if (msg_type == MSG_TYPE_SET_CONTENT) {
 
         if (streamers.isStreamerValid(login, secret)) {
 
