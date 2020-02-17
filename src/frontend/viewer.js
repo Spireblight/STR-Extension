@@ -119,7 +119,7 @@ function setRelics(relics, is_relics_multipage, character) {
                 const part = parts[i];
                 
                 if (part == '[E]') {
-                    var imgPath = "img/orb" + character + ".png"
+                    var imgPath = "img/orbs/orb" + character + ".png"
                     parts[i] = '<img style="vertical-align:top" src="' + imgPath + '" alt="[E]">'
                 }
             }
