@@ -6,7 +6,7 @@ div.item_placeholder {
     height: 6.666%;
     box-sizing: border-box;
     /* border: 2px solid #000000; */
-    cursor: url(magGlass2.png) 24 25, auto;
+    cursor: url(img/magGlass2.png) 24 25, auto;
 }
 
 div.tooltip {
