@@ -1,4 +1,8 @@
-div.item_placeholder {
+:root{
+    font-size: 2wv;
+}
+
+div.relic-hitbox {
     position: fixed;
     top: 6.111%;
     left: 1.4%;
@@ -9,65 +13,109 @@ div.item_placeholder {
     cursor: url(img/magGlass2.png) 24 25, auto;
 }
 
-div.tooltip {
-    display: none;
+div.potion-hitbox {
     position: fixed;
-    top: 12.777%;
-    left: 1.4%;
-    width: 315px;
+    top: 2.777%;
+    width: 3.333%;
+    height: 5.926%;
     box-sizing: border-box;
-    /* height: auto; */
+}
+
+div.powers-hitbox {
+    position: fixed;
+}
+
+div.powertip {
+    box-sizing: border-box;
     color: rgb(255, 247, 222);
+    background-color: rgb(34, 42, 43);
+    font-family: "Kreon", serif;
+    font-weight: 400;
+    line-height: 1.17;
     border: 7px solid;
+    border-radius: 15px;
+    -moz-border-radius: 15px;
+    -webkit-border-radius: 15px;
     border-top-color: rgb(83, 105, 110);
     border-left-color: rgb(83, 105, 110);
     border-right-color: rgb(51, 66, 70);
     border-bottom-color: rgb(51, 66, 70);
-    border-radius: 15px;
-    -moz-border-radius: 15px;
-    -webkit-border-radius: 15px;
-    padding: 7px 11px 9px;
-    background-color: rgb(34, 42, 43);
-    font-family: "Kreon", serif;
-    font-weight: 400;
-    /* font-size: 1.406%; */
+    width: 315px;
+    padding: 0px 11px 9px;
     font-size: 22px;
-    line-height: 1.17;
     text-shadow: 3px 3px 0px rgba(0,0,0,0.3);
+    margin-bottom: 6px;
 }
 
-div.tooltip_header {
+div.powertip-header-noimg {
+    margin: 7px 0px 5px;
+}
+
+div.powertip-header-wimg {
+    margin: 2px 0px -1px;
+}
+
+img.powertip-img {
+    vertical-align: -11px;
+    width: 36px;
+    height: 36px;
+}
+
+div.powertip-header {
     color: rgb(239, 200, 81);
-    /* font-family: "Kreon", serif; */
     font-weight: 700;
     -webkit-text-stroke-color: rgb(58, 49, 20);
     text-shadow: 1px 1px 0px rgba(0,0,0,0.3);
-    margin-bottom: 4px;
     letter-spacing: 1px;
-    /* -webkit-text-stroke-width: 0.104%; */
-    /* -webkit-text-stroke-width: 1px; */
 }
 
-.text_white {
+
+div.powertip-strip {
+    display: none;
+    position: fixed;
+    width: 315px;
+}
+
+
+div.powertip-multicol {
+    display: none;
+    position: fixed;
+}
+
+div.powertip-multicol-column {
+    float: left;
+    width: 315px;
+    margin-right: 8px;
+}
+
+.relic-marker {}
+
+.potion-marker {}
+
+.player-powers-marker {}
+
+.monster-powers-marker {}
+
+.text-white {
     color: rgb(255, 247, 222);
 }
 
-.text_yellow {
+.text-yellow {
     color: rgb(239, 200, 81);
 }
 
-.text_blue {
+.text-blue {
     color: rgb(135, 206, 235);
 }
 
-.text_red {
+.text-red {
     color: rgb(255, 101, 99);
 }
 
-.text_green {
+.text-green {
     color: rgb(127, 255, 0);
 }
 
-.text_other {
+.text-other {
     color: rgb(200, 90, 200);
 }
