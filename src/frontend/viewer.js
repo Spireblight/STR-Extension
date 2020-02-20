@@ -25,11 +25,9 @@ function receiveMessage(broadcast) {
             setRelics(msg.relics, msg.power_tips, character)
             setPotions(msg.potions, msg.power_tips, character)
 
-            if (msg.player_powers)
-                setPlayerPowers(msg.player_powers, msg.power_tips, character)
+            setPlayerPowers(msg.player_powers, msg.power_tips, character)
 
-            if (msg.monster_powers)
-                setMonsterPowers(msg.monster_powers, msg.power_tips, character)
+            setMonsterPowers(msg.monster_powers, msg.power_tips, character)
         }
     } else {
         log('unrecognized msg_type: ' + msg_type)
@@ -42,11 +40,11 @@ const RELIC_HITBOX_MULTIPAGE_OFFSET = 1.875 //%
 const MAX_DISPLAY_RELICS = 25 //count
 const POTION_HITBOX_WIDTH = 3.333 // %
 const MAX_RIGHT = 99.0 //%
-const POWERTIP_WIDTH = 315 //px
+const POWERTIP_WIDTH = 16.406 //%
 const MAX_POWERTIP_MULTICOL_HEIGHT = 70.0 //%
 const CHARACTER_POWERS_OFFSET = 1.041 //%
-const POWERTIP_BOTTOM_MARGIN = 7 //px
-const MULTICOL_COLUMN_RIGHT_MARGIN = 9 //px
+const POWERTIP_BOTTOM_MARGIN = 0.365 //%
+const MULTICOL_COLUMN_RIGHT_MARGIN = 0.469 //%
 const MAX_BOTTOM = 99.0 //%
 const MIN_TOP = 1.0 //%
 
@@ -182,7 +180,8 @@ function setPlayerPowers(player_powers, power_tips, character) {
 
     clearItemsByClass('player-powers-marker')
 
-    setCharacterPowers(player_powers, power_tips, 'player-powers-marker', 'player_powers', character)
+    if (player_powers)
+        setCharacterPowers(player_powers, power_tips, 'player-powers-marker', 'player_powers', character)
 }
 
 
@@ -200,11 +199,12 @@ function setMonsterPowers(monster_powers_list, power_tips, character) {
 
     clearItemsByClass('monster-powers-marker')
 
-    for (let i = 0; i < monster_powers_list.length; i++) {
-        const monster_powers = monster_powers_list[i];
+    if (monster_powers_list)
+        for (let i = 0; i < monster_powers_list.length; i++) {
+            const monster_powers = monster_powers_list[i];
 
-        setCharacterPowers(monster_powers, power_tips, 'monster-powers-marker', 'monster_powers_' + i, character)
-    }
+            setCharacterPowers(monster_powers, power_tips, 'monster-powers-marker', 'monster_powers_' + i, character)
+        }
 }
 
 
@@ -252,7 +252,7 @@ function setCharacterPowers(char, power_tips, marker, id, character) {
             var powertip_elem = createPowerTip(powertip.name, powertip.description, powertip.img, character)
             
             temp.appendChild(powertip_elem)
-            height_element = (powertip_elem.offsetHeight + POWERTIP_BOTTOM_MARGIN) / stream_height * 100
+            height_element = powertip_elem.offsetHeight / stream_height * 100 + POWERTIP_BOTTOM_MARGIN
             temp.removeChild(powertip_elem)
 
             console.log('element height: ' + height_element)
@@ -279,7 +279,7 @@ function setCharacterPowers(char, power_tips, marker, id, character) {
 
         // place whole multicol block
         var mc_h = max_height
-        var mc_w = ncolumns * (POWERTIP_WIDTH + MULTICOL_COLUMN_RIGHT_MARGIN) / stream_width * 100
+        var mc_w = ncolumns * (POWERTIP_WIDTH + MULTICOL_COLUMN_RIGHT_MARGIN)
         var mc_right_x = x + w + CHARACTER_POWERS_OFFSET
         var mc_left_x = x - CHARACTER_POWERS_OFFSET * 3 - mc_w
         var mc_x = 0.0
@@ -337,8 +337,8 @@ function createPowerTip(name, description, img, character) {
     tooltip.className = 'powertip'
     var img_html = ""
     var img_class = ""
-    if (img && fileExists('img/powers/' + img + '.png')) {
-        img_html = '<img src="img/powers/' + img + '.png" alt=" " class="powertip-img">'
+    if (img && fileExists('img/' + img + '.png')) {
+        img_html = '<img src="img/' + img + '.png" alt=" " class="powertip-img" onerror="this.src=\'img/placeholder.png\'">'
         img_class = 'powertip-header powertip-header-wimg'
     } else {
         img_class = 'powertip-header powertip-header-noimg'
@@ -361,6 +361,7 @@ function createPowerTip(name, description, img, character) {
                     case 'b': text_class = 'text-blue'; break;
                     case 'r': text_class = 'text-red'; break;
                     case 'g': text_class = 'text-green'; break;
+                    case 'p': text_class = 'text-pink'; break;
                     default:  text_class = 'text-other'; break;
                 }
 
@@ -380,7 +381,7 @@ function createPowerTip(name, description, img, character) {
             
             if (part == '[E]') {
                 var imgPath = "img/orbs/orb" + character + ".png"
-                parts[i] = '<img style="vertical-align:top" src="' + imgPath + '" alt="[E]">'
+                parts[i] = '<img src="' + imgPath + '" alt="[E]" class="energy-orb-img">'
             }
         }
 
@@ -420,10 +421,10 @@ function movePowerTipStrip(e) {
         var left = e.pageX + 52
         var top = e.pageY + 7 // - 15
         var stream_width = $('#items').width()
-        var max_left = ((stream_width * MAX_RIGHT) / 100 - POWERTIP_WIDTH)
+        var max_left = (MAX_RIGHT - POWERTIP_WIDTH) / 100 * stream_width
         
         if (left > max_left) { // display tooltip on the left side of cursor
-            left = e.pageX - 24 - 12 - POWERTIP_WIDTH
+            left = e.pageX - 24 - 12 - POWERTIP_WIDTH / 100 * stream_width
             top = e.pageY + 7 // + 3
         }
 
@@ -480,5 +481,5 @@ $(function() {
     // var relics = [{"name": "Cracked Core", "description": "At the start of each combat, #yChannel #b1 #yLightning."}, {"name": "Dolly's Mirror", "description": "Upon pickup, obtain an additional copy of a card in your deck."}, {"name": "Smiling Mask", "description": "The Merchant's card removal service now always costs #b50 #yGold."}, {"name": "Orichalcum", "description": "If you end your turn without #yBlock, gain #b6 #yBlock."}, {"name": "Coffee Dripper", "description": "Gain [E] at the start of your turn. You can no longer #yRest at Rest Sites."}, {"name": "Toy Ornithopter", "description": "Whenever you use a potion, heal #b5 HP."}, {"name": "Ink Bottle", "description": "Whenever you play #b10 cards, draw #b1 card."}, {"name": "Omamori", "description": "Negate the next #b2 #rCurses you obtain."}]
     // setRelics(relics, "false")
 
-    // window.setInterval(checkIfSourceActive, 5000);
+    window.setInterval(checkIfSourceActive, 5000);
 });
