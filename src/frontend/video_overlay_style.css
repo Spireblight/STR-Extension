@@ -15,9 +15,9 @@ div.relic-hitbox {
 
 div.potion-hitbox {
     position: fixed;
-    top: 2.777%;
-    width: 3.333%;
-    height: 5.926%;
+    top: 0%;
+    width: 2.916%;
+    height: 5.556%;
     box-sizing: border-box;
 }
 

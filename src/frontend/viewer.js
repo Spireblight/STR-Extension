@@ -38,7 +38,7 @@ const RELIC_HITBOX_WIDTH = 3.75 //%
 const RELIC_HITBOX_LEFT = 1.458 //%
 const RELIC_HITBOX_MULTIPAGE_OFFSET = 1.875 //%
 const MAX_DISPLAY_RELICS = 25 //count
-const POTION_HITBOX_WIDTH = 3.333 // %
+const POTION_HITBOX_WIDTH = 2.916 // %
 const MAX_RIGHT = 99.0 //%
 const POWERTIP_WIDTH = 16.406 //%
 const MAX_POWERTIP_MULTICOL_HEIGHT = 70.0 //%
@@ -148,7 +148,7 @@ function setPotions(potions, power_tips, character) {
 
         const power_tip_indexes = potions.items[i];
         
-        var x_hitbox = x_hitbox_first + i * POTION_HITBOX_WIDTH
+        var x_hitbox = x_hitbox_first - POTION_HITBOX_WIDTH / 2 + i * POTION_HITBOX_WIDTH
 
         items.appendChild(createPotionHitbox('potion_' + i, x_hitbox))
         items.appendChild(createPowerTipStrip('potion_' + i, arraySubset(power_tips, power_tip_indexes), character, 'potion-marker'))
