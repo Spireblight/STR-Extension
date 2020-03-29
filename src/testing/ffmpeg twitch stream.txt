@@ -8,6 +8,34 @@ ffmpeg -re \
 -f flv \
 rtmp://live-lhr03.twitch.tv/app/STREAMKEY
 
+ffmpeg -re -f lavfi -i smptebars=size=640x320:rate=15 -f flv -vcodec libx264 -pix_fmt yuv420p -preset fast -r 15 -g 30 rtmp://live-fra.twitch.tv/app/live_32044102_URhJcW5uklHvLSADmrjk3Ey0WKeZfK
+
+
 - lhr03 is a london server
 
 For my test usage I only stream at 15fps, and just do a black.png, no audio
+
+PKG_CONFIG_PATH="$HOME/ffmpeg_build/lib/pkgconfig" ./configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin" --enable-static
+make
+make install
+
+
+
+cd ~/ffmpeg_sources
+curl -O -L https://ffmpeg.org/releases/ffmpeg-3.3.4.tar.bz2
+tar xjvf ffmpeg-3.3.4.tar.bz2
+cd ffmpeg-3.3.4
+PATH="$HOME/bin:$PATH" PKG_CONFIG_PATH="$HOME/ffmpeg_build/lib/pkgconfig" ./configure \
+  --prefix="$HOME/ffmpeg_build" \
+  --pkg-config-flags="--static" \
+  --extra-cflags="-I$HOME/ffmpeg_build/include" \
+  --extra-ldflags="-L$HOME/ffmpeg_build/lib" \
+  --extra-libs=-lpthread \
+  --extra-libs=-lm \
+  --bindir="$HOME/bin" \
+  --enable-gpl \
+  --enable-libx264 \
+  --enable-nonfree
+make
+make install
+hash -d ffmpeg
