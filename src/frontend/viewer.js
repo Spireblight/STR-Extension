@@ -18,7 +18,8 @@ const MSG_TYPE_SET_CONTENT = "set_content"
 const CHARACTERS = ["Ironclad", "TheSilent", "Defect", "Watcher"]
 
 function receiveMessage(broadcast) {
-    last_broadcast_secs = new Date() / 1000
+    // console.log(broadcast)
+
     var broadcast = JSON.parse(broadcast)
 
     var msg_type = broadcast.msg_type
@@ -28,7 +29,7 @@ function receiveMessage(broadcast) {
         if (last_broadcast !=  broadcast) {
             var character = sanitizeCharacter(msg.character)
 
-            setRelics(msg.relics, msg.power_tips, character)
+            setRelics(msg.relics, msg.power_tips, character)        
             setPotions(msg.potions, msg.power_tips, character)
             setPlayerPowers(msg.player_powers, msg.power_tips, character)
             setMonsterPowers(msg.monster_powers, msg.power_tips, character)
@@ -55,7 +56,7 @@ const MULTICOL_COLUMN_RIGHT_MARGIN = 0.469 //% - don't mess with this number or 
 const MAX_BOTTOM = 98.0 //%
 const MIN_TOP = 2.0 //%
 
-const SECS_NOBROADCAST_REMOVE_CONTENT = 70
+const SECS_NOBROADCAST_REMOVE_CONTENT = 5
 
 function sanitizeCharacter(character) {
     for (const char of CHARACTERS) {
@@ -529,7 +530,28 @@ function checkIfSourceActive() {
     var seconds = new Date() / 1000;
 
     if (seconds - last_broadcast_secs > SECS_NOBROADCAST_REMOVE_CONTENT) {
-        setRelics({is_relics_multipage: false, items: []}, [], "")
+        msg = {
+            msg_type: MSG_TYPE_SET_CONTENT,
+            message: {
+                character: "", 
+                relics: {
+                    is_relics_multipage: "false",
+                    items: []
+                },
+                potions: {
+                    potion_x: 0, 
+                    items: []
+                },
+                player_powers: {
+                    hitbox: {},
+                    power_tips: [],
+                },
+                monster_powers: [],
+                custom_tips: [],
+                power_tips: []
+            }
+        }
+        receiveMessage(JSON.stringify(msg))
     }
 }
 
@@ -538,16 +560,13 @@ $(function() {
 
     // listen for incoming broadcast message from our EBS
     twitch.listen('broadcast', function (target, contentType, message) {
-        // console.log('received a broadcast message: ' + message)
+        decomp_message = LZString.decompressFromUTF16(message);
 
-        receiveMessage(message);
+        last_broadcast_secs = new Date() / 1000
+        receiveMessage(decomp_message);
     });
 
     $('#items').on('mousemove', movePowerTipStrip);
 
-    // TESTING RELICS
-    // var relics = [{"name": "Cracked Core", "description": "At the start of each combat, #yChannel #b1 #yLightning."}, {"name": "Dolly's Mirror", "description": "Upon pickup, obtain an additional copy of a card in your deck."}, {"name": "Smiling Mask", "description": "The Merchant's card removal service now always costs #b50 #yGold."}, {"name": "Orichalcum", "description": "If you end your turn without #yBlock, gain #b6 #yBlock."}, {"name": "Coffee Dripper", "description": "Gain [E] at the start of your turn. You can no longer #yRest at Rest Sites."}, {"name": "Toy Ornithopter", "description": "Whenever you use a potion, heal #b5 HP."}, {"name": "Ink Bottle", "description": "Whenever you play #b10 cards, draw #b1 card."}, {"name": "Omamori", "description": "Negate the next #b2 #rCurses you obtain."}]
-    // setRelics(relics, "false")
-
-    window.setInterval(checkIfSourceActive, 5000);
+    window.setInterval(checkIfSourceActive, 2500);
 });
