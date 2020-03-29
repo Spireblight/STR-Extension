@@ -9,6 +9,7 @@ const ext = require('commander')
 const jsonwebtoken = require('jsonwebtoken');
 const request = require('request')
 const logging = require('./logging')
+const lzstring = require('lz-string')
 const logger = logging.logger
 const app = express()
 
@@ -109,7 +110,7 @@ app.post('/', function (req, res) {
                 'message': message
             }
 
-            sendBroadcast(login, streamers.getChannelId(login), JSON.stringify(msg))
+            sendBroadcast(login, streamers.getChannelId(login), lzstring.compressToUTF16(JSON.stringify(msg)))
 
             res.status(200).send(RESPONSE_SUCCESS)
         } else {
@@ -149,7 +150,7 @@ function sendBroadcast(login, channelId, message) {
   
     // Create the POST body for the Twitch API request.
     const body = JSON.stringify({
-      content_type: 'application/json',
+      content_type: 'text/plain',
       message: message,
       targets: ['broadcast'],
     });
