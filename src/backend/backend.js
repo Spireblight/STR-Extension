@@ -88,6 +88,7 @@ app.post('/', function (req, res) {
     const secret = req.body.streamer.secret
     const channel_id = req.body.streamer.channel_id
     const message = req.body.message
+    const delay = req.body.d
 
     if (msg_type == MSG_TYPE_ADD_STREAMER) {
         streamers.addStreamer(login, channel_id, secret)
@@ -106,11 +107,18 @@ app.post('/', function (req, res) {
         if (streamers.isStreamerValid(login, secret)) {
 
             var msg = {
+                'd': delay,
                 'msg_type': msg_type,
                 'message': message
             }
-
-            sendBroadcast(login, streamers.getChannelId(login), lzstring.compressToUTF16(JSON.stringify(msg)))
+            
+            var msg_uncompressed = JSON.stringify(msg);
+            var msg_compressed_uri = lzstring.compressToEncodedURIComponent(msg_uncompressed)
+            
+            logger.info("msg " + msg_uncompressed.length + " " + Buffer.byteLength(msg_uncompressed, 'utf8') / 1024 + "kb")
+            logger.info("compressed " + msg_compressed_uri.length + " " + Buffer.byteLength(msg_compressed_uri, 'utf8') / 1024 + "kb")
+            
+            sendBroadcast(login, streamers.getChannelId(login), msg_compressed_uri)
 
             res.status(200).send(RESPONSE_SUCCESS)
         } else {
@@ -150,11 +158,18 @@ function sendBroadcast(login, channelId, message) {
   
     // Create the POST body for the Twitch API request.
     const body = JSON.stringify({
-      content_type: 'text/plain',
+      content_type: 'application/json',
       message: message,
       targets: ['broadcast'],
     });
-  
+    
+    body_size = Buffer.byteLength(body, 'utf8') / 1024
+    logger.info("pubsub msg " + body.length + " " + body_size + "kb")
+
+    if (body_size > 5.0) {
+      logger.warn('pubsub message exceeds 5kb', {login: login, channelId: channelId, body: body})
+    }
+
     // Send the broadcast request to the Twitch API.
     logger.http('backend.pubsub.broadcast', {login: login, channelId: channelId})
 
@@ -167,7 +182,7 @@ function sendBroadcast(login, channelId, message) {
       }
       , (err, res) => {
         if (err) {
-          logger.warn('backend.pubsub.error', {channelId: channelId, error: err, statusCode: res.statusCode})
+          logger.warn('backend.pubsub.error', {channelId: channelId, error: err})
         } else {
           logger.http('backend.pubsub.success')
         }
