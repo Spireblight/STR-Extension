@@ -12,6 +12,7 @@ var last_custom_tips_list = ""
 var last_custom_tips_list_tips = ""
 var current_tooltip_id = ""
 var last_broadcast_secs = new Date() / 1000
+var latency = 0.0
 
 const MSG_TYPE_SET_CONTENT = "set_content"
 
@@ -20,7 +21,7 @@ const CHARACTERS = ["Ironclad", "TheSilent", "Defect", "Watcher"]
 function receiveMessage(broadcast) {
     // console.log(broadcast)
 
-    var broadcast = JSON.parse(broadcast)
+    // var broadcast = JSON.parse(broadcast)
 
     var msg_type = broadcast.msg_type
     var msg = broadcast.message
@@ -81,7 +82,7 @@ function arraySubset(array, indexes) {
 
 
 function clearItemsByClass(class_to_be_cleared) {
-    // console.log('before clear items')
+    // console.log('clear items in class ' + class_to_be_cleared)
 
     var items = document.getElementById('items')
     for (let i = items.children.length - 1; i >= 0; i--) {
@@ -138,14 +139,16 @@ function setRelics(relics, power_tips, character) {
 function setPotions(potions, power_tips, character) {
     // console.log('set potions, potions: ' + JSON.stringify(potions))
 
-    var ids = []
-    for (const power_tips of potions.items) {
-        ids = ids.concat(power_tips)
-    }
-    power_tips_subset = arraySubset(power_tips, ids);
+    if (potions) {
+        var ids = []
+        for (const power_tips of potions.items) {
+            ids = ids.concat(power_tips)
+        }
+        power_tips_subset = arraySubset(power_tips, ids);
 
-    if (JSON.stringify(potions) == last_potions && JSON.stringify(power_tips_subset) == last_potion_tips) {
-        return
+        if (JSON.stringify(potions) == last_potions && JSON.stringify(power_tips_subset) == last_potion_tips) {
+            return
+        }
     }
 
     if (current_tooltip_id && current_tooltip_id.startsWith('potion'))
@@ -185,10 +188,13 @@ function setPotions(potions, power_tips, character) {
 function setPlayerPowers(player_powers, power_tips, character) {
 
     // console.log('set player powers, player_powers: ' + JSON.stringify(player_powers))
-    power_tips_subset = arraySubset(power_tips, player_powers.power_tips);
 
-    if (JSON.stringify(player_powers) == last_player_powers && JSON.stringify(power_tips_subset) == last_player_power_tips)
-        return
+    if (player_powers) {
+        power_tips_subset = arraySubset(power_tips, player_powers.power_tips);
+
+        if (JSON.stringify(player_powers) == last_player_powers && JSON.stringify(power_tips_subset) == last_player_power_tips)
+            return
+    }
 
     if (current_tooltip_id && current_tooltip_id.startsWith('player_powers'))
         current_tooltip_id = undefined
@@ -199,7 +205,7 @@ function setPlayerPowers(player_powers, power_tips, character) {
     clearItemsByClass('player-powers-marker')
 
     if (player_powers)
-        setMulticolPowertips(player_powers, power_tips, 'player-powers-marker', 'player_powers', character, true)
+        setMulticolPowertips(player_powers, power_tips, 'player-powers-marker', 'player_powers', character, 1, true)
 }
 
 
@@ -207,14 +213,17 @@ function setMonsterPowers(monster_powers_list, power_tips, character) {
 
     // console.log('set monster powers, monster_powers_list: ' + JSON.stringify(monster_powers_list))
 
-    var ids = []
-    for (const monster of monster_powers_list) {
-        ids = ids.concat(monster.power_tips)
-    }
-    power_tips_subset = arraySubset(power_tips, ids);
-
-    if (JSON.stringify(monster_powers_list) == last_monster_powers_list && JSON.stringify(power_tips_subset) == last_monster_powers_list_tips)
-        return
+    if (monster_powers_list) {
+        
+        var ids = []
+        for (const monster of monster_powers_list) {
+            ids = ids.concat(monster.power_tips)
+        }
+        power_tips_subset = arraySubset(power_tips, ids);
+        
+        if (JSON.stringify(monster_powers_list) == last_monster_powers_list && JSON.stringify(power_tips_subset) == last_monster_powers_list_tips)
+            return
+    } 
 
     if (current_tooltip_id && current_tooltip_id.startsWith('monster_powers'))
         current_tooltip_id = undefined
@@ -228,7 +237,7 @@ function setMonsterPowers(monster_powers_list, power_tips, character) {
         for (let i = 0; i < monster_powers_list.length; i++) {
             const monster_powers = monster_powers_list[i];
 
-            setMulticolPowertips(monster_powers, power_tips, 'monster-powers-marker', 'monster_powers_' + i, character, true)
+            setMulticolPowertips(monster_powers, power_tips, 'monster-powers-marker', 'monster_powers_' + i, character, 0, true)
         }
 }
 
@@ -237,14 +246,16 @@ function setCustomTips(custom_tips_list, power_tips, character) {
 
     // console.log('set custom tips, custom_tips_list: ' + JSON.stringify(custom_tips_list))
 
-    var ids = []
-    for (const tip of custom_tips_list) {
-        ids = ids.concat(tip.power_tips)
-    }
-    power_tips_subset = arraySubset(power_tips, ids);
+    if (custom_tips_list) {
+        var ids = []
+        for (const tip of custom_tips_list) {
+            ids = ids.concat(tip.power_tips)
+        }
+        power_tips_subset = arraySubset(power_tips, ids);
 
-    if (JSON.stringify(custom_tips_list) == last_custom_tips_list && JSON.stringify(power_tips_subset) == last_custom_tips_list_tips)
-        return
+        if (JSON.stringify(custom_tips_list) == last_custom_tips_list && JSON.stringify(power_tips_subset) == last_custom_tips_list_tips)
+            return
+    }
 
     if (current_tooltip_id && current_tooltip_id.startsWith('custom_tips'))
         current_tooltip_id = undefined
@@ -258,12 +269,12 @@ function setCustomTips(custom_tips_list, power_tips, character) {
         for (let i = 0; i < custom_tips_list.length; i++) {
             const custom_tips = custom_tips_list[i];
 
-            setMulticolPowertips(custom_tips, power_tips, 'custom-tips-marker', 'custom_tips_' + i, character)
+            setMulticolPowertips(custom_tips, power_tips, 'custom-tips-marker', 'custom_tips_' + i, character, 2)
         }
 }
 
 
-function setMulticolPowertips(obj, power_tips, marker, id, character, heuristic_y) {
+function setMulticolPowertips(obj, power_tips, marker, id, character, hitbox_z, heuristic_y) {
 
     var items = document.getElementById('items')
 
@@ -274,7 +285,7 @@ function setMulticolPowertips(obj, power_tips, marker, id, character, heuristic_
     function createHitbox(id, x, y, w, h) {
         var hitbox = document.createElement('div')
         hitbox.className = 'powers-hitbox ' + marker
-        hitbox.style = 'left: ' + x + '%; top: ' + y + '%; width: ' + w + '%; height: ' + h + '%;'
+        hitbox.style = 'left: ' + x + '%; top: ' + y + '%; width: ' + w + '%; height: ' + h + '%; z-index: ' + hitbox_z + ';'
         hitbox.onmouseenter = function(e) {showPowerTipMulticol(e, id)}
         hitbox.onmouseout = function(e) {hidePowerTipMulticol(e, id)}
     
@@ -551,19 +562,33 @@ function checkIfSourceActive() {
                 power_tips: []
             }
         }
-        receiveMessage(JSON.stringify(msg))
+        receiveMessage(msg)
     }
 }
 
 
 $(function() {
 
+    window.Twitch.ext.onContext((ctx) => {
+        console.log('The delay is', ctx.hlsLatencyBroadcaster);
+        console.log(JSON.stringify(ctx));
+        if (ctx.hlsLatencyBroadcaster)
+            latency = ctx.hlsLatencyBroadcaster;
+    });
+
     // listen for incoming broadcast message from our EBS
     twitch.listen('broadcast', function (target, contentType, message) {
-        decomp_message = LZString.decompressFromUTF16(message);
+        console.log("received message")
+        decomp_message = LZString.decompressFromEncodedURIComponent(message);
+        
+        var broadcast = JSON.parse(decomp_message)
+        var msg_delay = Math.ceil(broadcast.d + latency * 1000.0)
+
+        console.log('queuing message with delay: ' + msg_delay + 'ms');
+        window.setTimeout(function () {receiveMessage(broadcast)}, Math.max(0, msg_delay))
 
         last_broadcast_secs = new Date() / 1000
-        receiveMessage(decomp_message);
+        // console.log(decomp_message)
     });
 
     $('#items').on('mousemove', movePowerTipStrip);
