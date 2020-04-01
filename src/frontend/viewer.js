@@ -14,27 +14,27 @@ var current_tooltip_id = ""
 var last_broadcast_secs = new Date() / 1000
 var latency = 0.0
 
-const MSG_TYPE_SET_CONTENT = "set_content"
+const MSG_TYPE_SET_CONTENT = 1 // "set_content"
 
 const CHARACTERS = ["Ironclad", "TheSilent", "Defect", "Watcher"]
 
 function receiveMessage(broadcast) {
-    // console.log(broadcast)
+    // console.log(JSON.stringify(broadcast))
 
-    // var broadcast = JSON.parse(broadcast)
-
-    var msg_type = broadcast.msg_type
-    var msg = broadcast.message
+    var msg_type = broadcast[1]
+    var msg = broadcast[2]
 
     if (msg_type == MSG_TYPE_SET_CONTENT) {
         if (last_broadcast !=  broadcast) {
-            var character = sanitizeCharacter(msg.character)
+            var character = sanitizeCharacter(msg.c)
 
-            setRelics(msg.relics, msg.power_tips, character)        
-            setPotions(msg.potions, msg.power_tips, character)
-            setPlayerPowers(msg.player_powers, msg.power_tips, character)
-            setMonsterPowers(msg.monster_powers, msg.power_tips, character)
-            setCustomTips(msg.custom_tips, msg.power_tips, character)
+            var power_tips = decompressPowerTips(msg.w)
+
+            setRelics(msg.r, power_tips, character)        
+            setPotions(msg.o, power_tips, character)
+            setPlayerPowers(msg.p, power_tips, character)
+            setMonsterPowers(msg.m, power_tips, character)
+            setCustomTips(msg.u, power_tips, character)
         }
     } else {
         log('unrecognized msg_type: ' + msg_type)
@@ -66,7 +66,7 @@ function sanitizeCharacter(character) {
         }
     }
     // in case the character is not recognized, use Ironclad mana symbol
-    return CHARACTERS[0]
+    return CHARACTERS[2]
 }
 
 
@@ -78,6 +78,20 @@ function arraySubset(array, indexes) {
     }
 
     return subset
+}
+
+function arraySlice(array, from, to) {
+    var slice = []
+
+    if (!to) {
+        to = array.length
+    }
+
+    for (let i = from; i < to; i++) {
+        slice.push(array[i])
+    }
+
+    return slice
 }
 
 
@@ -98,13 +112,28 @@ function clearItemsByClass(class_to_be_cleared) {
 }
 
 
+function decompressPowerTips(power_tips) {
+    power_tips = decompress(power_tips)
+
+    new_tips = []
+    split = power_tips.split(';;')
+
+    for (let i = 0; i < split.length; i++) {
+        const tip = split[i];
+        new_tips.push(tip.split(';'))
+    }
+
+    return new_tips
+}
+
+
 function setRelics(relics, power_tips, character) {
     // console.log('set relics, relics: ' + JSON.stringify(relics))
 
     if (JSON.stringify(relics)  == last_relics) // do not replace 
         return
 
-    is_relics_multipage = relics.is_relics_multipage
+    is_relics_multipage = relics[0]
     last_relics = JSON.stringify(relics)
 
     if (current_tooltip_id && current_tooltip_id.startsWith('relic'))
@@ -113,12 +142,12 @@ function setRelics(relics, power_tips, character) {
     clearItemsByClass('relic-marker')
 
     var items = document.getElementById('items')
-    for (let i = 0; i < relics.items.length; i++) {
+    for (let i = 0; i < relics[1].length; i++) {
         // console.log('adding relic ' + i)
 
-        const power_tip_indexes = relics.items[i];
+        const power_tip_indexes = relics[1][i];
         
-        var x_hitbox = RELIC_HITBOX_LEFT + i * RELIC_HITBOX_WIDTH + (is_relics_multipage == "true" ? 1 : 0) * RELIC_HITBOX_MULTIPAGE_OFFSET
+        var x_hitbox = RELIC_HITBOX_LEFT + i * RELIC_HITBOX_WIDTH + is_relics_multipage * RELIC_HITBOX_MULTIPAGE_OFFSET
 
         items.appendChild(createRelicHitbox('relic_' + i, x_hitbox))
         items.appendChild(createPowerTipStrip('relic_' + i, arraySubset(power_tips, power_tip_indexes), character, 'relic-marker'))
@@ -141,8 +170,8 @@ function setPotions(potions, power_tips, character) {
 
     if (potions) {
         var ids = []
-        for (const power_tips of potions.items) {
-            ids = ids.concat(power_tips)
+        for (let i = 1; i < potions[1].length; i++) {
+            ids = ids.concat(potions[1][i])
         }
         power_tips_subset = arraySubset(power_tips, ids);
 
@@ -159,13 +188,14 @@ function setPotions(potions, power_tips, character) {
 
     clearItemsByClass('potion-marker')
 
-    var x_hitbox_first = (potions.potion_x / 1920.0) * 100
+    var x_hitbox_first = (potions[0] / 1920.0) * 100
 
     var items = document.getElementById('items')
-    for (let i = 0; i < potions.items.length; i++) {
+    
+    for (let i = 0; i < potions[1].length; i++) {
         // console.log('adding potion ' + i)
 
-        const power_tip_indexes = potions.items[i];
+        const power_tip_indexes = potions[1][i];
         
         var x_hitbox = x_hitbox_first - POTION_HITBOX_WIDTH / 2 + i * POTION_HITBOX_WIDTH
 
@@ -190,7 +220,8 @@ function setPlayerPowers(player_powers, power_tips, character) {
     // console.log('set player powers, player_powers: ' + JSON.stringify(player_powers))
 
     if (player_powers) {
-        power_tips_subset = arraySubset(power_tips, player_powers.power_tips);
+
+        power_tips_subset = arraySubset(power_tips, player_powers[4]);
 
         if (JSON.stringify(player_powers) == last_player_powers && JSON.stringify(power_tips_subset) == last_player_power_tips)
             return
@@ -217,7 +248,7 @@ function setMonsterPowers(monster_powers_list, power_tips, character) {
         
         var ids = []
         for (const monster of monster_powers_list) {
-            ids = ids.concat(monster.power_tips)
+            ids = ids.concat(monster[4])
         }
         power_tips_subset = arraySubset(power_tips, ids);
         
@@ -249,7 +280,7 @@ function setCustomTips(custom_tips_list, power_tips, character) {
     if (custom_tips_list) {
         var ids = []
         for (const tip of custom_tips_list) {
-            ids = ids.concat(tip.power_tips)
+            ids = ids.concat(custom_tips_list[4])
         }
         power_tips_subset = arraySubset(power_tips, ids);
 
@@ -278,9 +309,16 @@ function setMulticolPowertips(obj, power_tips, marker, id, character, hitbox_z, 
 
     var items = document.getElementById('items')
 
-    var hitbox = obj.hitbox
+    var hitbox = {
+        x: obj[0],
+        y: obj[1],
+        w: obj[2],
+        h: obj[3]
+    }
+    var obj_power_tips = obj[4]
+
     items.appendChild(createHitbox(id, hitbox.x, hitbox.y, hitbox.w, hitbox.h))
-    items.appendChild(createPowertipMulticol(id, hitbox.x, hitbox.y, hitbox.w, hitbox.h, arraySubset(power_tips, obj.power_tips), character, marker))
+    items.appendChild(createPowertipMulticol(id, hitbox.x, hitbox.y, hitbox.w, hitbox.h, arraySubset(power_tips, obj_power_tips), character, marker))
 
     function createHitbox(id, x, y, w, h) {
         var hitbox = document.createElement('div')
@@ -314,9 +352,13 @@ function setMulticolPowertips(obj, power_tips, marker, id, character, hitbox_z, 
         var max_height = 0.0
         var power_tip_heights = []
         for (let i = 0; i < power_tips.length; i++) {
-            const powertip = power_tips[i];
+            const power_tip = power_tips[i];
             
-            var powertip_elem = createPowerTip(powertip.name, powertip.description, powertip.img, character)
+            name = power_tip[0]
+            description = power_tip[1]
+            img = (power_tip.length == 3) ? power_tip[2]:undefined
+
+            var powertip_elem = createPowerTip(name, description, img, character)
             
             temp.appendChild(powertip_elem)
             height_element = powertip_elem.offsetHeight / stream_height * 100 + POWERTIP_BOTTOM_MARGIN
@@ -404,7 +446,11 @@ function createPowerTipStrip(id, power_tips, character, marker) {
     strip.id = id
 
     for (power_tip of power_tips) {
-        strip.appendChild(createPowerTip(power_tip.name, power_tip.description, power_tip.img, character))
+        name = power_tip[0]
+        description = power_tip[1]
+        img = (power_tip.length == 3) ? power_tip[2]:undefined
+
+        strip.appendChild(createPowerTip(name, description, img, character))
     }
 
     return strip
@@ -424,7 +470,8 @@ function createPowerTip(name, description, img, character) {
         img_class = 'powertip-header powertip-header-noimg'
     }
 
-    tooltip.innerHTML = '<div class="' + img_class + '">' + name + img_html + '</div><div>' + replaceManaSymbols(replaceColorCodes(description), character) + '</div>'
+    description = replaceNewLines(replaceManaSymbols(replaceColorCodes(description), character))
+    tooltip.innerHTML = '<div class="' + img_class + '">' + name + img_html + '</div><div>' + description + '</div>'
     return tooltip
 
     function replaceColorCodes(text) {
@@ -466,6 +513,32 @@ function createPowerTip(name, description, img, character) {
         }
 
         return parts.join(' ')
+    }
+
+    function replaceNewLines(text) {
+        parts = text.split(' ')
+        new_text = ''
+        previous_special = true
+
+        for (let i = 0; i < parts.length; i++) {
+            const word = parts[i];
+
+            if (word == 'NL') {
+                new_text += '<br>'
+                previous_special = true
+            } else if (word == 'TAB') {
+                new_text += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+                previous_special = true
+            } else {
+                if (!previous_special)
+                    new_text += ' '
+                new_text += word
+                previous_special = false
+            }
+            
+        }
+
+        return new_text
     }
 }
 
@@ -536,56 +609,87 @@ function log(msg) {
 }
 
 
+const WILDCARDS = '0123456789abcdefghijklmnopqrstvwxyzABCDEFGHIJKLMNOPQRSTVWXYZ_`[]/^%?@><=-+*:;,.()#$!\'{}~'
+
+function escapeRegex(str) {
+    return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
+function decompress(msg) {
+
+    parts = msg.split('||')
+
+    compression_dict = parts[0].split('|')
+    var text = parts[1]
+
+    for (let i = compression_dict.length-1; i >= 0; i--) {
+        const word = compression_dict[i];
+        const wildcard = '&' + WILDCARDS[i];
+        
+        text = text.replace(new RegExp(escapeRegex(wildcard), 'g'), word)
+    }
+
+    return text
+}
+
+
+
 // checks for inactivity from Slay the Relics Exporter -> when inactive for long enough, essentially hide the extension
 function checkIfSourceActive() {
     var seconds = new Date() / 1000;
 
     if (seconds - last_broadcast_secs > SECS_NOBROADCAST_REMOVE_CONTENT) {
-        msg = {
-            msg_type: MSG_TYPE_SET_CONTENT,
-            message: {
-                character: "", 
-                relics: {
-                    is_relics_multipage: "false",
-                    items: []
-                },
-                potions: {
-                    potion_x: 0, 
-                    items: []
-                },
-                player_powers: {
-                    hitbox: {},
-                    power_tips: [],
-                },
-                monster_powers: [],
-                custom_tips: [],
-                power_tips: []
+        msg = [
+            0, // delay
+            1, // message type
+            {  // message
+                c: "", 
+                r: [0, []],
+                o: [0, []],
+                w: "||",
             }
-        }
+        ]
         receiveMessage(msg)
     }
+}
+
+
+function testingMessage() {
+    msg = [
+        0, // delay
+        1, // message type
+        {  // message
+            c: "", 
+            r: [0, []],
+            o: [0, []],
+            u: [[20.0, 20.0, 20.0, 20.0, [0]]],
+            w: "||This is a Tip;#yHey there how  are you? NL NL NL TAB this is a tab test NL TAB TAB double NL TAB a TAB a",
+        }
+    ]
+    receiveMessage(msg)
 }
 
 
 $(function() {
 
     window.Twitch.ext.onContext((ctx) => {
-        console.log('The delay is', ctx.hlsLatencyBroadcaster);
-        console.log(JSON.stringify(ctx));
+        // console.log('The delay is', ctx.hlsLatencyBroadcaster);
+        // console.log(JSON.stringify(ctx));
         if (ctx.hlsLatencyBroadcaster)
             latency = ctx.hlsLatencyBroadcaster;
     });
 
     // listen for incoming broadcast message from our EBS
     twitch.listen('broadcast', function (target, contentType, message) {
-        console.log("received message")
+        // console.log("received message")
         decomp_message = LZString.decompressFromEncodedURIComponent(message);
         
         var broadcast = JSON.parse(decomp_message)
-        var msg_delay = Math.ceil(broadcast.d + latency * 1000.0)
+        var msg_delay = Math.ceil(broadcast[0] + latency * 1000.0)
 
-        console.log('queuing message with delay: ' + msg_delay + 'ms');
+        // console.log('queuing message with delay: ' + msg_delay + 'ms');
         window.setTimeout(function () {receiveMessage(broadcast)}, Math.max(0, msg_delay))
+        // testingMessage()
 
         last_broadcast_secs = new Date() / 1000
         // console.log(decomp_message)
