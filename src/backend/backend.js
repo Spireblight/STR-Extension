@@ -18,9 +18,9 @@ const app = express()
 
 const BEARER_PREFIX = 'Bearer ';             // HTTP authorization headers have this prefix
 
-const MSG_TYPE_SET_CONTENT = "set_content"
-const MSG_TYPE_ADD_STREAMER = "add_streamer"
-const MSG_TYPE_STREAMER_EXISTS = "streamer_exists"
+const MSG_TYPE_SET_CONTENT = 1 // "set_content"
+const MSG_TYPE_ADD_STREAMER = 2 // "add_streamer"
+const MSG_TYPE_STREAMER_EXISTS = 3 // "streamer_exists"
 
 const RESPONSE_SUCCESS = "Success"
 const RESPONSE_TRUE = "true"
@@ -106,11 +106,7 @@ app.post('/', function (req, res) {
 
         if (streamers.isStreamerValid(login, secret)) {
 
-            var msg = {
-                'd': delay,
-                'msg_type': msg_type,
-                'message': message
-            }
+            var msg = [delay, msg_type, message]
             
             var msg_uncompressed = JSON.stringify(msg);
             var msg_compressed_uri = lzstring.compressToEncodedURIComponent(msg_uncompressed)
