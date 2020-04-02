@@ -40,6 +40,30 @@
           <li>Open your Steam Library, select Slay the Spire and click play</li>
           <li>A popup will ask whether to play with mods, select to play with mods</li>
           <li>A mod launcher window appears, make sure that you have BaseMod and SlayTheRelics Exporter mods selected and hit Play</li>
+          <li>The extension now should be active and working. You will however most likely have issues with the extension being faster than the stream (out-of-sync).
+            You can fix this once you start streaming with your viewers giving you feedback as follows:
+            <ul>
+              <li>Click Mods in the menu</li>
+              <li>Select Slay The Relics Exporter</li>
+              <li>Click Config in the bottom left</li>
+              <li>Set a delay and press Save. To find the optimal value, try starting at 5 seconds and ask your 
+                viewers for feedback on whether the extension runs before or after the video. Here is a quick way to dial in your delay:
+                <ul>
+                  <li>Go to Mods->BaseMod->Config, check the "Enable dev console"</li>
+                  <li>Start the game, either a new run or continue a previous run</li>
+                  <li>Get into a monster room</li>
+                  <li>Press ~ (character next to 1 on US keyboard layout) to open the dev console (to hide it press again)</li>
+                  <li>Ask your viewers to move their mouse to the area where the next relic would be added</li>
+                  <li>Type in <pre>relic add Akabeko</pre></li>
+                  <li>Press Enter and ask your viewers about the delay between the extension and the stream video</li>
+                  <li>Save&Exit to adjust delay</li>
+                  <li>Resume game and type in <pre>relic remove Akabeko</pre></li>
+                  <li>Rinse and repeat until most people are happy. You should be able to dial it in within about 0.5 second range for everyone.</li>
+                  <li>If you adjust the settings of your streaming software and your encoding latency changes, this will obviously needs to be readjusted accordingly</li>
+                </ul>
+              </li>
+            </ul>
+          </li>
           <li>That's it, you're good to go! Your game will now automatically send data to this extension as long as you're playing with the mod.</li>
         </ul>
         <br>
@@ -51,10 +75,25 @@
         <input type="button" value="Save Secret" id="btn_save">
         <br>
       </form>
-      <h3>Additional Things to Note</h3>
+      <h3>READ THIS PLEASE, BEFORE YOU BEGIN USING THE EXTENSION</h3>
       <ul>
-        <li>In order for the extension to be aligned properly with the game, the game capture should match the stream size exactly.
-          Otherwise the tooltip display areas will be misaligned</li>
+        <li>In order for the extension to be properly visually aligned with the game, the game capture has to perfectly fill the whole stream (as if you had the game fullscreen)</li>
+        <li>It is highly unlikely, but possible that the extension might appear to stop working when it's trying to display too much information. 
+          There is a hard limit on the size of the messages that can be sent to a Twitch extension. 
+          This limit should be hit in very rare cases, playing with base game characters this should never happen.
+          If it does, please let me know at adam@slaytherelics.xyz.
+        </li>
+        <li><b>If you stumble upon any bugs</b>, be it with the mod or with the extension itself, <b>please contact me at adam@slaytherelics.xyz</b>.
+          I have tested A LOT but it's impossible to test everything.
+        </li>
+        <li>If you stream Slay the Spire regularly and if you'll enjoy using this extension please consider this, I have spent couple hundreds hours creating 
+          this, I will spend plenty more maintaining it and updating it, I have rented a domain and a server and every year I will have to pay for those.
+          If you find that this extension brings value to your stream, please consider supporting me and the server through a one-time or a recurring donation to 
+          <a href="paypal.me/AdamSlayTheRelics">paypal.me/AdamSlayTheRelics</a>.
+          Now it's completely free as I trust that if something brings value to people, they are willing to appreciate it. Please keep this in mind as you start using 
+          this extension. Thank you.
+        </li>
+        <li>That's it! I truly hope that you and your viewers enjoy this new addition to your stream!</li>
       </ul>
     </div>
 </body>

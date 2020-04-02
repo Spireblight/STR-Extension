@@ -5,9 +5,9 @@ const twitch = window.Twitch.ext;
 // const BACKEND_URL = 'https://localhost:8081'
 const BACKEND_URL = 'https://slaytherelics.xyz:8081'
 
-const MSG_TYPE_SET_RELICS = "set_relics"
-const MSG_TYPE_ADD_STREAMER = "add_streamer"
-const MSG_TYPE_STREAMER_EXISTS = "streamer_exists"
+const MSG_TYPE_SET_RELICS = 1
+const MSG_TYPE_ADD_STREAMER = 2
+const MSG_TYPE_STREAMER_EXISTS = 3
 
 const RESPONSE_SUCCESS = "Success"
 const RESPONSE_TRUE = "true"

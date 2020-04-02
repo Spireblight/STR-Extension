@@ -33,9 +33,9 @@ div.powertip {
     font-weight: 400;
     line-height: 1.17;
     border: 0.324rem solid;
-    border-radius: 0.694rem;
-    -moz-border-radius: 0.694rem;
-    -webkit-border-radius: 0.694rem;
+    border-radius: 0.63rem;/*0.694rem;*/
+    -moz-border-radius: 0.63rem;
+    -webkit-border-radius: 0.63rem;
     border-top-color: rgb(83, 105, 110);
     border-left-color: rgb(83, 105, 110);
     border-right-color: rgb(51, 66, 70);

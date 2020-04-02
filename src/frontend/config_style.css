@@ -21,3 +21,11 @@ li {
 .secret-form {
     line-height: 1.5;
 }
+
+a {
+    color: black;
+}
+
+a:hover {
+    color: rgb(0, 200, 255);
+}
