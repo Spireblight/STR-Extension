@@ -19,7 +19,7 @@ const MSG_TYPE_SET_CONTENT = 1 // "set_content"
 const CHARACTERS = ["Ironclad", "TheSilent", "Defect", "Watcher"]
 
 function receiveMessage(broadcast) {
-    console.log(JSON.stringify(broadcast))
+    // console.log(JSON.stringify(broadcast))
 
     var msg_type = broadcast[1]
     var msg = broadcast[2]
