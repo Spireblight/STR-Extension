@@ -19,7 +19,7 @@ const MSG_TYPE_SET_CONTENT = 1 // "set_content"
 const CHARACTERS = ["Ironclad", "TheSilent", "Defect", "Watcher"]
 
 function receiveMessage(broadcast) {
-    // console.log(JSON.stringify(broadcast))
+    console.log(JSON.stringify(broadcast))
 
     var msg_type = broadcast[1]
     var msg = broadcast[2]
@@ -280,7 +280,7 @@ function setCustomTips(custom_tips_list, power_tips, character) {
     if (custom_tips_list) {
         var ids = []
         for (const tip of custom_tips_list) {
-            ids = ids.concat(custom_tips_list[4])
+            ids = ids.concat(tip[4])
         }
         power_tips_subset = arraySubset(power_tips, ids);
 
