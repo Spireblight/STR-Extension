@@ -458,7 +458,10 @@ function createPowerTipStrip(id, power_tips, character, marker) {
 
 
 function createPowerTip(name, description, img, character) {
-    
+    name = sanitize(name)
+    description = sanitize(description)
+    img = sanitize(img)
+
     var tooltip = document.createElement('div')
     tooltip.className = 'powertip'
     var img_html = ""
@@ -540,6 +543,14 @@ function createPowerTip(name, description, img, character) {
 
         return new_text
     }
+}
+
+
+function sanitize(text) {
+    if (text)
+        return text.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    else
+        return text
 }
 
 
