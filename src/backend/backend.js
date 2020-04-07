@@ -111,8 +111,8 @@ app.post('/', function (req, res) {
             var msg_uncompressed = JSON.stringify(msg);
             var msg_compressed_uri = lzstring.compressToEncodedURIComponent(msg_uncompressed)
             
-            logger.info("msg " + msg_uncompressed.length + " " + Buffer.byteLength(msg_uncompressed, 'utf8') / 1024 + "kb")
-            logger.info("compressed " + msg_compressed_uri.length + " " + Buffer.byteLength(msg_compressed_uri, 'utf8') / 1024 + "kb")
+            // logger.info("msg " + msg_uncompressed.length + " " + Buffer.byteLength(msg_uncompressed, 'utf8') / 1024 + "kb")
+            // logger.info("compressed " + msg_compressed_uri.length + " " + Buffer.byteLength(msg_compressed_uri, 'utf8') / 1024 + "kb")
             
             sendBroadcast(login, streamers.getChannelId(login), msg_compressed_uri)
 
@@ -160,10 +160,10 @@ function sendBroadcast(login, channelId, message) {
     });
     
     body_size = Buffer.byteLength(body, 'utf8') / 1024
-    logger.info("pubsub msg " + body.length + " " + body_size + "kb")
+    // logger.info("pubsub msg " + body.length + " " + body_size + "kb")
 
     if (body_size > 5.0) {
-      logger.warn('pubsub message exceeds 5kb', {login: login, channelId: channelId, body: body})
+      logger.warn('backend.pubsub.broadcast pubsub message exceeds 5kb', {login: login, channelId: channelId, body: body})
     }
 
     // Send the broadcast request to the Twitch API.
