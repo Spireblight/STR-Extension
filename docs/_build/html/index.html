@@ -1,0 +1,325 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Welcome to Slay the Relics’s documentation! &mdash; Slay the Relics v1.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="_static/jquery.fancybox.min.css" type="text/css" />
+  
+    <link rel="stylesheet" href="_static/glpi.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Slay the Relics v1.1.0 documentation" href="#"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="#" class="icon icon-home"> Slay the Relics
+          
+
+          
+          </a>
+
+          
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Welcome to Slay the Relics’s documentation!</a></li>
+<li><a class="reference internal" href="#custom-tooltips-api-for-mods">Custom tooltips API for mods</a><ul>
+<li><a class="reference internal" href="#how-to-display-your-custom-tooltips-on-twitch">How to display your custom tooltips on Twitch</a></li>
+<li><a class="reference internal" href="#example-code">Example code</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">Slay the Relics</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#">Docs</a> &raquo;</li>
+        
+      <li>Welcome to Slay the Relics’s documentation!</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="welcome-to-slay-the-relics-s-documentation">
+<h1>Welcome to Slay the Relics’s documentation!<a class="headerlink" href="#welcome-to-slay-the-relics-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Slay the Relics is a twitch extension that displays information from the game on stream. It immitates the UI from the game itself.</p>
+<p>Twitch extension:
+<a class="reference external" href="https://dashboard.twitch.tv/extensions/7dgfio8rek8dhju8628riism3fd11p-1.1.0">https://dashboard.twitch.tv/extensions/7dgfio8rek8dhju8628riism3fd11p-1.1.0</a></p>
+<p>Acompanying mod:
+<a class="reference external" href="https://steamcommunity.com/sharedfiles/filedetails/?id=1989770578">https://steamcommunity.com/sharedfiles/filedetails/?id=1989770578</a></p>
+</div>
+<div class="section" id="custom-tooltips-api-for-mods">
+<h1>Custom tooltips API for mods<a class="headerlink" href="#custom-tooltips-api-for-mods" title="Permalink to this headline">¶</a></h1>
+<p>The extension supports content mods by default, it supports modded relics, potions, powers and orbs. However, some mods are using completely custom tooltips. For example Jorbs’s Wanderer uses tooltips on memories and snap counter which is custom or The Poker Player uses custom tooltips to display information about the suite functions and hand combination values.</p>
+<p>For this reason an API was implemented into the mod, that allows you, modders, display your own power tips on stream for these special custom cases (relics, potions, powers/buffs/debuffs and orbs are covered by default by the extension, even ones from mods).</p>
+<div class="section" id="how-to-display-your-custom-tooltips-on-twitch">
+<h2>How to display your custom tooltips on Twitch<a class="headerlink" href="#how-to-display-your-custom-tooltips-on-twitch" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>In your mod you provide the tips you want to display in a form of pairs of <code class="docutils literal notranslate"><span class="pre">Hitbox</span></code> and <code class="docutils literal notranslate"><span class="pre">ArrayList&lt;PowerTip&gt;</span></code> objects. the <code class="docutils literal notranslate"><span class="pre">ArrayList&lt;PowerTip&gt;</span></code> is the description you want to display (1 or more) and <code class="docutils literal notranslate"><span class="pre">Hitbox</span></code> describes the area on the screen which will trigger displaying of the descriptions on mouse enter.</p></li>
+<li><p>These tooltips will be displayed only in combat rooms during combat</p></li>
+<li><p>The API is used as follows:</p>
+<blockquote>
+<div><ul>
+<li><p>in any class that is annotated by <code class="docutils literal notranslate"><span class="pre">&#64;SpireInitializer</span></code> declare these 2 fields (naming is the key):</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">static</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Hitbox</span><span class="o">&gt;</span> <span class="n">slayTheRelicsHitboxes</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">PowerTip</span><span class="o">&gt;&gt;</span> <span class="n">slayTheRelicsPowerTips</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+</pre></div>
+</div>
+</li>
+<li><p>you can thus define multiple hitboxes with different power tips, same indexes in those two arrays correspond to each other</p></li>
+<li><p>SlayTheRelicsExporter (mod associated with the Twitch extension) will check those arrays approximately every 100 ms in <code class="docutils literal notranslate"><span class="pre">receivePostRender()</span></code> and send their values over to Twitch</p></li>
+<li><p>Assuming you already have a Hitbox and a PowerTip objects that are used in game, all you have to do
+is put those objects into those ArrayLists every time you update them in your mod. You can probably
+use your existing objects directly for those arrays.</p></li>
+<li><p>In PowerTip.body standard special characters are supported: <code class="docutils literal notranslate"><span class="pre">#y,</span> <span class="pre">#b,</span> <span class="pre">#g,</span> <span class="pre">#r,</span> <span class="pre">#p,</span> <span class="pre">NL,</span> <span class="pre">[E]</span></code></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>note that any single uppercase character in square brackets will be replaced by <code class="docutils literal notranslate"><span class="pre">[E]</span></code>, it’s sanitized as follows: <code class="docutils literal notranslate"><span class="pre">str</span> <span class="pre">=</span> <span class="pre">str.replaceAll(&quot;\\[[A-Z]\\]&quot;,</span> <span class="pre">&quot;[E]&quot;)</span></code></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>These two arrays obviously have to have the same length, otherwise they will be ignored</p></li>
+<li><p>SlayTheRelicsExporter (mod associated with the Twitch extension) in <code class="docutils literal notranslate"><span class="pre">receivePostInitialize()</span></code>
+iterates over all loaded mod classes that are annotated by <code class="docutils literal notranslate"><span class="pre">&#64;SpireInitializer</span></code>. Thus you can declare the two arrays in multiple classes.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<div class="admonition danger">
+<p class="admonition-title">Danger</p>
+<p><strong>It is absolutely vital</strong> that in every object that includes them, at least one of your arrays <code class="docutils literal notranslate"><span class="pre">slayTheRelicsHitboxes</span></code>, <code class="docutils literal notranslate"><span class="pre">slayTheRelicsPowerTips</span></code> is <strong>emptied</strong> when other characters are being played. If you fail to do so, your custom tips will be displayed even when the streamer is playing a completely different character. This would ruin the experience for everyone. Please, before releasing make absolutely sure that this is the case. Thank you.</p>
+</div>
+</div>
+<div class="section" id="example-code">
+<h2>Example code<a class="headerlink" href="#example-code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">yourmod.twitch</span><span class="p">;</span>
+
+<span class="kn">import</span> <span class="nn">basemod.BaseMod</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">basemod.interfaces.PreRenderSubscriber</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">com.evacipated.cardcrawl.modthespire.lib.SpireInitializer</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">com.megacrit.cardcrawl.helpers.Hitbox</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">com.megacrit.cardcrawl.helpers.PowerTip</span><span class="p">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.ArrayList</span><span class="p">;</span>
+
+<span class="nd">@SpireInitializer</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SlayTheRelicsIntegration</span> <span class="p">{</span>
+
+   <span class="c1">// =============== API for SlayTheRelics for displaying tooltips on Twitch =================</span>
+   <span class="c1">//</span>
+   <span class="c1">//</span>
+   <span class="c1">// These two properties are read by another mod that sends their contents over to a Twitch extension called</span>
+   <span class="c1">// SlayTheRelics and they are displayed alongside other tooltips on stream</span>
+   <span class="kd">public</span> <span class="kd">static</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Hitbox</span><span class="o">&gt;</span> <span class="n">slayTheRelicsHitboxes</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+   <span class="kd">public</span> <span class="kd">static</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">PowerTip</span><span class="o">&gt;&gt;</span> <span class="n">slayTheRelicsPowerTips</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+
+   <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">initialize</span><span class="p">()</span> <span class="p">{</span>
+      <span class="n">BaseMod</span><span class="p">.</span><span class="na">subscribe</span><span class="p">((</span><span class="n">PreRenderSubscriber</span><span class="p">)</span> <span class="p">(</span><span class="n">orthographicCamera</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">clear</span><span class="p">());</span>
+   <span class="p">}</span>
+
+   <span class="kd">private</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">clear</span><span class="p">()</span> <span class="p">{</span>
+      <span class="n">slayTheRelicsHitboxes</span><span class="p">.</span><span class="na">clear</span><span class="p">();</span>
+      <span class="n">slayTheRelicsPowerTips</span><span class="p">.</span><span class="na">clear</span><span class="p">();</span>
+   <span class="p">}</span>
+
+   <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">renderTipHitbox</span><span class="p">(</span><span class="n">Hitbox</span> <span class="n">hb</span><span class="p">,</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">PowerTip</span><span class="o">&gt;</span> <span class="n">tips</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">slayTheRelicsHitboxes</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">hb</span><span class="p">);</span>
+      <span class="n">slayTheRelicsPowerTips</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">tips</span><span class="p">);</span>
+   <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Adam Volný.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'v1.1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/language_data.js"></script>
+      <script type="text/javascript" src="_static/jquery.fancybox.min.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+  
+  <script type="text/javascript">
+    $(function(){
+      $('.image-reference').fancybox();
+    })
+  </script>
+
+</body>
+</html>
