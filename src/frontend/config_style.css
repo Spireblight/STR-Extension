@@ -14,7 +14,7 @@
 }
 
 li {
-    /* margin-top: 10px; */
+    margin-top: 3px;
     line-height: 1.5;
 }
 
@@ -23,9 +23,11 @@ li {
 }
 
 a {
-    color: black;
+    color: blue;
+    font-weight: bold;
+    font-size: 18px;
 }
 
 a:hover {
-    color: rgb(0, 200, 255);
+    color: rgb(0, 150, 200);
 }
