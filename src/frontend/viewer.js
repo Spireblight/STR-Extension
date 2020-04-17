@@ -687,7 +687,7 @@ const PRELOAD_IMAGES = ['img/intents/attackBuff.png', 'img/intents/attackDebuff.
 
 
 function preloadImages(array) {
-    console.log('preloading images')
+    // console.log('preloading images')
     if (!preloadImages.list) {
         preloadImages.list = [];
     }
