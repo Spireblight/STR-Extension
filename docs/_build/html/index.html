@@ -163,7 +163,7 @@
 <h1>Welcome to Slay the Relics’s documentation!<a class="headerlink" href="#welcome-to-slay-the-relics-s-documentation" title="Permalink to this headline">¶</a></h1>
 <p>Slay the Relics is a twitch extension that displays information from the game on stream. It immitates the UI from the game itself.</p>
 <p>Twitch extension:
-<a class="reference external" href="https://dashboard.twitch.tv/extensions/7dgfio8rek8dhju8628riism3fd11p-1.1.0">https://dashboard.twitch.tv/extensions/7dgfio8rek8dhju8628riism3fd11p-1.1.0</a></p>
+<a class="reference external" href="https://dashboard.twitch.tv/extensions/7dgfio8rek8dhju8628riism3fd11p">https://dashboard.twitch.tv/extensions/7dgfio8rek8dhju8628riism3fd11p</a></p>
 <p>Acompanying mod:
 <a class="reference external" href="https://steamcommunity.com/sharedfiles/filedetails/?id=1989770578">https://steamcommunity.com/sharedfiles/filedetails/?id=1989770578</a></p>
 </div>
@@ -187,10 +187,10 @@
 </li>
 <li><p>you can thus define multiple hitboxes with different power tips, same indexes in those two arrays correspond to each other</p></li>
 <li><p>SlayTheRelicsExporter (mod associated with the Twitch extension) will check those arrays approximately every 100 ms in <code class="docutils literal notranslate"><span class="pre">receivePostRender()</span></code> and send their values over to Twitch</p></li>
-<li><p>Assuming you already have a Hitbox and a PowerTip objects that are used in game, all you have to do
+<li><p>Assuming you already have <code class="docutils literal notranslate"><span class="pre">Hitbox</span></code> and <code class="docutils literal notranslate"><span class="pre">PowerTip</span></code> objects that are used in game, all you have to do
 is put those objects into those ArrayLists every time you update them in your mod. You can probably
 use your existing objects directly for those arrays.</p></li>
-<li><p>In PowerTip.body standard special characters are supported: <code class="docutils literal notranslate"><span class="pre">#y,</span> <span class="pre">#b,</span> <span class="pre">#g,</span> <span class="pre">#r,</span> <span class="pre">#p,</span> <span class="pre">NL,</span> <span class="pre">[E]</span></code></p>
+<li><p>In <code class="docutils literal notranslate"><span class="pre">PowerTip.body</span></code> standard special characters are supported: <code class="docutils literal notranslate"><span class="pre">#y,</span> <span class="pre">#b,</span> <span class="pre">#g,</span> <span class="pre">#r,</span> <span class="pre">#p,</span> <span class="pre">NL,</span> <span class="pre">[E]</span></code></p>
 <blockquote>
 <div><ul class="simple">
 <li><p>note that any single uppercase character in square brackets will be replaced by <code class="docutils literal notranslate"><span class="pre">[E]</span></code>, it’s sanitized as follows: <code class="docutils literal notranslate"><span class="pre">str</span> <span class="pre">=</span> <span class="pre">str.replaceAll(&quot;\\[[A-Z]\\]&quot;,</span> <span class="pre">&quot;[E]&quot;)</span></code></p></li>
@@ -206,7 +206,7 @@ iterates over all loaded mod classes that are annotated by <code class="docutils
 </ul>
 <div class="admonition danger">
 <p class="admonition-title">Danger</p>
-<p><strong>It is absolutely vital</strong> that in every object that includes them, at least one of your arrays <code class="docutils literal notranslate"><span class="pre">slayTheRelicsHitboxes</span></code>, <code class="docutils literal notranslate"><span class="pre">slayTheRelicsPowerTips</span></code> is <strong>emptied</strong> when other characters are being played. If you fail to do so, your custom tips will be displayed even when the streamer is playing a completely different character. This would ruin the experience for everyone. Please, before releasing make absolutely sure that this is the case. Thank you.</p>
+<p><strong>It is absolutely vital</strong> that in every object that includes them, at least one of your arrays <code class="docutils literal notranslate"><span class="pre">slayTheRelicsHitboxes</span></code>, <code class="docutils literal notranslate"><span class="pre">slayTheRelicsPowerTips</span></code> is <strong>emptied</strong> when other characters are being played. If you fail to do so, your custom tips will be displayed even when the streamer is playing a completely different character. This would ruin the experience for everyone. Please, before releasing make absolutely sure that this is the case. Thank you. (In the example below, this is taken care of, you can see that in <code class="docutils literal notranslate"><span class="pre">initialize()</span></code> a <code class="docutils literal notranslate"><span class="pre">PreRenderSubscriber</span></code> is assigned to empty those arrays before every render cycle, so I encourage you to use it)</p>
 </div>
 </div>
 <div class="section" id="example-code">
@@ -241,6 +241,7 @@ iterates over all loaded mod classes that are annotated by <code class="docutils
       <span class="n">slayTheRelicsPowerTips</span><span class="p">.</span><span class="na">clear</span><span class="p">();</span>
    <span class="p">}</span>
 
+   <span class="c1">// Call this in your render methods to show custom tooltips on stream</span>
    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">renderTipHitbox</span><span class="p">(</span><span class="n">Hitbox</span> <span class="n">hb</span><span class="p">,</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">PowerTip</span><span class="o">&gt;</span> <span class="n">tips</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">slayTheRelicsHitboxes</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">hb</span><span class="p">);</span>
       <span class="n">slayTheRelicsPowerTips</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">tips</span><span class="p">);</span>

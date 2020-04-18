@@ -5,7 +5,7 @@ Welcome to Slay the Relics's documentation!
 Slay the Relics is a twitch extension that displays information from the game on stream. It immitates the UI from the game itself.
 
 Twitch extension: 
-https://dashboard.twitch.tv/extensions/7dgfio8rek8dhju8628riism3fd11p-1.1.0
+https://dashboard.twitch.tv/extensions/7dgfio8rek8dhju8628riism3fd11p
 
 Acompanying mod: 
 https://steamcommunity.com/sharedfiles/filedetails/?id=1989770578
@@ -36,11 +36,11 @@ How to display your custom tooltips on Twitch
    
    * SlayTheRelicsExporter (mod associated with the Twitch extension) will check those arrays approximately every 100 ms in ``receivePostRender()`` and send their values over to Twitch
     
-   * Assuming you already have a Hitbox and a PowerTip objects that are used in game, all you have to do
+   * Assuming you already have ``Hitbox`` and ``PowerTip`` objects that are used in game, all you have to do
      is put those objects into those ArrayLists every time you update them in your mod. You can probably
      use your existing objects directly for those arrays.
      
-   * In PowerTip.body standard special characters are supported: ``#y, #b, #g, #r, #p, NL, [E]``
+   * In ``PowerTip.body`` standard special characters are supported: ``#y, #b, #g, #r, #p, NL, [E]``
 
       * note that any single uppercase character in square brackets will be replaced by ``[E]``, it's sanitized as follows: ``str = str.replaceAll("\\[[A-Z]\\]", "[E]")``
         
@@ -49,7 +49,7 @@ How to display your custom tooltips on Twitch
    * SlayTheRelicsExporter (mod associated with the Twitch extension) in ``receivePostInitialize()``
      iterates over all loaded mod classes that are annotated by ``@SpireInitializer``. Thus you can declare the two arrays in multiple classes.
 
-.. danger:: **It is absolutely vital** that in every object that includes them, at least one of your arrays ``slayTheRelicsHitboxes``, ``slayTheRelicsPowerTips`` is **emptied** when other characters are being played. If you fail to do so, your custom tips will be displayed even when the streamer is playing a completely different character. This would ruin the experience for everyone. Please, before releasing make absolutely sure that this is the case. Thank you.
+.. danger:: **It is absolutely vital** that in every object that includes them, at least one of your arrays ``slayTheRelicsHitboxes``, ``slayTheRelicsPowerTips`` is **emptied** when other characters are being played. If you fail to do so, your custom tips will be displayed even when the streamer is playing a completely different character. This would ruin the experience for everyone. Please, before releasing make absolutely sure that this is the case. Thank you. (In the example below, this is taken care of, you can see that in ``initialize()`` a ``PreRenderSubscriber`` is assigned to empty those arrays before every render cycle, so I encourage you to use it)
 
 Example code
 ------------------------------------------------------------
@@ -86,6 +86,7 @@ Example code
          slayTheRelicsPowerTips.clear();
       }
 
+      // Call this in your render methods to show custom tooltips on stream
       public static void renderTipHitbox(Hitbox hb, ArrayList<PowerTip> tips) {
          slayTheRelicsHitboxes.add(hb);
          slayTheRelicsPowerTips.add(tips);
