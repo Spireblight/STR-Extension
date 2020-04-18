@@ -729,6 +729,81 @@ function preloadNextImageBunch() {
 }
 
 
+current_message_parts = []
+current_update_id = null
+
+function receiveBroadcast(message) {
+    console.log('receive broadcast: ' + message)
+    message = JSON.parse(message)
+
+    let part_index = message[0]
+    let nparts = message[1]
+    let update_id = message[2] // this is common to all parts and identifies them together
+    let content = message[3]
+
+    // console.log('message: ' + message)
+
+    console.log('parts len ' + current_message_parts.length + ' part index ' + part_index)
+    console.log(typeof(nparts))
+    console.log(typeof(content))
+
+    if (current_message_parts.length == 0) {
+        if (part_index == 0) {
+            console.log('first message part')
+            pushContent(update_id, content, nparts)
+        }
+    } else {
+        if (update_id == current_update_id) {
+            // following up previous update
+            if (part_index == current_message_parts.length) {
+                console.log('message follows previous update')
+                pushContent(update_id, content, nparts)
+            }
+        } else {
+            // received message with unexpected UID, pubsub update probably lost, so forget previous message and start receiveing this one
+            if (part_index == 0) {
+                console.log('unexpected message first message with new id, dropping old message')
+                current_message_parts = []
+                pushContent(update_id, content, nparts)
+            }
+        }
+    }
+}
+
+
+function pushContent(update_id, content, nparts) {
+    console.log('push content')
+
+    current_update_id = update_id
+    current_message_parts.push(content)
+
+    console.log('nparts ' + nparts + ' curr len ' + current_message_parts.length)
+
+    if (nparts == current_message_parts.length) { // all parts were received - process the message
+        let message = ''
+        for (var part of current_message_parts) {
+            message += part
+        }
+
+        let decomp_message = LZString.decompressFromEncodedURIComponent(message);
+        console.log('decomp message: ')
+        console.log(decomp_message)
+        decomp_message = JSON.parse(decomp_message)
+        let msg_delay = Math.ceil(decomp_message[0] + latency * 1000.0)
+
+        // console.log('all ' + current_message_parts.length + ' parts collected, resulting message:')
+        // console.log(decomp_message)
+
+        window.setTimeout(receiveMessage, Math.max(0, msg_delay), decomp_message)
+
+        current_message_parts = []
+        current_update_id = null
+    }
+}
+
+
+console.log('looading')
+
 $(function() {
 
     window.Twitch.ext.onContext((ctx) => {
@@ -740,17 +815,18 @@ $(function() {
 
     // listen for incoming broadcast message from our EBS
     twitch.listen('broadcast', function (target, contentType, message) {
-        // console.log("received message")
-        decomp_message = LZString.decompressFromEncodedURIComponent(message);
+        console.log("received message")
+        // decomp_message = LZString.decompressFromEncodedURIComponent(message);
         
-        var broadcast = JSON.parse(decomp_message)
-        var msg_delay = Math.ceil(broadcast[0] + latency * 1000.0)
+        // var broadcast = JSON.parse(decomp_message)
+        // var msg_delay = Math.ceil(broadcast[0] + latency * 1000.0)
 
-        // console.log('queuing message with delay: ' + msg_delay + 'ms');
-        window.setTimeout(function () {receiveMessage(broadcast)}, Math.max(0, msg_delay))
-        // testingMessage()
+        // // console.log('queuing message with delay: ' + msg_delay + 'ms');
+        // window.setTimeout(function () {receiveMessage(broadcast)}, Math.max(0, msg_delay))
+        // // testingMessage()
 
         last_broadcast_secs = new Date() / 1000
+        receiveBroadcast(message)
         // console.log(decomp_message)
     });
 
