@@ -1,6 +1,5 @@
 
 var twitch = window.Twitch.ext;
-var last_broadcast = ""
 var last_relics = ""
 var last_potions = ""
 var last_potion_tips = ""
@@ -10,11 +9,13 @@ var last_monster_powers_list = ""
 var last_monster_powers_list_tips = ""
 var last_custom_tips_list = ""
 var last_custom_tips_list_tips = ""
+var last_cards = ""
 var current_tooltip_id = ""
 var last_broadcast_secs = new Date() / 1000
 var latency = 0.0
 
-const MSG_TYPE_SET_CONTENT = 1 // "set_content"
+const MSG_TYPE_SET_TIPS = 1
+const MSG_TYPE_SET_DECK = 4
 
 const CHARACTERS = ["Ironclad", "TheSilent", "Defect", "Watcher"]
 
@@ -24,18 +25,21 @@ function receiveMessage(broadcast) {
     var msg_type = broadcast[1]
     var msg = broadcast[2]
 
-    if (msg_type == MSG_TYPE_SET_CONTENT) {
-        if (last_broadcast !=  broadcast) {
-            var character = sanitizeCharacter(msg.c)
+    if (msg_type == MSG_TYPE_SET_TIPS) {
+        var character = sanitizeCharacter(msg.c)
 
-            var power_tips = decompressPowerTips(msg.w)
+        var power_tips = decompressPowerTips(msg.w)
 
-            setRelics(msg.r, power_tips, character)        
-            setPotions(msg.o, power_tips, character)
-            setPlayerPowers(msg.p, power_tips, character)
-            setMonsterPowers(msg.m, power_tips, character)
-            setCustomTips(msg.u, power_tips, character)
-        }
+        setRelics(msg.r, power_tips, character)        
+        setPotions(msg.o, power_tips, character)
+        setPlayerPowers(msg.p, power_tips, character)
+        setMonsterPowers(msg.m, power_tips, character)
+        setCustomTips(msg.u, power_tips, character)
+    } else if (msg_type == MSG_TYPE_SET_DECK) {
+        var character = sanitizeCharacter(msg.c)
+        var deck = decompressDeck(msg.k)
+
+        setDeck(deck.cards, deck.tips, character)
     } else {
         log('unrecognized msg_type: ' + msg_type)
     }
@@ -113,17 +117,246 @@ function clearItemsByClass(class_to_be_cleared) {
 
 
 function decompressPowerTips(power_tips) {
-    power_tips = decompress(power_tips)
+    return splitSemicolonDelimited2DArray(decompress(power_tips))
+}
 
-    new_tips = []
-    split = power_tips.split(';;')
+
+function splitSemicolonDelimited2DArray(text) {
+    array = []
+    split = text.split(';;')
 
     for (let i = 0; i < split.length; i++) {
-        const tip = split[i];
-        new_tips.push(tip.split(';'))
+        const element = split[i];
+        array.push(element.split(';'))
     }
 
-    return new_tips
+    return array
+}
+
+
+function initializeDeck() {
+    $('#deck_button').click(function (e) {
+        $('#deck_view').css('display', 'block')
+        console.log('deck button click')
+    })
+
+    $('#deck_view').click(function(e) {
+        console.log('deck view click')
+        $('#deck_view').css('display', 'none')
+    })
+
+    $('#deck_view_body').click(function(e) {
+        e.stopImmediatePropagation()
+        // catch the event on deck view
+    })
+
+    // $('#deck_view').onclick = function() {
+        // $('#deck_view').style.display = 'none'
+    // }
+}
+
+
+function decompressDeck(deck) {
+    deck = decompress(deck)
+
+    parts = deck.split(";;;")
+
+    console.log(deck)
+
+    cards = splitSemicolonDelimited2DArray(parts[0])
+    tips = splitSemicolonDelimited2DArray(parts[1])
+
+    return {cards: cards, tips: tips}
+}
+
+
+function clearDeck() {
+    const content = document.getElementById('deck_view_content')
+
+    while(content.firstChild)
+        content.removeChild(content.lastChild)
+}
+
+
+function setDeck(cards, tips, character) {
+
+    console.log('set deck')
+
+    // if (JSON.stringify(cards) == last_cards)
+        // return
+
+    if (current_tooltip_id && current_tooltip_id.startsWith('card'))
+        current_tooltip_id = undefined
+
+    last_cards = JSON.stringify(cards)
+    clearDeck()
+
+    console.log('cleared deck')
+
+    console.log(JSON.stringify(tips))
+
+    const content = document.getElementById('deck_view_content')
+    
+    card_width = 12.361 // rem
+    card_height = 15.926 // rem
+    ncards_row = 5
+    x = 0
+    y = 0
+
+    for (let i = 0; i < cards.length; i++) {
+        const card = cards[i];
+
+        const cardElem = createCard(card, tips, character)
+        cardElem.style.left = x + 'rem'
+        cardElem.style.top = y + 'rem'
+        content.appendChild(cardElem)
+
+        x += card_width
+        if (i % ncards_row == ncards_row - 1) {
+            x = 0
+            y += card_height
+        }
+
+    }
+}
+
+
+// these are defaults from the base game that are integer encoded, the one from mods get sent by their full name
+CARD_TYPE = ['ATTACK', 'SKILL', 'POWER', 'STATUS', 'CURSE']
+CARD_RARITY = ['BASIC', 'SPECIAL', 'COMMON', 'UNCOMMON', 'RARE', 'CURSE']
+CARD_COLOR = ['RED', 'GREEN', 'BLUE', 'PURPLE', 'COLORLESS', 'CURSE']
+
+
+function createCard(card, keywords, character) {
+    // name ; type ; rarity ; color ; cost ; description ; img path ; keywords
+
+    console.log(JSON.stringify(card))
+
+    let name = card[0]
+    let type = parseCardType(card[1])
+    let rarity = parseCardRarity(card[2])
+    let color = parseCardColor(card[3])
+    let cost = parseCost(card[4])
+    let upgrades = parseInt(card[5])
+    let description = card[6]
+    let keywordIds = parseKeywords(card[7])
+
+    // cardElem.innerHTML = name + ' ' + type + ' ' + rarity + ' ' + color + ' ' + cost + ' ' + description + ' ' + JSON.stringify(arraySubset(keywords, keywordIds))
+
+    return createCardElement(name, type, rarity, color, cost, upgrades, description, keywords, character)
+
+    function createCardElement(name, type, rarity, color, cost, upgrades, description, keywords, character) {
+        
+        const card = document.createElement('div')
+        card.classList.add('card')
+
+        const bg = document.createElement('div')
+        bg.className = 'card-img'
+        bg.style.backgroundImage = getBackgroundPath(color, type)
+        bg.style.zIndex = -4
+        card.appendChild(bg)
+
+        const portrait = document.createElement('div')
+        portrait.className = 'card-portrait'
+        portrait.style.backgroundImage = getPortraitPath(color, name, upgrades)
+        portrait.style.zIndex = -3
+        card.appendChild(portrait)
+
+        const frame = document.createElement('div')
+        frame.className = 'card-img'
+        frame.style.backgroundImage = getFramePath(color, type, rarity)
+        frame.style.zIndex = -2
+        card.appendChild(frame)
+        
+        if (cost != null) {
+            const energyOrb = document.createElement('div')
+            energyOrb.className = 'card-img'
+            energyOrb.style.backgroundImage = getEnergyOrbPath(color)
+            energyOrb.style.zIndex = -1
+            card.appendChild(energyOrb)
+            
+            const energyCost = document.createElement('div')
+            energyCost.className = 'card-cost outline'
+            energyCost.innerHTML = cost
+            energyCost.zIndex = 1
+            card.appendChild(energyCost)
+        }
+
+        let name_aux = name
+        if (upgrades > 0)
+            name_aux = colorizeString(name_aux, '#g')
+        const title = document.createElement('div')
+        title.className = 'card-title outline'
+        title.innerHTML = replaceColorCodes(name_aux)
+        card.appendChild(title)
+
+        const desc = document.createElement('div')
+        desc.className = 'card-description'
+        const descText = document.createElement('span')
+        descText.className = 'card-description-text'
+        descText.innerHTML = replaceNewLines(replaceManaSymbols(replaceColorCodes(description), character))
+        desc.appendChild(descText)
+        card.appendChild(desc)
+
+        return card
+
+        function getBackgroundPath(color, type) {return 'url("img/cards/' + color + '/background_' + type + '.png")'}
+        function getFramePath(color, type, rarity) {return 'url("img/cards/' + color + '/frame_' + type + '_' + rarity + '.png")'}
+        function getEnergyOrbPath(color) {return 'url("img/cards/' + color + '/energy_orb.png")'}
+        function getPortraitPath(color, name, upgrades) {
+            if (upgrades > 0)
+                name = name.substring(0, name.lastIndexOf('+'))
+            return 'url("img/cards/' + color + '/portraits/' + name + '.png")'
+        }
+    }
+
+    function parseCost(cost) {
+        if (cost == -2)
+            return null
+        else if (cost == -1)
+            return "X"
+        else
+            return parseInt(cost)
+    }
+
+    function colorizeString(str, color_prefix) {
+        let split = str.split(' ')
+        str = ""
+        for (let i = 0; i < split.length; i++) {
+            const part = split[i];
+            str += color_prefix + part 
+            if (i < split.length - 1)
+                str += " "
+        }
+        return str
+    }
+
+    function parseCardType(type) {
+        let parsed = parseInt(type)
+        return isNaN(parsed) ? type : CARD_TYPE[parsed]
+    }
+
+    function parseCardRarity(rarity) {
+        let parsed = parseInt(rarity)
+        return isNaN(parsed) ? rarity : CARD_RARITY[parsed]
+    }
+
+    function parseCardColor(color) {
+        let parsed = parseInt(color)
+        return isNaN(parsed) ? color : CARD_COLOR[parsed]
+    }
+
+    function parseKeywords(keywords) {
+        if (keywords == '-')
+            return []
+        else {
+            split = keywords.split(',')
+            for (let i = 0; i < split.length; i++) {
+                split[i] = parseInt(split[i])      
+            }
+            return split
+        }
+    }
 }
 
 
@@ -490,73 +723,74 @@ function createPowerTip(header_text, raw_description_text, img_path, character) 
     tooltip.appendChild(description)
     
     return tooltip
+}
 
-    function replaceColorCodes(text) {
-        var parts = text.split(' ')
 
-        for (let i = 0; i < parts.length; i++) {
-            const part = parts[i];
-            
-            if (part.charAt(0) == '#') {
-                var text_class = ''
+function replaceColorCodes(text) {
+    var parts = text.split(' ')
 
-                switch(part.charAt(1)) {
-                    case 'y': text_class = 'text-yellow'; break;
-                    case 'b': text_class = 'text-blue'; break;
-                    case 'r': text_class = 'text-red'; break;
-                    case 'g': text_class = 'text-green'; break;
-                    case 'p': text_class = 'text-pink'; break;
-                    default:  text_class = 'text-other'; break;
-                }
+    for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+        
+        if (part.charAt(0) == '#') {
+            var text_class = ''
 
-                var text = part.substring(2)
-                parts[i] = '<span class="' + text_class + '">' + text + '</span>'
+            switch(part.charAt(1)) {
+                case 'y': text_class = 'text-yellow'; break;
+                case 'b': text_class = 'text-blue'; break;
+                case 'r': text_class = 'text-red'; break;
+                case 'g': text_class = 'text-green'; break;
+                case 'p': text_class = 'text-pink'; break;
+                default:  text_class = 'text-other'; break;
             }
-        }
 
-        return parts.join(' ')
+            var text = part.substring(2)
+            parts[i] = '<span class="' + text_class + '">' + text + '</span>'
+        }
     }
 
-    function replaceManaSymbols(text, character) {
-        var parts = text.split(' ')
+    return parts.join(' ')
+}
 
-        for (let i = 0; i < parts.length; i++) {
-            const part = parts[i];
-            
-            if (part == '[E]') {
-                var imgPath = "img/orbs/orb" + character + ".png"
-                parts[i] = '<img src="' + imgPath + '" alt="[E]" class="energy-orb-img">'
-            }
+function replaceManaSymbols(text, character) {
+    var parts = text.split(' ')
+
+    for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+        
+        if (part == '[E]') {
+            var imgPath = "img/orbs/orb" + character + ".png"
+            parts[i] = '<img src="' + imgPath + '" alt="[E]" class="energy-orb-img">'
         }
-
-        return parts.join(' ')
     }
 
-    function replaceNewLines(text) {
-        parts = text.split(' ')
-        new_text = ''
-        previous_special = true
+    return parts.join(' ')
+}
 
-        for (let i = 0; i < parts.length; i++) {
-            const word = parts[i];
+function replaceNewLines(text) {
+    parts = text.split(' ')
+    new_text = ''
+    previous_special = true
 
-            if (word == 'NL') {
-                new_text += '<br>'
-                previous_special = true
-            } else if (word == 'TAB') {
-                new_text += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-                previous_special = true
-            } else {
-                if (!previous_special)
-                    new_text += ' '
-                new_text += word
-                previous_special = false
-            }
-            
+    for (let i = 0; i < parts.length; i++) {
+        const word = parts[i];
+
+        if (word == 'NL') {
+            new_text += '<br>'
+            previous_special = true
+        } else if (word == 'TAB') {
+            new_text += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+            previous_special = true
+        } else {
+            if (!previous_special)
+                new_text += ' '
+            new_text += word
+            previous_special = false
         }
-
-        return new_text
+        
     }
+
+    return new_text
 }
 
 
@@ -733,7 +967,7 @@ current_message_parts = []
 current_update_id = null
 
 function receiveBroadcast(message) {
-    console.log('receive broadcast: ' + message)
+    // console.log('receive broadcast: ' + message)
     message = JSON.parse(message)
 
     let part_index = message[0]
@@ -743,26 +977,26 @@ function receiveBroadcast(message) {
 
     // console.log('message: ' + message)
 
-    console.log('parts len ' + current_message_parts.length + ' part index ' + part_index)
-    console.log(typeof(nparts))
-    console.log(typeof(content))
+    // console.log('parts len ' + current_message_parts.length + ' part index ' + part_index)
+    // console.log(typeof(nparts))
+    // console.log(typeof(content))
 
     if (current_message_parts.length == 0) {
         if (part_index == 0) {
-            console.log('first message part')
+            // console.log('first message part')
             pushContent(update_id, content, nparts)
         }
     } else {
         if (update_id == current_update_id) {
             // following up previous update
             if (part_index == current_message_parts.length) {
-                console.log('message follows previous update')
+                // console.log('message follows previous update')
                 pushContent(update_id, content, nparts)
             }
         } else {
             // received message with unexpected UID, pubsub update probably lost, so forget previous message and start receiveing this one
             if (part_index == 0) {
-                console.log('unexpected message first message with new id, dropping old message')
+                // console.log('unexpected message first message with new id, dropping old message')
                 current_message_parts = []
                 pushContent(update_id, content, nparts)
             }
@@ -772,12 +1006,12 @@ function receiveBroadcast(message) {
 
 
 function pushContent(update_id, content, nparts) {
-    console.log('push content')
+    // console.log('push content')
 
     current_update_id = update_id
     current_message_parts.push(content)
 
-    console.log('nparts ' + nparts + ' curr len ' + current_message_parts.length)
+    // console.log('nparts ' + nparts + ' curr len ' + current_message_parts.length)
 
     if (nparts == current_message_parts.length) { // all parts were received - process the message
         let message = ''
@@ -786,8 +1020,8 @@ function pushContent(update_id, content, nparts) {
         }
 
         let decomp_message = LZString.decompressFromEncodedURIComponent(message);
-        console.log('decomp message: ')
-        console.log(decomp_message)
+        // console.log('decomp message: ')
+        // console.log(decomp_message)
         decomp_message = JSON.parse(decomp_message)
         let msg_delay = Math.ceil(decomp_message[0] + latency * 1000.0)
 
@@ -832,7 +1066,9 @@ $(function() {
 
     $('#items').on('mousemove', movePowerTipStrip);
 
-    window.setInterval(checkIfSourceActive, 2500);
+    // window.setInterval(checkIfSourceActive, 2500);
 
     window.setTimeout(preloadNextImageBunch, PRELOAD_INTERVAL)
+
+    initializeDeck()
 });
