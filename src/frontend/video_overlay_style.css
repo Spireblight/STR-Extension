@@ -2,28 +2,12 @@
     font-size: 2vh; /* Pixel values are based on height 1080px therefore 1rem = 21.6px for this resolution */
 }
 
-div.relic-hitbox {
+div.hitbox {
     position: fixed;
-    top: 6.111%;
-    left: 1.4%;
-    width: 3.75%;
-    /* height: 6.666%; */
-    height: 8.666%;
-    box-sizing: border-box;
-    /* border: 2px solid #000000; */
+}
+
+.mag-glass {
     cursor: url(img/magGlass2.png) 24 25, auto;
-}
-
-div.potion-hitbox {
-    position: fixed;
-    top: 0%;
-    width: 2.916%;
-    height: 5.556%;
-    box-sizing: border-box;
-}
-
-div.powers-hitbox {
-    position: fixed;
 }
 
 div.powertip {
@@ -86,7 +70,7 @@ div.powertip-strip {
 
 div.powertip-multicol {
     display: none;
-    position: fixed;
+    position: absolute;
 }
 
 div.powertip-multicol-column {
@@ -95,43 +79,6 @@ div.powertip-multicol-column {
     margin-right: 0.370rem;
 }
 
-.relic-marker {}
-
-.potion-marker {}
-
-.player-powers-marker {}
-
-.monster-powers-marker {}
-
-.custom-tips-marker {}
-
-.text-white {
-    color: rgb(255, 247, 222);
-}
-
-.text-yellow {
-    color: rgb(239, 200, 81);
-}
-
-.text-blue {
-    color: rgb(135, 206, 235);
-}
-
-.text-red {
-    color: rgb(255, 101, 99);
-}
-
-.text-green {
-    color: rgb(127, 255, 0);
-}
-
-.text-pink {
-    color: rgb(238, 130, 238);
-}
-
-.text-other {
-    color: rgb(53, 255, 255);
-}
 
 #deck_button {
     position: absolute;
@@ -227,7 +174,17 @@ div.card-title {
     font-weight: 700;
     font-size: 0.984rem; /* 0.948rem; */
     color: white;
-    text-shadow: 0.139rem 0.139rem 0px rgba(0,0,0,0.3), -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+    --outline-color: rgb(50,50,50);
+    /* --outline-color: #000; */
+    /* --outline-color: rgb(89,89,89); - original*/
+    text-shadow: 0.139rem 0.139rem 0px rgba(0,0,0,0.3), -1px -1px 0 var(--outline-color),
+        0   -1px 0 var(--outline-color),
+        1px -1px 0 var(--outline-color),
+        1px  0   0 var(--outline-color),
+        1px  1px 0 var(--outline-color),
+        0    1px 0 var(--outline-color),
+        -1px  1px 0 var(--outline-color),
+        -1px  0   0 var(--outline-color);
 }
 
 div.card-cost {
@@ -235,18 +192,17 @@ div.card-cost {
     text-align: center;
     vertical-align: middle;
     left: 3.137%;
-    top: 2.275%;
+    top: 2.075%;/*2.275%;*/
     width: 14%;
     height: 10%;
     overflow: hidden;
     font-weight: 700;
-    font-size: 1.458rem;/* 1.385rem; */
+    font-size: 1.53rem;/* 1.458rem;/* 1.385rem; */
     color: white;
 }
 
 div.card-description {
     position: absolute;
-    /* display: inline-block; */
     left: 14%;
     top: 62.471%;
     width: 72%;
@@ -260,12 +216,46 @@ div.card-description {
 }
 
 span.card-description-text {
-    /* vertical-align: middle; */
     line-height: 1.05;
     display: inline-block;
     vertical-align: middle;
 }
 
-.outline {
-    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+.outline-black {
+    text-shadow: -1px -1px 0 #000,
+        0   -1px 0 #000,
+        1px -1px 0 #000,
+        1px  0   0 #000,
+        1px  1px 0 #000,
+        0    1px 0 #000,
+        -1px  1px 0 #000,
+        -1px  0   0 #000;
+}
+
+.text-white {
+    color: rgb(255, 247, 222);
+}
+
+.text-yellow {
+    color: rgb(239, 200, 81);
+}
+
+.text-blue {
+    color: rgb(135, 206, 235);
+}
+
+.text-red {
+    color: rgb(255, 101, 99);
+}
+
+.text-green {
+    color: rgb(127, 255, 0);
+}
+
+.text-pink {
+    color: rgb(238, 130, 238);
+}
+
+.text-other {
+    color: rgb(53, 255, 255);
 }
