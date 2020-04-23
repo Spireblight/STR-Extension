@@ -19,7 +19,8 @@ const CARD_VIEW_SCALE = 0.97
 const CARD_VIEW_WIDTH = CARD_BASE_WIDTH * CARD_VIEW_SCALE
 const CARD_VIEW_HEIGHT = CARD_BASE_HEIGHT * CARD_VIEW_SCALE
 const CARD_VIEW_Y_MARGIN = 0.55 // rem
-
+const CARD_VIEW_X_OFFSET = 13.541 // rem
+const CARD_VIEW_Y_OFFSET = 3 // rem
 
 const CARD_HOVER_SCALE = 1.32
 
@@ -96,8 +97,8 @@ function setDeck(cards, tips, character) {
     // card_width = 12.361 // rem
     // card_height = 15.926 // rem
     ncards_row = 5
-    x = xoffset
-    y = yoffset
+    x = xoffset + CARD_VIEW_X_OFFSET
+    y = yoffset + CARD_VIEW_Y_OFFSET
 
     for (let i = 0; i < cards.length; i++) {
         const card = cards[i];
@@ -140,10 +141,18 @@ function setDeck(cards, tips, character) {
 
         x += CARD_BASE_WIDTH
         if (i % ncards_row == ncards_row - 1) {
-            x = xoffset
+            x = xoffset + CARD_VIEW_X_OFFSET
             y += CARD_BASE_HEIGHT + CARD_VIEW_Y_MARGIN
         }
     }
+
+    const footer = document.createElement('div')
+    footer.className = 'deck-view-footer'
+    footer.style.left = 0
+    footer.style.top = y + CARD_BASE_HEIGHT + CARD_VIEW_Y_MARGIN + 'rem'
+    content.appendChild(footer)
+
+    addToCollection(CATEGORY_CARDS, footer)
 }
 
 
