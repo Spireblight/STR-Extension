@@ -39,6 +39,10 @@ function decompressDeck(deck) {
 }
 
 
+function hideDeck() {
+    $('#deck_view').css('display', 'none')
+}
+
 
 function initializeDeck() {
     $('#deck_button').click(function (e) {
@@ -46,15 +50,12 @@ function initializeDeck() {
         console.log('deck button click')
     })
 
-    $('#deck_view').click(function(e) {
-        console.log('deck view click')
-        $('#deck_view').css('display', 'none')
-    })
+    $('#deck_view_left_bar').click(hideDeck)
 
-    $('#deck_view_body').click(function(e) {
-        e.stopImmediatePropagation()
-        // catch the event on deck view
-    })
+    $('#deck_view_right_bar').click(hideDeck)
+
+    $('#deck_view_return_btn').click(hideDeck)
+
 
     // $('#deck_view').onclick = function() {
         // $('#deck_view').style.display = 'none'
@@ -138,6 +139,7 @@ function setDeck(cards, tips, character) {
         strip.hitbox.classList.add("mag-glass")
         strip.hitbox.onmouseenter = function(e) {cardMouseEnter(e, strip.tips.id)}
         strip.hitbox.onmouseleave = function(e) {cardMouseExit(e, strip.tips.id)}
+        strip.hitbox.onclick = function(e) {cardClick(e, strip.tips.id)}
 
         x += CARD_BASE_WIDTH
         if (i % ncards_row == ncards_row - 1) {
@@ -153,6 +155,11 @@ function setDeck(cards, tips, character) {
     content.appendChild(footer)
 
     addToCollection(CATEGORY_CARDS, footer)
+}
+
+
+function cardClick(e, id) {
+    e.stopPropagation()
 }
 
 

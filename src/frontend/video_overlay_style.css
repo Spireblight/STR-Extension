@@ -109,6 +109,37 @@ div.powertip-multicol-column {
     background-color: rgba(0,0,0,0.9);
 }
 
+#deck_view_return_btn {
+    position: absolute;
+    left: 0%;
+    top: 77.778%;
+    width: 14.323%;
+    height: 9.259%;
+    background-size: cover;
+    background-image: url('img/ui/btn_return_base.png');
+    z-index: 1
+}
+
+#deck_view_return_btn:hover {
+    background-image: url('img/ui/btn_return_hover.png');
+}
+
+#deck_view_left_bar {
+    position: absolute;
+    left: 0%;
+    top: 0%;
+    width: 15.234%;
+    height: 100%;
+}
+
+#deck_view_right_bar {
+    position: absolute;
+    right: 0%;
+    top: 0%;
+    width: 15.234%;
+    height: 100%;
+}
+
 .deck-view-footer {
     position: absolute;
     display: block;
