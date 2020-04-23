@@ -41,6 +41,11 @@ function splitSemicolonDelimited2DArray(text) {
 }
 
 
+function parseCommaDelimitedIntegerArray(text) {
+    return JSON.parse('[' + text + ']')
+}
+
+
 function sanitizeCharacter(character) {
     for (const char of CHARACTERS) {
         if (character == char) {
@@ -123,7 +128,7 @@ function createMulticolPowertips(parent, hitbox, tips, category, character, id_p
     // var items = document.getElementById('items')
     let id = id_prefix + getNextId()
 
-    let hitboxElem = createHitbox(id, hitbox.x, hitbox.y, hitbox.z, hitbox.w, hitbox.h)
+    let hitboxElem = createHitbox(id, category, hitbox.x, hitbox.y, hitbox.z, hitbox.w, hitbox.h)
     let tipsElem = createPowertipMulticol(id, hitbox.x, hitbox.y, hitbox.w, hitbox.h, tips, character)
 
     addToCollection(category, hitboxElem)
@@ -134,13 +139,13 @@ function createMulticolPowertips(parent, hitbox, tips, category, character, id_p
 
     return {hitbox: hitboxElem, tips: tipsElem}
 
-    function createHitbox(id, x, y, z, w, h) {
+    function createHitbox(id, category, x, y, z, w, h) {
         var hitbox = document.createElement('div')
         hitbox.className = 'hitbox'
         hitbox.style = 'left: ' + x + '; top: ' + y + '; width: ' + w + '; height: ' + h + '; z-index: ' + z + ';'
         hitbox.id = id + '_hitbox'
-        hitbox.onmouseenter = function(e) {showPowerTipMulticol(e, id)}
-        hitbox.onmouseout = function(e) {hidePowerTipMulticol(e, id)}
+        hitbox.onmouseenter = function(e) {showPowerTipMulticol(e, id, category)}
+        hitbox.onmouseout = function(e) {hidePowerTipMulticol(e, id, category)}
     
         return hitbox
     }
@@ -221,7 +226,7 @@ function createPowerTipStrip(parent, hitbox, tips, category, character, id_prefi
 
     let id = id_prefix + getNextId()
 
-    let hitboxElem = createHitbox(id, hitbox.x, hitbox.y, hitbox.z, hitbox.w, hitbox.h)
+    let hitboxElem = createHitbox(id, category, hitbox.x, hitbox.y, hitbox.z, hitbox.w, hitbox.h)
     let tipsElem = createStrip(id, tips, character)
 
     addToCollection(category, hitboxElem)
@@ -248,12 +253,12 @@ function createPowerTipStrip(parent, hitbox, tips, category, character, id_prefi
         return strip
     }
 
-    function createHitbox(id, x, y, z, w, h) {
+    function createHitbox(id, category, x, y, z, w, h) {
         var hitbox = document.createElement('div')
         hitbox.className = 'hitbox'
         hitbox.style = 'left: ' + x + '; top: ' + y + '; width: ' + w + '; height: ' + h + '; z-index: ' + z + ';'
-        hitbox.onmouseenter = function(e) {showPowerTipStrip(e, id)}
-        hitbox.onmouseout = function(e) {hidePowerTipStrip(e, id)}
+        hitbox.onmouseenter = function(e) {showPowerTipStrip(e, id, category)}
+        hitbox.onmouseout = function(e) {hidePowerTipStrip(e, id, category)}
     
         return hitbox
     }

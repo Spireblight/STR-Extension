@@ -17,6 +17,7 @@ const MAX_DISPLAY_RELICS = 25 //count
 const POTION_HITBOX_WIDTH = 2.916 // %
 const MAX_RIGHT = 99.0 //%
 const POWERTIP_WIDTH = 16.406 //%
+const POWERTIP_WIDTH_REM = 14.583 //%
 const MAX_POWERTIP_MULTICOL_HEIGHT = 70.0 //%
 const CHARACTER_POWERS_OFFSET_R = 1.0416 //%
 const CHARACTER_POWERS_OFFSET_L = -2.917 //%
@@ -48,9 +49,11 @@ function setRelics(relics, power_tips, character) {
     is_relics_multipage = relics[0]
     last_relics = JSON.stringify(relics)
 
-    if (current_tooltip_id && current_tooltip_id.startsWith('relic'))
-        current_tooltip_id = undefined
-
+    if (current_tooltip_id && current_tooltip_category == CATEGORY_RELICS) {
+        current_tooltip_id = null
+        current_tooltip_category = null    
+    }
+        
     clearCollection(CATEGORY_RELICS)
 
     for (let i = 0; i < relics[1].length; i++) {
@@ -86,8 +89,11 @@ function setPotions(potions, power_tips, character) {
         }
     }
 
-    if (current_tooltip_id && current_tooltip_id.startsWith('potion'))
-        current_tooltip_id = undefined
+    if (current_tooltip_id && current_tooltip_category == CATEGORY_POTIONS) {
+        current_tooltip_id = null
+        current_tooltip_category = null
+    }
+        
 
     last_potions = JSON.stringify(potions)
     last_potion_tips = JSON.stringify(power_tips_subset)
@@ -126,8 +132,10 @@ function setPlayerPowers(player_powers, power_tips, character) {
             return
     }
 
-    if (current_tooltip_id && current_tooltip_id.startsWith('player_powers'))
-        current_tooltip_id = undefined
+    if (current_tooltip_id && current_tooltip_category == CATEGORY_PLAYER_POWERS) {
+        current_tooltip_id = null
+        current_tooltip_category = null    
+    }
 
     last_player_powers = JSON.stringify(player_powers)
     last_player_power_tips = JSON.stringify(power_tips_subset)
@@ -165,8 +173,10 @@ function setMonsterPowers(monster_powers_list, power_tips, character) {
             return
     } 
 
-    if (current_tooltip_id && current_tooltip_id.startsWith('monster_powers'))
-        current_tooltip_id = undefined
+    if (current_tooltip_id && current_tooltip_category == CATEGORY_MONSTER_POWERS) {
+        current_tooltip_id = null
+        current_tooltip_category = null    
+    }
 
     last_monster_powers_list = JSON.stringify(monster_powers_list)
     last_monster_powers_list_tips = JSON.stringify(power_tips_subset)
@@ -207,8 +217,10 @@ function setCustomTips(custom_tips_list, power_tips, character) {
             return
     }
 
-    if (current_tooltip_id && current_tooltip_id.startsWith('custom_tips'))
-        current_tooltip_id = undefined
+    if (current_tooltip_id && current_tooltip_category == CATEGORY_MONSTER_POWERS) {
+        current_tooltip_id = null
+        current_tooltip_category = null    
+    }
 
     last_custom_tips_list = JSON.stringify(custom_tips_list)
     last_custom_tips_list_tips = JSON.stringify(power_tips_subset)

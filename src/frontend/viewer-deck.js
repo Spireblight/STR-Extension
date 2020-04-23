@@ -1,5 +1,5 @@
 
-var last_cards = ""
+var last_deck = ""
 
 const CATEGORY_CARDS = 'cards'
 
@@ -25,17 +25,26 @@ const CARD_VIEW_Y_OFFSET = 3 // rem
 const CARD_HOVER_SCALE = 1.32
 
 
+const CARD_VIEW_TIPS_X_OFFSET = -0.15 // rem
+const CARD_VIEW_TIPS_Y_OFFSET = 0.71 // rem
+
+const DECK_VIEW_SHOW_TIP_STRIP_DELAY = 200
+
+
 function decompressDeck(deck) {
     deck = decompress(deck)
 
-    parts = deck.split(";;;")
-
     // console.log(deck)
 
-    cards = splitSemicolonDelimited2DArray(parts[0])
-    tips = splitSemicolonDelimited2DArray(parts[1])
+    parts = deck.split(";;;")
+    
+    deck = parseCommaDelimitedIntegerArray(parts[0])
+    cards = splitSemicolonDelimited2DArray(parts[1])
+    tips = splitSemicolonDelimited2DArray(parts[2])
 
-    return {cards: cards, tips: tips}
+    // console.log(JSON.stringify([deck, cards, tips]))
+
+    return {deck: deck, cards: cards, tips: tips}
 }
 
 
@@ -71,22 +80,28 @@ function clearDeck() {
 }
 
 
-function setDeck(cards, tips, character) {
+function setDeck(deck, cards, tips, character) {
 
-    // console.log('set deck')
+    console.log('set deck')
 
-    if (JSON.stringify(cards) == last_cards)
+    if (deck == '-')
         return
 
-    if (current_tooltip_id && current_tooltip_id.startsWith('card'))
-        current_tooltip_id = undefined
+    if (JSON.stringify([deck, cards, tips]) == last_deck)
+        return
 
-    last_cards = JSON.stringify(cards)
+    if (current_tooltip_id && current_tooltip_category == CATEGORY_CARDS) {
+        current_tooltip_id = null
+        current_tooltip_category = null    
+    }
+
+    last_deck = JSON.stringify([deck, cards, tips])
     clearDeck()
 
-    // console.log('cleared deck')
-
-    // console.log(JSON.stringify(tips))
+    console.log('cleared deck')
+    console.log(JSON.stringify(deck))
+    console.log(JSON.stringify(cards))
+    console.log(JSON.stringify(tips))
 
     const content = document.getElementById('deck_view_content')
     
@@ -101,23 +116,32 @@ function setDeck(cards, tips, character) {
     x = xoffset + CARD_VIEW_X_OFFSET
     y = yoffset + CARD_VIEW_Y_OFFSET
 
-    for (let i = 0; i < cards.length; i++) {
-        const card = cards[i];
+    for (let i = 0; i < deck.length; i++) {
+        const card = cards[deck[i]];
+
+        // name ; bottleStatus ; cardToPreview ; cardToPreview upgraded ; nameUpgraded ; upgrades ; keyword upgraded ; descriptionUpgraded ; keywords ; cost ; type ; rarity ; color ; description
+
+        console.log(JSON.stringify(card))
 
         let name = card[0]
-        let nameUpgraded = card[1]
-        let type = parseCardType(card[2])
-        let rarity = parseCardRarity(card[3])
-        let color = parseCardColor(card[4])
-        let cost = parseCost(card[5])
-        let upgrades = parseInt(card[6])
-        let description = card[7]
-        let descriptionUpgraded = card[8]
+        let bottle_status = card[1]
+        let card_to_preview = parseInt(card[2])
+        let card_to_preview_upgraded = parseInt(card[3])
+        let name_upgraded = card[4]
+        let upgrades = parseInt(card[5])
+        let keyword_ids_upgraded = parseKeywords(card[6])
+        let description_upgraded = card[7]
+        let keyword_ids = parseKeywords(card[8])
+        let cost = parseCost(card[9])
+        let type = parseCardType(card[10])
+        let rarity = parseCardRarity(card[11])
+        let color = parseCardColor(card[12])
+        let description = card[13]
 
         const cardElem = createCardElement(name, type, rarity, color, cost, upgrades, description, character, CARD_VIEW_WIDTH)
 
-        let keywordIds = parseKeywords(card[9])
-        let keywords = arraySubset(tips, keywordIds)
+        let keywords = arraySubset(tips, keyword_ids)
+        let keywords_upgraded = arraySubset(tips, keyword_ids_upgraded)
 
         hitbox = {
             x: x - xoffset + 'rem',
@@ -134,12 +158,21 @@ function setDeck(cards, tips, character) {
         cardElem.style.left = x + 'rem'
         cardElem.style.top = y + 'rem'
         cardElem.id = strip.tips.id + '_card'
-        strip.tips.style.zIndex = 3
+        strip.tips.style.zIndex = 5
 
+        // add custom card hitbox handlers
         strip.hitbox.classList.add("mag-glass")
         strip.hitbox.onmouseenter = function(e) {cardMouseEnter(e, strip.tips.id)}
         strip.hitbox.onmouseleave = function(e) {cardMouseExit(e, strip.tips.id)}
         strip.hitbox.onclick = function(e) {cardClick(e, strip.tips.id)}
+
+        // add shadow
+        for (powertip of strip.tips.childNodes) {
+            powertip.classList.add('powertip-shadow')
+        }
+
+        // place tips beside the card
+        placeDeckViewTipStrip(cardElem, strip)
 
         x += CARD_BASE_WIDTH
         if (i % ncards_row == ncards_row - 1) {
@@ -164,7 +197,6 @@ function cardClick(e, id) {
 
 
 function cardMouseEnter(e, id) {
-    const tips = document.getElementById(id)
     const card = document.getElementById(id + '_card')
 
     let x = parseRem(card.style.left)
@@ -183,9 +215,19 @@ function cardMouseEnter(e, id) {
     setCardWidth(card, CARD_VIEW_WIDTH * CARD_HOVER_SCALE)
 
     current_tooltip_id = id
+    current_tooltip_category = CATEGORY_CARDS
 
-    tips.style.display = 'block'
+    setTimeout(showTipStrip, DECK_VIEW_SHOW_TIP_STRIP_DELAY, id)
 }
+
+
+function showTipStrip(id) {
+    if (current_tooltip_id == id) {
+        const tips = document.getElementById(id)
+        tips.style.display = 'block'
+    }
+}
+
 
 function cardMouseExit(e, id) {
 
@@ -207,7 +249,8 @@ function cardMouseExit(e, id) {
 
     setCardWidth(card, CARD_VIEW_WIDTH)
 
-    current_tooltip_id = undefined
+    current_tooltip_id = null
+    current_tooltip_category = null
 
     tips.style.display = 'none'
 }
@@ -350,4 +393,19 @@ function parseKeywords(keywords) {
     }
 }
 
-// function placeDeckViewTipStrip()
+function placeDeckViewTipStrip(card, strip) {
+
+    let x = parseRem(card.style.left)
+    let y = parseRem(card.style.top)
+
+    let xdiff = CARD_VIEW_WIDTH * (CARD_HOVER_SCALE - 1) / 2
+    let ydiff = CARD_VIEW_HEIGHT * (CARD_HOVER_SCALE - 1) / 2
+
+    strip.tips.style.top = y - ydiff + CARD_VIEW_TIPS_Y_OFFSET + 'rem'
+
+    if (x < 55) { // card column 1-4
+        strip.tips.style.left = x + CARD_VIEW_WIDTH + xdiff + CARD_VIEW_TIPS_X_OFFSET + 'rem'
+    } else { // card column 5
+        strip.tips.style.left = x - xdiff - CARD_VIEW_TIPS_X_OFFSET - POWERTIP_WIDTH_REM + 'rem'
+    }
+}

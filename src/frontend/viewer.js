@@ -2,6 +2,8 @@
 var twitch = window.Twitch.ext;
 
 var current_tooltip_id = ""
+var current_tooltip_category = null
+
 var last_broadcast_secs = new Date() / 1000
 var latency = 0.0
 
@@ -32,33 +34,37 @@ function processMessage(broadcast) {
         var character = sanitizeCharacter(msg.c)
         var deck = decompressDeck(msg.k)
 
-        setDeck(deck.cards, deck.tips, character)
+        setDeck(deck.deck, deck.cards, deck.tips, character)
     } else {
         log('unrecognized msg_type: ' + msg_type)
     }
 }
 
-function showPowerTipStrip(e, id) {
+function showPowerTipStrip(e, id, category) {
     current_tooltip_id = id
+    current_tooltip_category = category
     movePowerTipStrip(e)
     document.getElementById(id).style.display = 'block';
 }
 
 
 function hidePowerTipStrip(e, id) {
-    current_tooltip_id = undefined
+    current_tooltip_id = null
+    current_tooltip_category = null
     document.getElementById(id).style.display = 'none';
 }
 
 
-function showPowerTipMulticol(e, id) {
+function showPowerTipMulticol(e, id, category) {
     current_tooltip_id = id
+    current_tooltip_category = category
     document.getElementById(id).style.display = 'block';
 }
 
 
 function hidePowerTipMulticol(e, id) {
-    current_tooltip_id = undefined
+    current_tooltip_id = null
+    current_tooltip_category = null
     document.getElementById(id).style.display = 'none';
 }
 

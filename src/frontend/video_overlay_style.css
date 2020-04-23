@@ -32,6 +32,12 @@ div.powertip {
     margin-bottom: 0.278rem;
 }
 
+.powertip-shadow {
+    -webkit-box-shadow: 0.65em 0.7em 0.035em 0.105em rgba(0,0,0,0.3);
+    -moz-box-shadow: 0.65em 0.7em 0.035em 0.105em rgba(0,0,0,0.3);
+    box-shadow: 0.65em 0.7em 0.035em 0.105em rgba(0,0,0,0.3);
+}
+
 div.powertip-header-noimg {
     margin: 0.324rem 0rem 0.231rem;
 }
