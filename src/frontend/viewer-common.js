@@ -114,10 +114,14 @@ class MulticolPowertipsPlacement {
 }
 
 
-function createMulticolPowertips(parent, hitbox, tips, category, character) {
+function createMulticolPowertips(parent, hitbox, tips, category, character, id_prefix) {
+
+    if (!id_prefix) {
+        id_prefix = ""
+    }
 
     // var items = document.getElementById('items')
-    let id = getNextId()
+    let id = id_prefix + getNextId()
 
     let hitboxElem = createHitbox(id, hitbox.x, hitbox.y, hitbox.z, hitbox.w, hitbox.h)
     let tipsElem = createPowertipMulticol(id, hitbox.x, hitbox.y, hitbox.w, hitbox.h, tips, character)
@@ -133,7 +137,7 @@ function createMulticolPowertips(parent, hitbox, tips, category, character) {
     function createHitbox(id, x, y, z, w, h) {
         var hitbox = document.createElement('div')
         hitbox.className = 'hitbox'
-        hitbox.style = 'left: ' + x + '%; top: ' + y + '%; width: ' + w + '%; height: ' + h + '%; z-index: ' + z + ';'
+        hitbox.style = 'left: ' + x + '; top: ' + y + '; width: ' + w + '; height: ' + h + '; z-index: ' + z + ';'
         hitbox.id = id + '_hitbox'
         hitbox.onmouseenter = function(e) {showPowerTipMulticol(e, id)}
         hitbox.onmouseout = function(e) {hidePowerTipMulticol(e, id)}
@@ -177,7 +181,7 @@ function createMulticolPowertips(parent, hitbox, tips, category, character) {
 
             power_tip_heights.push(height_element)
 
-            console.log('element height: ' + height_element)
+            // console.log('element height: ' + height_element)
             
             if (height + height_element > MAX_POWERTIP_MULTICOL_HEIGHT) {
                 if (height > max_height)
@@ -209,9 +213,13 @@ function createMulticolPowertips(parent, hitbox, tips, category, character) {
 }
 
 
-function createPowerTipStrip(parent, hitbox, tips, category, character) {
+function createPowerTipStrip(parent, hitbox, tips, category, character, id_prefix) {
     
-    let id = 'movable_' + getNextId()
+    if (!id_prefix) {
+        id_prefix = ""
+    }
+
+    let id = id_prefix + getNextId()
 
     let hitboxElem = createHitbox(id, hitbox.x, hitbox.y, hitbox.z, hitbox.w, hitbox.h)
     let tipsElem = createStrip(id, tips, character)
@@ -243,7 +251,7 @@ function createPowerTipStrip(parent, hitbox, tips, category, character) {
     function createHitbox(id, x, y, z, w, h) {
         var hitbox = document.createElement('div')
         hitbox.className = 'hitbox'
-        hitbox.style = 'left: ' + x + '%; top: ' + y + '%; width: ' + w + '%; height: ' + h + '%; z-index: ' + z + ';'
+        hitbox.style = 'left: ' + x + '; top: ' + y + '; width: ' + w + '; height: ' + h + '; z-index: ' + z + ';'
         hitbox.onmouseenter = function(e) {showPowerTipStrip(e, id)}
         hitbox.onmouseout = function(e) {hidePowerTipStrip(e, id)}
     
@@ -366,7 +374,16 @@ function sanitize(text) {
 }
 
 
+function parseRem(val) {
+    val = val.substring(0, val.length-3)
+    return parseFloat(val)
+}
 
+
+function parsePercentage(val) {
+    val = val.substring(0, val.length-1)
+    return parseFloat(val)
+}
 
 
 const PRELOAD_IMAGES = ['img/intents/attackBuff.png', 'img/intents/attackDebuff.png', 'img/intents/attackDefend.png', 'img/intents/buff1.png', 'img/intents/debuff1.png', 'img/intents/debuff2.png', 'img/intents/defend.png', 'img/intents/defendBuff.png', 'img/intents/escape.png', 'img/intents/magic.png', 'img/intents/sleep.png', 'img/intents/special.png', 'img/intents/stun.png', 'img/intents/tip/1.png', 'img/intents/tip/2.png', 'img/intents/tip/3.png', 'img/intents/tip/4.png', 'img/intents/tip/5.png', 'img/intents/tip/6.png', 'img/intents/tip/7.png', 'img/intents/unknown.png', 'img/magGlass2.png', 'img/orbs/orb.png', 'img/orbs/orbDefect.png', 'img/orbs/orbIronclad.png', 'img/orbs/orbTheSilent.png', 'img/orbs/orbWatcher.png', 'img/placeholder.png', 'img/powers/48/accuracy.png', 'img/powers/48/afterImage.png', 'img/powers/48/ai.png', 'img/powers/48/amplify.png', 'img/powers/48/anger.png', 'img/powers/48/armor.png', 'img/powers/48/artifact.png', 'img/powers/48/attackBurn.png', 'img/powers/48/backAttack.png', 'img/powers/48/backAttack2.png', 'img/powers/48/barricade.png', 'img/powers/48/beat.png', 'img/powers/48/berserk.png', 'img/powers/48/bias.png', 'img/powers/48/blur.png', 'img/powers/48/book.png', 'img/powers/48/brutality.png', 'img/powers/48/buffer.png', 'img/powers/48/burst.png', 'img/powers/48/carddraw.png', 'img/powers/48/cExplosion.png', 'img/powers/48/channel.png', 'img/powers/48/choke.png', 'img/powers/48/closeUp.png', 'img/powers/48/combust.png', 'img/powers/48/confusion.png', 'img/powers/48/conserve.png', 'img/powers/48/constricted.png', 'img/powers/48/controlled_change.png', 'img/powers/48/corruption.png', 'img/powers/48/curiosity.png', 'img/powers/48/darkembrace.png', 'img/powers/48/defenseNext.png', 'img/powers/48/demonForm.png', 'img/powers/48/deva.png', 'img/powers/48/deva2.png', 'img/powers/48/devotion.png', 'img/powers/48/dexterity.png', 'img/powers/48/doubleDamage.png', 'img/powers/48/doubleTap.png', 'img/powers/48/draw.png', 'img/powers/48/draw2.png', 'img/powers/48/echo.png', 'img/powers/48/end_turn_death.png', 'img/powers/48/energized_blue.png', 'img/powers/48/energized_green.png', 'img/powers/48/entangle.png', 'img/powers/48/envenom.png', 'img/powers/48/establishment.png', 'img/powers/48/evolve.png', 'img/powers/48/explosive.png', 'img/powers/48/fading.png', 'img/powers/48/fasting.png', 'img/powers/48/firebreathing.png', 'img/powers/48/flameBarrier.png', 'img/powers/48/flex.png', 'img/powers/48/flight.png', 'img/powers/48/focus.png', 'img/powers/48/forcefield.png', 'img/powers/48/frail.png', 'img/powers/48/fumes.png', 'img/powers/48/heartDef.png', 'img/powers/48/heatsink.png', 'img/powers/48/hello.png', 'img/powers/48/hex.png', 'img/powers/48/hymn.png', 'img/powers/48/infiniteBlades.png', 'img/powers/48/infinitegreen.png', 'img/powers/48/int.png', 'img/powers/48/intangible.png', 'img/powers/48/juggernaut.png', 'img/powers/48/lessdraw.png', 'img/powers/48/like_water.png', 'img/powers/48/lockon.png', 'img/powers/48/loop.png', 'img/powers/48/magnet.png', 'img/powers/48/malleable.png', 'img/powers/48/mantra.png', 'img/powers/48/mastery.png', 'img/powers/48/master_protect.png', 'img/powers/48/master_reality.png', 'img/powers/48/master_smite.png', 'img/powers/48/mayhem.png', 'img/powers/48/mental_fortress.png', 'img/powers/48/minion.png', 'img/powers/48/modeShift.png', 'img/powers/48/nightmare.png', 'img/powers/48/nirvana.png', 'img/powers/48/noattack.png', 'img/powers/48/noBlock.png', 'img/powers/48/noDraw.png', 'img/powers/48/noPain.png', 'img/powers/48/no_skill.png', 'img/powers/48/no_stance.png', 'img/powers/48/omega.png', 'img/powers/48/painfulStabs.png', 'img/powers/48/panache.png', 'img/powers/48/path_to_victory.png', 'img/powers/48/penNib.png', 'img/powers/48/phantasmal.png', 'img/powers/48/platedarmor.png', 'img/powers/48/poison.png', 'img/powers/48/pressure_points.png', 'img/powers/48/reactive.png', 'img/powers/48/rebound.png', 'img/powers/48/regen.png', 'img/powers/48/regrow.png', 'img/powers/48/repair.png', 'img/powers/48/retain.png', 'img/powers/48/ritual.png', 'img/powers/48/rupture.png', 'img/powers/48/rushdown.png', 'img/powers/48/sadistic.png', 'img/powers/48/shackle.png', 'img/powers/48/sharpHide.png', 'img/powers/48/shift.png', 'img/powers/48/skillBurn.png', 'img/powers/48/slow.png', 'img/powers/48/split.png', 'img/powers/48/sporeCloud.png', 'img/powers/48/stasis.png', 'img/powers/48/static_discharge.png', 'img/powers/48/storm.png', 'img/powers/48/strength.png', 'img/powers/48/surrounded.png', 'img/powers/48/swivel.png', 'img/powers/48/talk_to_hand.png', 'img/powers/48/the_bomb.png', 'img/powers/48/thievery.png', 'img/powers/48/thorns.png', 'img/powers/48/thousandCuts.png', 'img/powers/48/time.png', 'img/powers/48/tools.png', 'img/powers/48/unawakened.png', 'img/powers/48/vigor.png', 'img/powers/48/vulnerable.png', 'img/powers/48/wave_of_the_hand.png', 'img/powers/48/weak.png', 'img/powers/48/wireheading.png', 'img/powers/48/wraithForm.png']

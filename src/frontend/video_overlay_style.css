@@ -3,7 +3,7 @@
 }
 
 div.hitbox {
-    position: fixed;
+    position: absolute;
 }
 
 .mag-glass {
@@ -63,7 +63,7 @@ div.powertip-header {
 
 div.powertip-strip {
     display: none;
-    position: fixed;
+    position: absolute;
     width: 14.583rem;
 }
 
@@ -105,7 +105,6 @@ div.powertip-multicol-column {
     top: 0%;
     width: 100%;
     height: 100%;
-    /* border: 2px solid white; */
     z-index: 10;
 }
 
@@ -114,7 +113,6 @@ div.powertip-multicol-column {
     left: 15.234%;
     width: 72%;/*69.531%;*/
     height: 100%;
-    /* border: 2px solid white; */
 }
 
 #deck_view_header {
@@ -128,21 +126,35 @@ div.powertip-multicol-column {
 #deck_view_content {
     position: absolute;
     top: 5%;
-    /* border: 2px solid white; */
     width: 100%;
     height: 95%;
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow-x: visible;
+    overflow-y: scroll;
 }
 
 div.card {
     position: absolute;
     float: left;
-    width: 12.361rem;
-    height: 15.926rem;
-    /* border: 2px solid gray; */
-    /* background-color: white; */
     font-family: "Kreon", serif;
+    font-size: 1rem;
+}
+
+div.card-shadow {
+    position: absolute;
+    left: 7.67%;
+    top: 5.337%;
+    width: 84.661%;
+    height: 91.991%;
+    z-index: -10;
+    visibility: hidden;
+
+    border-radius: 0.474em;
+    -moz-border-radius: 0.474em;
+    -webkit-border-radius: 0.474em;
+    
+    -webkit-box-shadow: 0px 0px 1.403em 1.228em rgba(0,0,0,0.45), 0.65em 0.7em 0.035em 0.105em rgba(0,0,0,0.3);
+    -moz-box-shadow: 0px 0px 1.403em 1.228em rgba(0,0,0,0.45), 0.65em 0.7em 0.035em 0.105em rgba(0,0,0,0.3);
+    box-shadow: 0px 0px 1.403em 1.228em rgba(0,0,0,0.45), 0.65em 0.7em 0.035em 0.105em rgba(0,0,0,0.3);
 }
 
 div.card-img {
@@ -172,11 +184,9 @@ div.card-title {
     height: 25%;
     overflow: hidden;
     font-weight: 700;
-    font-size: 0.984rem; /* 0.948rem; */
+    font-size: 0.984em; /* 0.948rem; */
     color: white;
     --outline-color: rgb(50,50,50);
-    /* --outline-color: #000; */
-    /* --outline-color: rgb(89,89,89); - original*/
     text-shadow: 0.139rem 0.139rem 0px rgba(0,0,0,0.3), -1px -1px 0 var(--outline-color),
         0   -1px 0 var(--outline-color),
         1px -1px 0 var(--outline-color),
@@ -197,7 +207,7 @@ div.card-cost {
     height: 10%;
     overflow: hidden;
     font-weight: 700;
-    font-size: 1.53rem;/* 1.458rem;/* 1.385rem; */
+    font-size: 1.53em;/* 1.458rem;/* 1.385rem; */
     color: white;
 }
 
@@ -206,10 +216,10 @@ div.card-description {
     left: 14%;
     top: 62.471%;
     width: 72%;
-    height: 4.873rem;
-    line-height: 4.873rem;
+    height: 4.873em; /*30.597%;*/ /*4.873rem;*/
+    line-height: 4.873em; /*30.597%*/ /*4.873rem;*/
     font-weight: 400;
-    font-size: 0.875rem;
+    font-size: 0.875em;
     overflow: hidden;
     color: white;
     text-align: center;

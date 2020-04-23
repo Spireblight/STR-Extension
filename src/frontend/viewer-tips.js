@@ -58,14 +58,14 @@ function setRelics(relics, power_tips, character) {
 
         const tips = arraySubset(power_tips, relics[1][i]);
         const hitbox = {
-            x: RELIC_HITBOX_LEFT + i * RELIC_HITBOX_WIDTH + is_relics_multipage * RELIC_HITBOX_MULTIPAGE_OFFSET,
-            y: 6.111,
+            x: (RELIC_HITBOX_LEFT + i * RELIC_HITBOX_WIDTH + is_relics_multipage * RELIC_HITBOX_MULTIPAGE_OFFSET) + '%',
+            y: 6.111 + '%',
             z: 1,
-            w: 3.75,
-            h: 8.666
+            w: 3.75 + '%',
+            h: 8.666 + '%'
         }
 
-        strip = createPowerTipStrip(items, hitbox, tips, CATEGORY_RELICS, character, 'mag-glass')
+        strip = createPowerTipStrip(items, hitbox, tips, CATEGORY_RELICS, character, 'movable_')
         strip.hitbox.classList.add('mag-glass')
     }
 }
@@ -102,14 +102,14 @@ function setPotions(potions, power_tips, character) {
         let tips = arraySubset(power_tips, potions[1][i]);
         
         let hitbox = {
-            x: x_hitbox_first - POTION_HITBOX_WIDTH / 2 + i * POTION_HITBOX_WIDTH,
-            y: 0,
+            x: (x_hitbox_first - POTION_HITBOX_WIDTH / 2 + i * POTION_HITBOX_WIDTH) + '%',
+            y: 0 + '%',
             z: 1,
-            w: 2.916,
-            h: 5.556
+            w: 2.916 + '%',
+            h: 5.556 + '%'
         }
 
-        createPowerTipStrip(items, hitbox, tips, CATEGORY_POTIONS, character)
+        createPowerTipStrip(items, hitbox, tips, CATEGORY_POTIONS, character, 'movable_')
     }
 }
 
@@ -136,11 +136,11 @@ function setPlayerPowers(player_powers, power_tips, character) {
 
     if (player_powers) {
         let hitbox = {
-            x: player_powers[0],
-            y: player_powers[1],
+            x: player_powers[0] + '%',
+            y: player_powers[1] + '%',
             z: 2,
-            w: player_powers[2],
-            h: player_powers[3]
+            w: player_powers[2] + '%',
+            h: player_powers[3] + '%'
         }
         let tips = arraySubset(power_tips, player_powers[4])
         let multicol = createMulticolPowertips(items, hitbox, tips, CATEGORY_PLAYER_POWERS, character)
@@ -178,11 +178,11 @@ function setMonsterPowers(monster_powers_list, power_tips, character) {
             const monster_powers = monster_powers_list[i];
 
             let hitbox = {
-                x: monster_powers[0],
-                y: monster_powers[1],
+                x: monster_powers[0] + '%',
+                y: monster_powers[1] + '%',
                 z: 2,
-                w: monster_powers[2],
-                h: monster_powers[3]
+                w: monster_powers[2] + '%',
+                h: monster_powers[3] + '%'
             }
             let tips = arraySubset(power_tips, monster_powers[4])
 
@@ -220,11 +220,11 @@ function setCustomTips(custom_tips_list, power_tips, character) {
             const custom_tips = custom_tips_list[i];
 
             let hitbox = {
-                x: custom_tips[0],
-                y: custom_tips[1],
+                x: custom_tips[0] + '%',
+                y: custom_tips[1] + '%',
                 z: 3,
-                w: custom_tips[2],
-                h: custom_tips[3]
+                w: custom_tips[2] + '%',
+                h: custom_tips[3] + '%'
             }
             let tips = arraySubset(power_tips, custom_tips[4])
 
@@ -236,10 +236,10 @@ function setCustomTips(custom_tips_list, power_tips, character) {
 
 function placeMulticolTips(hitbox, multicol, heuristic_y) {
 
-    var x = hitbox.x
-    var y = hitbox.y
-    var w = hitbox.w
-    var h = hitbox.h
+    var x = parsePercentage(hitbox.x)
+    var y = parsePercentage(hitbox.y)
+    var w = parsePercentage(hitbox.w)
+    var h = parsePercentage(hitbox.h)
 
     var mc_h = parsePercentage(multicol.tips.style.height)
     var mc_w = parsePercentage(multicol.tips.style.width)
@@ -247,8 +247,6 @@ function placeMulticolTips(hitbox, multicol, heuristic_y) {
     var mc_left_x = x + CHARACTER_POWERS_OFFSET_L - mc_w
     var mc_x = 0
 
-    console.log('mc_h ' + mc_h)
-    
     // decide whether the multicol block will be placed on the left or on the right
     if (mc_right_x + mc_w > MAX_RIGHT) { // would be outside of the stream on the right, display on the left
         if (mc_left_x >= 0) { // left multicol fits into stream
@@ -267,7 +265,7 @@ function placeMulticolTips(hitbox, multicol, heuristic_y) {
     }
 
     // console.log('power_tip_heights[0] ' + power_tip_heights[0])
-    console.log('y ' + y + ' h ' + h + ' mc_h ' + mc_h + ' mc_w ' + mc_w)
+    // console.log('y ' + y + ' h ' + h + ' mc_h ' + mc_h + ' mc_w ' + mc_w)
 
     if (heuristic_y) {
         // don't worry about this line, it just approximates what is in the game. You have spent several hours on this one line. It's a heuristic, it's good enough
@@ -276,7 +274,7 @@ function placeMulticolTips(hitbox, multicol, heuristic_y) {
         var mc_y = y + h / 2 - mc_h / 2
     }
         
-    console.log('mc_y ' + mc_y)
+    // console.log('mc_y ' + mc_y)
 
     if (mc_y + mc_h > MAX_BOTTOM) { // would be below stream
         mc_y = MAX_BOTTOM - mc_h
