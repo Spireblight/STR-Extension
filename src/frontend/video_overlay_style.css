@@ -88,21 +88,28 @@ div.powertip-multicol-column {
 
 #deck_button {
     position: absolute;
-    width: 8%;
+    width: 3.333%;
     height: 8%;
-    top: 10%;
-    right: 3%;
+    top: 0%;
+    right: 4.375%;
     z-index: 9;
+    background-size: contain;
+    /* border: 1px solid rgba(255,255,255,0.0); */
+    box-sizing: border-box;
+    background-repeat: no-repeat;
 }
 
-#deck_button:hover {
-    position: absolute;
-    width: 8%;
-    height: 8%;
-    top: 10%;
-    right: 3%;
-    border: 2px solid white;
+
+.button-border {
+    border: 1px solid rgba(255,255,255,0.4);
 }
+
+
+.button-border:hover {
+    border: 1px solid rgba(255,255,255,0.8);
+    background-image: url(img/ui/deck.png);
+}
+
 
 #deck_view {
     display: none;
@@ -123,6 +130,7 @@ div.powertip-multicol-column {
     height: 9.259%;
     background-size: cover;
     background-image: url('img/ui/btn_return_base.png');
+    background-repeat: no-repeat;
     z-index: 1
 }
 
@@ -136,6 +144,7 @@ div.powertip-multicol-column {
     top: 0%;
     width: 15.234%;
     height: 100%;
+    z-index: -1;
 }
 
 #deck_view_right_bar {
@@ -144,6 +153,7 @@ div.powertip-multicol-column {
     top: 0%;
     width: 15.234%;
     height: 100%;
+    z-index: -1;
 }
 
 .deck-view-footer {
@@ -167,9 +177,10 @@ div.card {
     float: left;
     font-family: "Kreon", serif;
     font-size: 1rem;
+    overflow: visible;
 }
 
-div.card-shadow {
+div.card-shadow-drop {
     position: absolute;
     left: 7.67%;
     top: 5.337%;
@@ -182,14 +193,33 @@ div.card-shadow {
     -moz-border-radius: 0.474em;
     -webkit-border-radius: 0.474em;
     
-    -webkit-box-shadow: 0px 0px 1.403em 1.228em rgba(0,0,0,0.45), 0.65em 0.7em 0.035em 0.105em rgba(0,0,0,0.3);
-    -moz-box-shadow: 0px 0px 1.403em 1.228em rgba(0,0,0,0.45), 0.65em 0.7em 0.035em 0.105em rgba(0,0,0,0.3);
-    box-shadow: 0px 0px 1.403em 1.228em rgba(0,0,0,0.45), 0.65em 0.7em 0.035em 0.105em rgba(0,0,0,0.3);
+    -webkit-box-shadow: 0.65em 0.7em 0.035em 0.105em rgba(0,0,0,0.3);
+    -moz-box-shadow: 0.65em 0.7em 0.035em 0.105em rgba(0,0,0,0.3);
+    box-shadow: 0.65em 0.7em 0.035em 0.105em rgba(0,0,0,0.3);
+}
+
+div.card-shadow-blur {
+    position: absolute;
+    left: 7.67%;
+    top: 5.337%;
+    width: 84.661%;
+    height: 91.991%;
+    z-index: -10;
+    visibility: hidden;
+
+    border-radius: 0.474em;
+    -moz-border-radius: 0.474em;
+    -webkit-border-radius: 0.474em;
+    
+    -webkit-box-shadow: 0px 0px 1.403em 1.228em rgba(0,0,0,0.45);
+    -moz-box-shadow: 0px 0px 1.403em 1.228em rgba(0,0,0,0.45);
+    box-shadow: 0px 0px 1.403em 1.228em rgba(0,0,0,0.45);
 }
 
 div.card-img {
     position: absolute;
     background-size: cover;
+    background-repeat: no-repeat;
     left: 0%;
     top: 0%;
     width: 100%;
@@ -199,6 +229,7 @@ div.card-img {
 div.card-portrait {
     position: absolute;
     background-size: cover;
+    background-repeat: no-repeat;
     left: 12.979%;
     top: 13.4%;
     width: 73.746%;
@@ -225,6 +256,15 @@ div.card-title {
         0    1px 0 var(--outline-color),
         -1px  1px 0 var(--outline-color),
         -1px  0   0 var(--outline-color);
+}
+
+div.card-bottle {
+    position: absolute;
+    right: -3.3%;
+    top: -1%;
+    width: 3.6em;
+    height: 3.6em;
+    background-size: cover;
 }
 
 div.card-cost {

@@ -10,23 +10,14 @@ var last_custom_tips_list = ""
 var last_custom_tips_list_tips = ""
 
 
-const RELIC_HITBOX_WIDTH = 3.75 //%
-const RELIC_HITBOX_LEFT = 1.458 //%
-const RELIC_HITBOX_MULTIPAGE_OFFSET = 1.875 //%
 const MAX_DISPLAY_RELICS = 25 //count
-const POTION_HITBOX_WIDTH = 2.916 // %
+
 const MAX_RIGHT = 99.0 //%
-const POWERTIP_WIDTH = 16.406 //%
-const POWERTIP_WIDTH_REM = 14.583 //%
-const MAX_POWERTIP_MULTICOL_HEIGHT = 70.0 //%
+const MAX_BOTTOM = 98.0 //%
+const MIN_TOP = 2.0 //%
 const CHARACTER_POWERS_OFFSET_R = 1.0416 //%
 const CHARACTER_POWERS_OFFSET_L = -2.917 //%
 const CHARACTER_HEALTHBAR_HEIGHT = 6.666 //%
-const POWERTIP_BOTTOM_MARGIN = 0.365 //%
-const MULTICOL_COLUMN_RIGHT_MARGIN = 0.469 //% - don't mess with this number or the columns won't be separated
-const MAX_BOTTOM = 98.0 //%
-const MIN_TOP = 2.0 //%
-
 
 const CATEGORY_RELICS = 'relics'
 const CATEGORY_POTIONS = 'potions'
@@ -68,7 +59,7 @@ function setRelics(relics, power_tips, character) {
             h: 8.666 + '%'
         }
 
-        strip = createPowerTipStrip(items, hitbox, tips, CATEGORY_RELICS, character, 'movable_')
+        strip = createPowerTipStrip(items, hitbox, tips, CATEGORY_RELICS, character)
         strip.hitbox.classList.add('mag-glass')
     }
 }
@@ -115,7 +106,7 @@ function setPotions(potions, power_tips, character) {
             h: 5.556 + '%'
         }
 
-        createPowerTipStrip(items, hitbox, tips, CATEGORY_POTIONS, character, 'movable_')
+        createPowerTipStrip(items, hitbox, tips, CATEGORY_POTIONS, character)
     }
 }
 

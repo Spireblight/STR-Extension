@@ -2,7 +2,17 @@
 const CHARACTERS = ["Ironclad", "TheSilent", "Defect", "Watcher"]
 const WILDCARDS = '0123456789abcdefghijklmnopqrstvwxyzABCDEFGHIJKLMNOPQRSTVWXYZ_`[]/^%?@><=-+*:;,.()#$!\'{}~'
 
-var _uid = 0
+const REM_PX = 21.6
+
+const RELIC_HITBOX_WIDTH = 3.75 //%
+const RELIC_HITBOX_LEFT = 1.458 //%
+const RELIC_HITBOX_MULTIPAGE_OFFSET = 1.875 //%
+const POTION_HITBOX_WIDTH = 2.916 // %
+const POWERTIP_WIDTH = 16.406 //%
+const POWERTIP_WIDTH_REM = 14.583 //%
+const MAX_POWERTIP_MULTICOL_HEIGHT = 70.0 //%
+const POWERTIP_BOTTOM_MARGIN = 0.365 //%
+const MULTICOL_COLUMN_RIGHT_MARGIN = 0.469 //% - don't mess with this number or the columns won't be separated
 
 var collections = {}
 
@@ -83,7 +93,13 @@ function arraySlice(array, from, to) {
 
 
 function getNextId() {
-    return "id" + _uid++
+    if (getNextId.uid == undefined) {
+        getNextId.uid = 0
+    }
+
+    getNextId.uid = (getNextId.uid + 1) % 1000
+
+    return "id" + getNextId.uid
 }
 
 
@@ -218,13 +234,9 @@ function createMulticolPowertips(parent, hitbox, tips, category, character, id_p
 }
 
 
-function createPowerTipStrip(parent, hitbox, tips, category, character, id_prefix) {
+function createPowerTipStrip(parent, hitbox, tips, category, character) {
     
-    if (!id_prefix) {
-        id_prefix = ""
-    }
-
-    let id = id_prefix + getNextId()
+    let id = getNextId()
 
     let hitboxElem = createHitbox(id, category, hitbox.x, hitbox.y, hitbox.z, hitbox.w, hitbox.h)
     let tipsElem = createStrip(id, tips, character)

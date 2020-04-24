@@ -1,19 +1,20 @@
 
 var last_deck = ""
 
-const CATEGORY_CARDS = 'cards'
+var deck_view_open = false
 
+const CATEGORY_CARDS = 'cards'
 
 // these are defaults from the base game that are integer encoded, the one from mods get sent by their full name
 CARD_TYPE = ['ATTACK', 'SKILL', 'POWER', 'STATUS', 'CURSE']
 CARD_RARITY = ['BASIC', 'SPECIAL', 'COMMON', 'UNCOMMON', 'RARE', 'CURSE']
 CARD_COLOR = ['RED', 'GREEN', 'BLUE', 'PURPLE', 'COLORLESS', 'CURSE']
 
+BOTTLE_RELICS = ['bottled_flame', 'bottled_lightning', 'bottled_tornado']
 
 const CARD_BASE_WIDTH = 12.361 //rem
 const CARD_BASE_HEIGHT = 15.926 //rem
 const CARD_BASE_FONT_SIZE = 1 //rem
-
 
 const CARD_VIEW_SCALE = 0.97
 const CARD_VIEW_WIDTH = CARD_BASE_WIDTH * CARD_VIEW_SCALE
@@ -24,11 +25,15 @@ const CARD_VIEW_Y_OFFSET = 3 // rem
 
 const CARD_HOVER_SCALE = 1.32
 
-
-const CARD_VIEW_TIPS_X_OFFSET = -0.15 // rem
-const CARD_VIEW_TIPS_Y_OFFSET = 0.71 // rem
+const CARD_TIPS_X_OFFSET = -0.15 // rem
+const CARD_TIPS_Y_OFFSET = 0.71 // rem
 
 const DECK_VIEW_SHOW_TIP_STRIP_DELAY = 200
+
+const CARD_PREVIEW_SCALE = 0.95
+const CARD_PREVIEW_WIDTH = CARD_BASE_WIDTH * CARD_PREVIEW_SCALE
+const CARD_PREVIEW_X_OFFSET = -0.8 // rem
+const CARD_PREVIEW_Y_OFFSET = 0.15
 
 
 function decompressDeck(deck) {
@@ -48,22 +53,26 @@ function decompressDeck(deck) {
 }
 
 
-function hideDeck() {
+function openDeckView() {
+    $('#deck_view').css('display', 'block')
+    deck_view_open = true
+}
+
+
+function closeDeckView() {
     $('#deck_view').css('display', 'none')
+    deck_view_open = false
 }
 
 
 function initializeDeck() {
-    $('#deck_button').click(function (e) {
-        $('#deck_view').css('display', 'block')
-        console.log('deck button click')
-    })
+    $('#deck_button').click(openDeckView)
 
-    $('#deck_view_left_bar').click(hideDeck)
+    $('#deck_view_left_bar').click(closeDeckView)
 
-    $('#deck_view_right_bar').click(hideDeck)
+    $('#deck_view_right_bar').click(closeDeckView)
 
-    $('#deck_view_return_btn').click(hideDeck)
+    $('#deck_view_return_btn').click(closeDeckView)
 
 
     // $('#deck_view').onclick = function() {
@@ -98,10 +107,7 @@ function setDeck(deck, cards, tips, character) {
     last_deck = JSON.stringify([deck, cards, tips])
     clearDeck()
 
-    console.log('cleared deck')
-    console.log(JSON.stringify(deck))
-    console.log(JSON.stringify(cards))
-    console.log(JSON.stringify(tips))
+    // console.log('cleared deck')
 
     const content = document.getElementById('deck_view_content')
     
@@ -121,7 +127,7 @@ function setDeck(deck, cards, tips, character) {
 
         // name ; bottleStatus ; cardToPreview ; cardToPreview upgraded ; nameUpgraded ; upgrades ; keyword upgraded ; descriptionUpgraded ; keywords ; cost ; type ; rarity ; color ; description
 
-        console.log(JSON.stringify(card))
+        // console.log(JSON.stringify(card))
 
         let name = card[0]
         let bottle_status = card[1]
@@ -166,13 +172,43 @@ function setDeck(deck, cards, tips, character) {
         strip.hitbox.onmouseleave = function(e) {cardMouseExit(e, strip.tips.id)}
         strip.hitbox.onclick = function(e) {cardClick(e, strip.tips.id)}
 
-        // add shadow
+        // add shadow to tips
         for (powertip of strip.tips.childNodes) {
             powertip.classList.add('powertip-shadow')
         }
 
         // place tips beside the card
         placeDeckViewTipStrip(cardElem, strip)
+
+        // place preview beside the card if it exists
+        if (card_to_preview != -1) {
+            const cardPreview = cards[card_to_preview]
+
+            let namePreview = cardPreview[0]
+            let upgradesPreview = parseInt(cardPreview[5])
+            let costPreview = parseCost(cardPreview[9])
+            let typePreview = parseCardType(cardPreview[10])
+            let rarityPreview = parseCardRarity(cardPreview[11])
+            let colorPreview = parseCardColor(cardPreview[12])
+            let descriptionPreview = cardPreview[13]
+
+            cardPreviewElem = createCardElement(namePreview, typePreview, rarityPreview, colorPreview, costPreview, upgradesPreview, descriptionPreview, character, CARD_PREVIEW_WIDTH)
+            cardPreviewElem.id = strip.tips.id + '_preview'
+            cardPreviewElem.style.display = 'none'
+            cardPreviewElem.style.zIndex = 5
+
+            cardPreviewElem.getElementsByClassName('card-shadow-drop')[0].style.visibility = 'visible'
+
+            placeCardPreview(cardElem, cardPreviewElem)
+
+            content.appendChild(cardPreviewElem)
+            addToCollection(CATEGORY_CARDS, cardPreviewElem)
+        }
+
+        // display correct bottle if it exists
+        if (bottle_status > 0) {
+            cardElem.getElementsByClassName('card-bottle')[0].style.backgroundImage = 'url(img/relics/' + BOTTLE_RELICS[bottle_status - 1] + '.png)'
+        }
 
         x += CARD_BASE_WIDTH
         if (i % ncards_row == ncards_row - 1) {
@@ -209,22 +245,29 @@ function cardMouseEnter(e, id) {
     card.style.top = (y - ydiff) + 'rem'
     card.style.zIndex = 4
 
-    const shadow = card.getElementsByClassName('card-shadow')[0]
-    shadow.style.visibility = 'visible'
+    const shadow_drop = card.getElementsByClassName('card-shadow-drop')[0]
+    const shadow_blur = card.getElementsByClassName('card-shadow-blur')[0]
+    shadow_drop.style.visibility = 'visible'
+    shadow_blur.style.visibility = 'visible'
 
     setCardWidth(card, CARD_VIEW_WIDTH * CARD_HOVER_SCALE)
 
     current_tooltip_id = id
     current_tooltip_category = CATEGORY_CARDS
 
-    setTimeout(showTipStrip, DECK_VIEW_SHOW_TIP_STRIP_DELAY, id)
+    setTimeout(showTipStripAndPreview, DECK_VIEW_SHOW_TIP_STRIP_DELAY, id)
 }
 
 
-function showTipStrip(id) {
+function showTipStripAndPreview(id) {
     if (current_tooltip_id == id) {
         const tips = document.getElementById(id)
         tips.style.display = 'block'
+
+        const preview = document.getElementById(id + '_preview')
+        if(preview) {
+            preview.style.display = 'block'
+        }
     }
 }
 
@@ -233,6 +276,7 @@ function cardMouseExit(e, id) {
 
     const tips = document.getElementById(id)
     const card = document.getElementById(id + '_card')
+    const preview = document.getElementById(id + '_preview')
 
     let x = parseRem(card.style.left)
     let y = parseRem(card.style.top)
@@ -244,8 +288,10 @@ function cardMouseExit(e, id) {
     card.style.top = (y + ydiff) + 'rem'
     card.style.zIndex = 1
 
-    const shadow = card.getElementsByClassName('card-shadow')[0]
-    shadow.style.visibility = 'hidden'
+    const shadow_drop = card.getElementsByClassName('card-shadow-drop')[0]
+    const shadow_blur = card.getElementsByClassName('card-shadow-blur')[0]
+    shadow_drop.style.visibility = 'hidden'
+    shadow_blur.style.visibility = 'hidden'
 
     setCardWidth(card, CARD_VIEW_WIDTH)
 
@@ -253,6 +299,10 @@ function cardMouseExit(e, id) {
     current_tooltip_category = null
 
     tips.style.display = 'none'
+
+    if(preview) {
+        preview.style.display = 'none'
+    }
 }
 
 
@@ -278,9 +328,13 @@ function createCardElement(name, type, rarity, color, cost, upgrades, descriptio
     card.classList.add('card')
     setCardWidth(card, target_width)
 
-    const shadow = document.createElement('div')
-    shadow.className = 'card-shadow'
-    card.appendChild(shadow)
+    const shadow_blur = document.createElement('div')
+    shadow_blur.className = 'card-shadow-blur'
+    card.appendChild(shadow_blur)
+
+    const shadow_drop = document.createElement('div')
+    shadow_drop.className = 'card-shadow-drop'
+    card.appendChild(shadow_drop)
 
     const bg = document.createElement('div')
     bg.className = 'card-img'
@@ -321,6 +375,10 @@ function createCardElement(name, type, rarity, color, cost, upgrades, descriptio
     title.className = 'card-title'
     title.innerHTML = replaceColorCodes(name_aux)
     card.appendChild(title)
+
+    const bottle = document.createElement('div')
+    bottle.className = 'card-bottle'
+    card.appendChild(bottle)
 
     const desc = document.createElement('div')
     desc.className = 'card-description'
@@ -401,11 +459,27 @@ function placeDeckViewTipStrip(card, strip) {
     let xdiff = CARD_VIEW_WIDTH * (CARD_HOVER_SCALE - 1) / 2
     let ydiff = CARD_VIEW_HEIGHT * (CARD_HOVER_SCALE - 1) / 2
 
-    strip.tips.style.top = y - ydiff + CARD_VIEW_TIPS_Y_OFFSET + 'rem'
+    strip.tips.style.top = y - ydiff + CARD_TIPS_Y_OFFSET + 'rem'
 
     if (x < 55) { // card column 1-4
-        strip.tips.style.left = x + CARD_VIEW_WIDTH + xdiff + CARD_VIEW_TIPS_X_OFFSET + 'rem'
+        strip.tips.style.left = x + CARD_VIEW_WIDTH + xdiff + CARD_TIPS_X_OFFSET + 'rem'
     } else { // card column 5
-        strip.tips.style.left = x - xdiff - CARD_VIEW_TIPS_X_OFFSET - POWERTIP_WIDTH_REM + 'rem'
+        strip.tips.style.left = x - xdiff - CARD_TIPS_X_OFFSET - POWERTIP_WIDTH_REM + 'rem'
+    }
+}
+
+function placeCardPreview(card, cardPreview) {
+    let x = parseRem(card.style.left)
+    let y = parseRem(card.style.top)
+
+    let xdiff = CARD_VIEW_WIDTH * (CARD_HOVER_SCALE - 1) / 2
+    let ydiff = CARD_VIEW_HEIGHT * (CARD_HOVER_SCALE - 1) / 2
+
+    cardPreview.style.top = y - ydiff + CARD_PREVIEW_Y_OFFSET + 'rem'
+
+    if (x > 55) { // card column 1-4
+        cardPreview.style.left = x + CARD_VIEW_WIDTH + xdiff + CARD_PREVIEW_X_OFFSET + 'rem'
+    } else { // card column 5
+        cardPreview.style.left = x - xdiff - CARD_PREVIEW_X_OFFSET - CARD_PREVIEW_WIDTH + 'rem'
     }
 }
