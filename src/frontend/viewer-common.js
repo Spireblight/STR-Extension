@@ -106,7 +106,8 @@ function getNextId() {
 function clearCollection(category) {
     if (category in collections) {
         for (let i = 0; i < collections[category].length; i++) {
-            const element = array[i];
+            const element = collections[category][i];
+
             element.parentNode.removeChild(element)
         }
 
@@ -116,6 +117,9 @@ function clearCollection(category) {
 
 
 function addToCollection(category, element) {
+    if (!(element instanceof Element))
+        error('element is not instance of element but ' + typeof(element))
+
     if (category in collections) {
         collections[category].push(element)
     } else {
@@ -123,16 +127,9 @@ function addToCollection(category, element) {
     }
 }
 
-MULTICOL_PLACEMENT_AUTO_HEURISTIC = 'auto_heuristic'
-MULTICOL_PLACEMENT_AUTO_SIMPLE = 'auto_simple'
-MULTICOL_PLACEMENT_MANUAL_TOPLEFT = 'manual_topleft'
-MULTICOL_PLACEMENT_MANUAL_CENTER = 'manual_center'
 
-class MulticolPowertipsPlacement {
-    constructor(type, x, y) {
+////////////////////////////////////// TIPS
 
-    }
-}
 
 
 function createMulticolPowertips(parent, hitbox, tips, category, character, id_prefix) {
@@ -403,6 +400,10 @@ function parsePercentage(val) {
 }
 
 
+
+////////////////////////////////////// IMAGE PRELOAD
+
+
 const PRELOAD_IMAGES = ['img/intents/attackBuff.png', 'img/intents/attackDebuff.png', 'img/intents/attackDefend.png', 'img/intents/buff1.png', 'img/intents/debuff1.png', 'img/intents/debuff2.png', 'img/intents/defend.png', 'img/intents/defendBuff.png', 'img/intents/escape.png', 'img/intents/magic.png', 'img/intents/sleep.png', 'img/intents/special.png', 'img/intents/stun.png', 'img/intents/tip/1.png', 'img/intents/tip/2.png', 'img/intents/tip/3.png', 'img/intents/tip/4.png', 'img/intents/tip/5.png', 'img/intents/tip/6.png', 'img/intents/tip/7.png', 'img/intents/unknown.png', 'img/magGlass2.png', 'img/orbs/orb.png', 'img/orbs/orbDefect.png', 'img/orbs/orbIronclad.png', 'img/orbs/orbTheSilent.png', 'img/orbs/orbWatcher.png', 'img/placeholder.png', 'img/powers/48/accuracy.png', 'img/powers/48/afterImage.png', 'img/powers/48/ai.png', 'img/powers/48/amplify.png', 'img/powers/48/anger.png', 'img/powers/48/armor.png', 'img/powers/48/artifact.png', 'img/powers/48/attackBurn.png', 'img/powers/48/backAttack.png', 'img/powers/48/backAttack2.png', 'img/powers/48/barricade.png', 'img/powers/48/beat.png', 'img/powers/48/berserk.png', 'img/powers/48/bias.png', 'img/powers/48/blur.png', 'img/powers/48/book.png', 'img/powers/48/brutality.png', 'img/powers/48/buffer.png', 'img/powers/48/burst.png', 'img/powers/48/carddraw.png', 'img/powers/48/cExplosion.png', 'img/powers/48/channel.png', 'img/powers/48/choke.png', 'img/powers/48/closeUp.png', 'img/powers/48/combust.png', 'img/powers/48/confusion.png', 'img/powers/48/conserve.png', 'img/powers/48/constricted.png', 'img/powers/48/controlled_change.png', 'img/powers/48/corruption.png', 'img/powers/48/curiosity.png', 'img/powers/48/darkembrace.png', 'img/powers/48/defenseNext.png', 'img/powers/48/demonForm.png', 'img/powers/48/deva.png', 'img/powers/48/deva2.png', 'img/powers/48/devotion.png', 'img/powers/48/dexterity.png', 'img/powers/48/doubleDamage.png', 'img/powers/48/doubleTap.png', 'img/powers/48/draw.png', 'img/powers/48/draw2.png', 'img/powers/48/echo.png', 'img/powers/48/end_turn_death.png', 'img/powers/48/energized_blue.png', 'img/powers/48/energized_green.png', 'img/powers/48/entangle.png', 'img/powers/48/envenom.png', 'img/powers/48/establishment.png', 'img/powers/48/evolve.png', 'img/powers/48/explosive.png', 'img/powers/48/fading.png', 'img/powers/48/fasting.png', 'img/powers/48/firebreathing.png', 'img/powers/48/flameBarrier.png', 'img/powers/48/flex.png', 'img/powers/48/flight.png', 'img/powers/48/focus.png', 'img/powers/48/forcefield.png', 'img/powers/48/frail.png', 'img/powers/48/fumes.png', 'img/powers/48/heartDef.png', 'img/powers/48/heatsink.png', 'img/powers/48/hello.png', 'img/powers/48/hex.png', 'img/powers/48/hymn.png', 'img/powers/48/infiniteBlades.png', 'img/powers/48/infinitegreen.png', 'img/powers/48/int.png', 'img/powers/48/intangible.png', 'img/powers/48/juggernaut.png', 'img/powers/48/lessdraw.png', 'img/powers/48/like_water.png', 'img/powers/48/lockon.png', 'img/powers/48/loop.png', 'img/powers/48/magnet.png', 'img/powers/48/malleable.png', 'img/powers/48/mantra.png', 'img/powers/48/mastery.png', 'img/powers/48/master_protect.png', 'img/powers/48/master_reality.png', 'img/powers/48/master_smite.png', 'img/powers/48/mayhem.png', 'img/powers/48/mental_fortress.png', 'img/powers/48/minion.png', 'img/powers/48/modeShift.png', 'img/powers/48/nightmare.png', 'img/powers/48/nirvana.png', 'img/powers/48/noattack.png', 'img/powers/48/noBlock.png', 'img/powers/48/noDraw.png', 'img/powers/48/noPain.png', 'img/powers/48/no_skill.png', 'img/powers/48/no_stance.png', 'img/powers/48/omega.png', 'img/powers/48/painfulStabs.png', 'img/powers/48/panache.png', 'img/powers/48/path_to_victory.png', 'img/powers/48/penNib.png', 'img/powers/48/phantasmal.png', 'img/powers/48/platedarmor.png', 'img/powers/48/poison.png', 'img/powers/48/pressure_points.png', 'img/powers/48/reactive.png', 'img/powers/48/rebound.png', 'img/powers/48/regen.png', 'img/powers/48/regrow.png', 'img/powers/48/repair.png', 'img/powers/48/retain.png', 'img/powers/48/ritual.png', 'img/powers/48/rupture.png', 'img/powers/48/rushdown.png', 'img/powers/48/sadistic.png', 'img/powers/48/shackle.png', 'img/powers/48/sharpHide.png', 'img/powers/48/shift.png', 'img/powers/48/skillBurn.png', 'img/powers/48/slow.png', 'img/powers/48/split.png', 'img/powers/48/sporeCloud.png', 'img/powers/48/stasis.png', 'img/powers/48/static_discharge.png', 'img/powers/48/storm.png', 'img/powers/48/strength.png', 'img/powers/48/surrounded.png', 'img/powers/48/swivel.png', 'img/powers/48/talk_to_hand.png', 'img/powers/48/the_bomb.png', 'img/powers/48/thievery.png', 'img/powers/48/thorns.png', 'img/powers/48/thousandCuts.png', 'img/powers/48/time.png', 'img/powers/48/tools.png', 'img/powers/48/unawakened.png', 'img/powers/48/vigor.png', 'img/powers/48/vulnerable.png', 'img/powers/48/wave_of_the_hand.png', 'img/powers/48/weak.png', 'img/powers/48/wireheading.png', 'img/powers/48/wraithForm.png']
 const MAX_CONCURRENT_PRELOADS = 2
 const PRELOAD_INTERVAL = 250
@@ -446,4 +447,161 @@ function preloadNextImageBunch() {
 
     if(image_preload_index < PRELOAD_IMAGES.length)
         window.setTimeout(preloadNextImageBunch, PRELOAD_INTERVAL)
+}
+
+
+
+////////////////////////////////////// CARDS
+
+// these are defaults from the base game that are integer encoded, the one from mods get sent by their full name
+CARD_TYPE = ['ATTACK', 'SKILL', 'POWER', 'STATUS', 'CURSE']
+CARD_RARITY = ['BASIC', 'SPECIAL', 'COMMON', 'UNCOMMON', 'RARE', 'CURSE']
+CARD_COLOR = ['RED', 'GREEN', 'BLUE', 'PURPLE', 'COLORLESS', 'CURSE']
+
+BOTTLE_RELICS = ['bottled_flame', 'bottled_lightning', 'bottled_tornado']
+
+const CARD_BASE_WIDTH = 12.361 //rem
+const CARD_BASE_HEIGHT = 15.926 //rem
+const CARD_BASE_FONT_SIZE = 1 //rem
+
+
+function setCardWidth(card, target_width) {
+    const scale = target_width / CARD_BASE_WIDTH
+
+    const width = CARD_BASE_WIDTH * scale + 'rem'
+    const height = CARD_BASE_HEIGHT * scale + 'rem'
+    const font_size = CARD_BASE_FONT_SIZE * scale + 'rem'
+
+    card.style.width = width
+    card.style.height = height
+    card.style.fontSize = font_size
+}
+
+
+function createCardElement(name, type, rarity, color, cost, upgrades, description, character, target_width) {
+
+    if (target_width == undefined)
+        target_width = CARD_BASE_WIDTH
+
+    const card = document.createElement('div')
+    card.classList.add('card')
+    setCardWidth(card, target_width)
+
+    const shadow_blur = document.createElement('div')
+    shadow_blur.className = 'card-shadow-blur'
+    card.appendChild(shadow_blur)
+
+    const shadow_drop = document.createElement('div')
+    shadow_drop.className = 'card-shadow-drop'
+    card.appendChild(shadow_drop)
+
+    const bg = document.createElement('div')
+    bg.className = 'card-img'
+    bg.style.backgroundImage = getBackgroundPath(color, type)
+    bg.style.zIndex = -4
+    card.appendChild(bg)
+
+    const portrait = document.createElement('div')
+    portrait.className = 'card-portrait'
+    portrait.style.backgroundImage = getPortraitPath(color, name, upgrades)
+    portrait.style.zIndex = -3
+    card.appendChild(portrait)
+
+    const frame = document.createElement('div')
+    frame.className = 'card-img'
+    frame.style.backgroundImage = getFramePath(color, type, rarity)
+    frame.style.zIndex = -2
+    card.appendChild(frame)
+    
+    if (cost != null) {
+        const energyOrb = document.createElement('div')
+        energyOrb.className = 'card-img'
+        energyOrb.style.backgroundImage = getEnergyOrbPath(color)
+        energyOrb.style.zIndex = -1
+        card.appendChild(energyOrb)
+        
+        const energyCost = document.createElement('div')
+        energyCost.className = 'card-cost outline-black'
+        energyCost.innerHTML = cost
+        energyCost.zIndex = 1
+        card.appendChild(energyCost)
+    }
+
+    let name_aux = name
+    if (upgrades > 0)
+        name_aux = colorizeString(name_aux, '#g')
+    const title = document.createElement('div')
+    title.className = 'card-title'
+    title.innerHTML = replaceColorCodes(name_aux)
+    card.appendChild(title)
+
+    const bottle = document.createElement('div')
+    bottle.className = 'card-bottle'
+    card.appendChild(bottle)
+
+    const desc = document.createElement('div')
+    desc.className = 'card-description'
+    const descText = document.createElement('span')
+    descText.className = 'card-description-text'
+    descText.innerHTML = replaceNewLines(replaceManaSymbols(replaceColorCodes(description), character))
+    desc.appendChild(descText)
+    card.appendChild(desc)
+
+    // console.log(JSON.stringify(keywords))
+
+    return card
+
+    function getBackgroundPath(color, type) {return 'url("img/cards/' + color + '/background_' + type + '.png")'}
+    function getFramePath(color, type, rarity) {return 'url("img/cards/' + color + '/frame_' + type + '_' + rarity + '.png")'}
+    function getEnergyOrbPath(color) {return 'url("img/cards/' + color + '/energy_orb.png")'}
+    function getPortraitPath(color, name, upgrades) {
+        if (upgrades > 0 && name.lastIndexOf('+') != -1)
+            name = name.substring(0, name.lastIndexOf('+'))
+        name = name.replace(/[\\/:*?"<>|]/g, '_')
+        return 'url("img/cards/' + color + '/portraits/' + name + '.png")'
+    }
+}
+
+function parseCost(cost) {
+    if (cost == -2)
+        return null
+    else if (cost == -1)
+        return "X"
+    else
+        return parseInt(cost)
+}
+
+function colorizeString(str, color_prefix) {
+    let split = str.split(' ')
+    str = ""
+    for (let i = 0; i < split.length; i++) {
+        const part = split[i];
+        str += color_prefix + part 
+        if (i < split.length - 1)
+            str += " "
+    }
+    return str
+}
+
+function parseCardType(type) {
+    let parsed = parseInt(type)
+    return isNaN(parsed) ? type : CARD_TYPE[parsed]
+}
+
+function parseCardRarity(rarity) {
+    let parsed = parseInt(rarity)
+    return isNaN(parsed) ? rarity : CARD_RARITY[parsed]
+}
+
+function parseCardColor(color) {
+    let parsed = parseInt(color)
+    return isNaN(parsed) ? color : CARD_COLOR[parsed]
+}
+
+function parseKeywords(keywords) {
+    if (keywords == '-')
+        return []
+    else {
+        return JSON.parse('[' + keywords + ']')
+    }
 }

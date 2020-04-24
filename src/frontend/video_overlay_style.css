@@ -1,5 +1,9 @@
 :root{
     font-size: 2vh; /* Pixel values are based on height 1080px therefore 1rem = 21.6px for this resolution */
+    -webkit-user-select: none; /* Safari */        
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
 }
 
 div.hitbox {
@@ -66,13 +70,11 @@ div.powertip-header {
     letter-spacing: 0.046rem;
 }
 
-
 div.powertip-strip {
     display: none;
     position: absolute;
     width: 14.583rem;
 }
-
 
 div.powertip-multicol {
     display: none;
@@ -85,31 +87,108 @@ div.powertip-multicol-column {
     margin-right: 0.370rem;
 }
 
-
 #deck_button {
     position: absolute;
-    width: 3.333%;
+    display: none;
+    width: 3.438%;
     height: 8%;
     top: 0%;
-    right: 4.375%;
+    right: 4.427%;
     z-index: 9;
     background-size: contain;
+    background-position-y: -0.046rem;
     /* border: 1px solid rgba(255,255,255,0.0); */
     box-sizing: border-box;
     background-repeat: no-repeat;
 }
 
-
 .button-border {
     border: 1px solid rgba(255,255,255,0.4);
 }
-
 
 .button-border:hover {
     border: 1px solid rgba(255,255,255,0.8);
     background-image: url(img/ui/deck.png);
 }
 
+
+#card_view {
+    display: none;
+    position: absolute;
+    left: 0%;
+    top: 0%;
+    width: 100%;
+    height: 100%;
+    z-index: 20;
+    background-color: rgba(0,0,0,0.9);
+}
+
+#card_view_prev_btn {
+    position: absolute;
+    width: 7.812%;
+    height: 14.815%;
+    left: 24.74%;
+    top: 42.13%;
+    background-image: url(img/ui/btn_prev_base.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+#card_view_prev_btn:hover {
+    background-image: url(img/ui/btn_prev_hover.png);
+}
+
+#card_view_next_btn {
+    position: absolute;
+    width: 7.812%;
+    height: 14.815%;
+    left: 67.813%;
+    top: 42.13%;
+    background-image: url(img/ui/btn_next_base.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+#card_view_next_btn:hover {
+    background-image: url(img/ui/btn_next_hover.png);
+}
+
+#card_view_checkbox {
+    position: absolute;
+    width: 13.594%;
+    height: 4.907%;
+    left: 43.229%;
+    top: 91.296%;
+    background-repeat: none;
+    background-size: cover;
+}
+
+.card-view-checkbox-unchecked {
+    background-image: url(img/ui/checkbox_upgrade.png)
+}
+
+.card-view-checkbox-unchecked:hover {
+    background-image: url(img/ui/checkbox_upgrade_hover.png)
+}
+
+.card-view-checkbox-checked {
+    background-image: url(img/ui/checkbox_upgrade_checked.png)
+}
+
+.card-view-checkbox-checked:hover {
+    background-image: url(img/ui/checkbox_upgrade_checked_hover.png)
+}
+
+#card_view_tips_box {
+    position: absolute;
+    left: 67.708%;
+    top: 59.908%;
+    width: 19%;
+    height: 40.092%;
+    overflow-y: auto;
+    display: block;
+    /* border: 1px solid white; */
+}
 
 #deck_view {
     display: none;
@@ -338,4 +417,9 @@ span.card-description-text {
 
 .text-other {
     color: rgb(53, 255, 255);
+}
+
+#placeholder {
+    width: 0%;
+    height: 0%;
 }

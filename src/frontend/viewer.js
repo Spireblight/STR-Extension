@@ -34,7 +34,16 @@ function processMessage(broadcast) {
         var character = sanitizeCharacter(msg.c)
         var deck = decompressDeck(msg.k)
 
-        setDeck(deck.deck, deck.cards, deck.tips, character)
+        if (msg.k != last_deck) {
+            last_deck = msg.k
+
+            setDeck(deck.deck, deck.cards, deck.tips, character)
+            console.log('set deck finished')
+            setCardView(deck.deck, deck.cards, deck.tips, character)
+            console.log('set card view finished')
+
+        }
+        
     } else {
         log('unrecognized msg_type: ' + msg_type)
     }
@@ -77,15 +86,12 @@ function movePowerTipStrip(e) {
         var scale = stream_width / 1920
         var left = e.pageX + 52 * scale
         var top = e.pageY + 7 * scale // - 15
-        // var stream_width = $('#items').width()
         var max_left = (MAX_RIGHT - POWERTIP_WIDTH) / 100 * stream_width
         
         if (left > max_left) { // display tooltip on the left side of cursor
             left = e.pageX - 36 * scale - POWERTIP_WIDTH / 100 * stream_width
             top = e.pageY + 7 * scale // + 3
         }
-
-        // console.log('left', left, 'stream_width', stream_width, 'max_left', max_left)
 
         $('#' + current_tooltip_id).css({
             left:  left + 'px',
@@ -96,7 +102,6 @@ function movePowerTipStrip(e) {
         
         var stream_width = items.offsetWidth
         var scale = stream_width / 1920
-        console.log(scale)
 
         var left = e.pageX - (POWERTIP_WIDTH_REM * REM_PX / 2 - 17) * scale
         var top = 89 * scale// - 15
@@ -264,4 +269,5 @@ $(function() {
     window.setTimeout(preloadNextImageBunch, PRELOAD_INTERVAL)
 
     initializeDeck()
+    initializeCardView()
 });
