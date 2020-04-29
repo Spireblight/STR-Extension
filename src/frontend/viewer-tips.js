@@ -59,8 +59,8 @@ function setRelics(relics, power_tips, character) {
             h: 8.666 + '%'
         }
 
-        strip = createPowerTipStrip(items, hitbox, tips, CATEGORY_RELICS, character)
-        strip.hitbox.classList.add('mag-glass')
+        strip = new PowerTipStrip(items, hitbox, tips, CATEGORY_RELICS, character)
+        strip.hitboxElem.setMagnifyingGlassCursor()
     }
 }
 
@@ -106,7 +106,7 @@ function setPotions(potions, power_tips, character) {
             h: 5.556 + '%'
         }
 
-        createPowerTipStrip(items, hitbox, tips, CATEGORY_POTIONS, character)
+        new PowerTipStrip(items, hitbox, tips, CATEGORY_POTIONS, character)
     }
 }
 
@@ -142,8 +142,8 @@ function setPlayerPowers(player_powers, power_tips, character) {
             h: player_powers[3] + '%'
         }
         let tips = arraySubset(power_tips, player_powers[4])
-        let multicol = createMulticolPowertips(items, hitbox, tips, CATEGORY_PLAYER_POWERS, character)
-        placeMulticolTips(hitbox, multicol, true)
+        let multicol = new PowerTipBlock(items, hitbox, tips, CATEGORY_PLAYER_POWERS, character)
+        placePowerTipBlockTips(hitbox, multicol, true)
     }
 }
 
@@ -187,8 +187,8 @@ function setMonsterPowers(monster_powers_list, power_tips, character) {
             }
             let tips = arraySubset(power_tips, monster_powers[4])
 
-            let multicol = createMulticolPowertips(items, hitbox, tips, CATEGORY_MONSTER_POWERS, character)
-            placeMulticolTips(hitbox, multicol, true)
+            let multicol = new PowerTipBlock(items, hitbox, tips, CATEGORY_MONSTER_POWERS, character)
+            placePowerTipBlockTips(hitbox, multicol, true)
         }
 }
 
@@ -231,21 +231,21 @@ function setCustomTips(custom_tips_list, power_tips, character) {
             }
             let tips = arraySubset(power_tips, custom_tips[4])
 
-            let multicol = createMulticolPowertips(items, hitbox, tips, CATEGORY_CUSTOM_TIPS, character)
-            placeMulticolTips(hitbox, multicol, false)
+            let multicol = new PowerTipBlock(items, hitbox, tips, CATEGORY_CUSTOM_TIPS, character)
+            placePowerTipBlockTips(hitbox, multicol, false)
         }
 }
 
 
-function placeMulticolTips(hitbox, multicol, heuristic_y) {
+function placePowerTipBlockTips(hitbox, multicol, heuristic_y) {
 
     var x = parsePercentage(hitbox.x)
     var y = parsePercentage(hitbox.y)
     var w = parsePercentage(hitbox.w)
     var h = parsePercentage(hitbox.h)
 
-    var mc_h = parsePercentage(multicol.tips.style.height)
-    var mc_w = parsePercentage(multicol.tips.style.width)
+    var mc_h = parsePercentage(multicol.tipsElem.style.height)
+    var mc_w = parsePercentage(multicol.tipsElem.style.width)
     var mc_right_x = x + w + CHARACTER_POWERS_OFFSET_R
     var mc_left_x = x + CHARACTER_POWERS_OFFSET_L - mc_w
     var mc_x = 0
@@ -287,6 +287,6 @@ function placeMulticolTips(hitbox, multicol, heuristic_y) {
         mc_y = MIN_TOP
     }
 
-    multicol.tips.style.left = mc_x + "%"
-    multicol.tips.style.top = mc_y + "%"
+    multicol.tipsElem.style.left = mc_x + "%"
+    multicol.tipsElem.style.top = mc_y + "%"
 }

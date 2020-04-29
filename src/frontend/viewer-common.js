@@ -16,6 +16,33 @@ const MULTICOL_COLUMN_RIGHT_MARGIN = 0.469 //% - don't mess with this number or 
 
 var collections = {}
 
+
+class CustomElement{
+    constructor(root = null) {
+        this.root = root
+    }
+}
+
+
+class PlaceholderElement extends CustomElement {
+    constructor() {
+        const elem = document.createElement('div')
+        elem.display = 'none'
+        super(elem)
+    }
+}
+
+
+function appendChild(parent, child) {
+    if (child instanceof Element)
+        parent.appendChild(child)
+    else if (child instanceof CustomElement)
+        parent.appendChild(child.root)
+    else
+        error('invalid child type: ' + typeof(child))
+}
+
+
 function escapeRegex(str) {
     return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
@@ -108,7 +135,10 @@ function clearCollection(category) {
         for (let i = 0; i < collections[category].length; i++) {
             const element = collections[category][i];
 
-            element.parentNode.removeChild(element)
+            if (element instanceof CustomElement)
+                element.root.parentNode.removeChild(element.root)
+            else
+                element.parentNode.removeChild(element)
         }
 
         collections[category] = []
@@ -117,8 +147,8 @@ function clearCollection(category) {
 
 
 function addToCollection(category, element) {
-    if (!(element instanceof Element))
-        error('element is not instance of element but ' + typeof(element))
+    if (!(element instanceof Element || element instanceof CustomElement))
+        error('element is neither the instance of Element nor CustomElement but ' + typeof(element))
 
     if (category in collections) {
         collections[category].push(element)
@@ -131,71 +161,119 @@ function addToCollection(category, element) {
 ////////////////////////////////////// TIPS
 
 
+class PowerTip {
+    constructor(header_text, raw_description_text, img_path) {
+        name = power_tip[0]
+        description = power_tip[1]
+        img = (power_tip.length == 3) ? power_tip[2]:undefined
+    }
+}
 
-function createMulticolPowertips(parent, hitbox, tips, category, character, id_prefix) {
 
-    if (!id_prefix) {
-        id_prefix = ""
+class PowerTipElement extends CustomElement {
+    constructor (header_text, raw_description_text, img_path, character) {
+        header_text = sanitizeHtmlTags(header_text)
+        raw_description_text = sanitizeHtmlTags(raw_description_text)
+        img_path = sanitizeHtmlTags(img_path)
+
+        let root = document.createElement('div')
+        root.className = 'powertip'
+
+        let header = document.createElement('div')
+        header.classList.add('powertip-header')
+        header.classList.add('outline')
+        header.innerHTML = header_text
+
+        let img
+        if (img_path) {
+            img = document.createElement('img')
+            img.src = 'img/' + img_path + '.png'
+            img.alt = ' '
+            img.classList.add('powertip-img')
+            img.onerror = function() {this.src='img/placeholder.png'}
+            
+            header.appendChild(img)
+            header.classList.add('powertip-header-wimg')
+        } else {
+            header.classList.add('powertip-header-noimg')
+        }
+
+        let description = document.createElement('div')
+        description.innerHTML = replaceNewLines(replaceManaSymbols(replaceColorCodes(raw_description_text), character))
+        
+        root.appendChild(header)
+        root.appendChild(description)
+
+        super(root)
+    }
+}
+
+class HitboxElement extends CustomElement {
+    constructor(hitbox) {
+        let root = document.createElement('div')
+        root.className = 'hitbox'
+        root.style = 'left: ' + hitbox.x + '; top: ' + hitbox.y + '; width: ' + hitbox.w + '; height: ' + hitbox.h + '; z-index: ' + hitbox.z + ';'
+
+        super(root)
     }
 
-    // var items = document.getElementById('items')
-    let id = id_prefix + getNextId()
+    setMagnifyingGlassCursor() {
+        this.root.classList.add('mag-glass')
+    }
+}
 
-    let hitboxElem = createHitbox(id, category, hitbox.x, hitbox.y, hitbox.z, hitbox.w, hitbox.h)
-    let tipsElem = createPowertipMulticol(id, hitbox.x, hitbox.y, hitbox.w, hitbox.h, tips, character)
+class PowerTipBlock {
+    constructor(parent, hitbox, tips, category, character, id_prefix) {
 
-    addToCollection(category, hitboxElem)
-    addToCollection(category, tipsElem)
+        if (!id_prefix) {
+            id_prefix = ""
+        }
+        let id = id_prefix + getNextId()
+        
+        let hitboxElem = new HitboxElement(hitbox)
+        hitboxElem.root.onmouseenter = function(e) {showPowerTipMulticol(e, id, category)}
+        hitboxElem.root.onmouseout = function(e) {hidePowerTipMulticol(e, id, category)}
+        let tipsElem = this.createPowertipMulticol(id, tips, character)
 
-    parent.appendChild(hitboxElem)
-    parent.appendChild(tipsElem)
+        addToCollection(category, hitboxElem)
+        addToCollection(category, tipsElem)
+        
+        appendChild(parent, hitboxElem)
+        appendChild(parent, tipsElem)
 
-    return {hitbox: hitboxElem, tips: tipsElem}
-
-    function createHitbox(id, category, x, y, z, w, h) {
-        var hitbox = document.createElement('div')
-        hitbox.className = 'hitbox'
-        hitbox.style = 'left: ' + x + '; top: ' + y + '; width: ' + w + '; height: ' + h + '; z-index: ' + z + ';'
-        hitbox.id = id + '_hitbox'
-        hitbox.onmouseenter = function(e) {showPowerTipMulticol(e, id, category)}
-        hitbox.onmouseout = function(e) {hidePowerTipMulticol(e, id, category)}
-    
-        return hitbox
+        this.tipsElem = tipsElem
+        this.hitboxElem = hitboxElem
     }
 
-    function createPowertipMulticol(id, x, y, w, h, power_tips, character) {
-        var multicol = document.createElement('div')
+    createPowertipMulticol(id, power_tips, character) {
+        let multicol = document.createElement('div')
         multicol.className = 'powertip-multicol'
         multicol.id = id
         
-        var stream_width = $('#items').width()
-        // var stream_height = $('#items').height()
-        var stream_height = document.body.offsetHeight
-        // console.log('stream height = ' + stream_height)
+        let stream_height = document.body.offsetHeight
 
-        var column = document.createElement('div')
+        let column = document.createElement('div')
         column.className = 'powertip-multicol-column'
         multicol.appendChild(column)
-        var ncolumns = 1
+        let ncolumns = 1
         
-        var temp = document.getElementById('temp')
+        let temp = document.getElementById('temp')
 
         // create powertips and distribute them to columns
-        var height = 0.0
-        var max_height = 0.0
-        var power_tip_heights = []
+        let height = 0.0
+        let max_height = 0.0
+        let power_tip_heights = []
         for (let i = 0; i < power_tips.length; i++) {
             const power_tip = power_tips[i];
             
-            name = power_tip[0]
-            description = power_tip[1]
-            img = (power_tip.length == 3) ? power_tip[2]:undefined
+            let name = power_tip[0]
+            let description = power_tip[1]
+            let img = (power_tip.length == 3) ? power_tip[2]:undefined
 
-            var powertip_elem = createPowerTip(name, description, img, character)
-            
-            temp.appendChild(powertip_elem)
-            height_element = powertip_elem.offsetHeight / stream_height * 100 + POWERTIP_BOTTOM_MARGIN
-            temp.removeChild(powertip_elem)
+            let powertip_elem = new PowerTipElement(name, description, img, character)
+            temp.appendChild(powertip_elem.root)
+            let height_element = powertip_elem.root.offsetHeight / stream_height * 100 + POWERTIP_BOTTOM_MARGIN
+            temp.removeChild(powertip_elem.root)
 
             power_tip_heights.push(height_element)
 
@@ -215,15 +293,15 @@ function createMulticolPowertips(parent, hitbox, tips, category, character, id_p
                 height += height_element
             }
 
-            column.appendChild(powertip_elem)
+            column.appendChild(powertip_elem.root)
         }
 
         if (height > max_height)
             max_height = height
 
         // place whole multicol block
-        var mc_h = max_height
-        var mc_w = ncolumns * (POWERTIP_WIDTH + MULTICOL_COLUMN_RIGHT_MARGIN)
+        let mc_h = max_height
+        let mc_w = ncolumns * (POWERTIP_WIDTH + MULTICOL_COLUMN_RIGHT_MARGIN)
         multicol.style = 'width: ' + mc_w + '%; height: ' + mc_h + '%;'
 
         return multicol
@@ -231,85 +309,41 @@ function createMulticolPowertips(parent, hitbox, tips, category, character, id_p
 }
 
 
-function createPowerTipStrip(parent, hitbox, tips, category, character) {
+class PowerTipStrip {
+    constructor (parent, hitbox, tips, category, character) {
+        let id = getNextId()
+
+        let hitboxElem = new HitboxElement(hitbox)
+        hitboxElem.root.onmouseenter = function(e) {showPowerTipStrip(e, id, category)}
+        hitboxElem.root.onmouseout = function(e) {hidePowerTipStrip(e, id, category)}
+        let tipsElem = this.createStrip(id, tips, character)
     
-    let id = getNextId()
+        addToCollection(category, hitboxElem)
+        addToCollection(category, tipsElem)
+    
+        appendChild(parent, hitboxElem)
+        appendChild(parent, tipsElem)
 
-    let hitboxElem = createHitbox(id, category, hitbox.x, hitbox.y, hitbox.z, hitbox.w, hitbox.h)
-    let tipsElem = createStrip(id, tips, character)
+        this.hitboxElem = hitboxElem
+        this.tipsElem = tipsElem
+    }
 
-    addToCollection(category, hitboxElem)
-    addToCollection(category, tipsElem)
-
-    parent.appendChild(hitboxElem)
-    parent.appendChild(tipsElem)
-
-    return {hitbox: hitboxElem, tips: tipsElem}
-
-    function createStrip(id, tips, character) {
-        var strip = document.createElement('div')
+    createStrip(id, tips, character) {
+        let strip = document.createElement('div')
         strip.className = 'powertip-strip'
         strip.id = id
     
-        for (power_tip of tips) {
-            name = power_tip[0]
-            description = power_tip[1]
-            img = (power_tip.length == 3) ? power_tip[2]:undefined
-    
-            strip.appendChild(createPowerTip(name, description, img, character))
+        for (let power_tip of tips) {
+            let name = power_tip[0]
+            let description = power_tip[1]
+            let img = (power_tip.length == 3) ? power_tip[2]:undefined
+            
+            appendChild(strip, new PowerTipElement(name, description, img, character))
         }
     
         return strip
     }
-
-    function createHitbox(id, category, x, y, z, w, h) {
-        var hitbox = document.createElement('div')
-        hitbox.className = 'hitbox'
-        hitbox.style = 'left: ' + x + '; top: ' + y + '; width: ' + w + '; height: ' + h + '; z-index: ' + z + ';'
-        hitbox.onmouseenter = function(e) {showPowerTipStrip(e, id, category)}
-        hitbox.onmouseout = function(e) {hidePowerTipStrip(e, id, category)}
-    
-        return hitbox
-    }
 }
-
-
-function createPowerTip(header_text, raw_description_text, img_path, character) {
-    header_text = sanitize(header_text)
-    raw_description_text = sanitize(raw_description_text)
-    img_path = sanitize(img_path)
-
-    var tooltip = document.createElement('div')
-    tooltip.className = 'powertip'
-
-    var header = document.createElement('div')
-    header.classList.add('powertip-header')
-    header.classList.add('outline')
-    header.innerHTML = header_text
-
-    var img
-    if (img_path) {
-        img = document.createElement('img')
-        img.src = 'img/' + img_path + '.png'
-        img.alt = ' '
-        img.classList.add('powertip-img')
-        img.onerror = function() {this.src='img/placeholder.png'}
-        
-        header.appendChild(img)
-        header.classList.add('powertip-header-wimg')
-    } else {
-        header.classList.add('powertip-header-noimg')
-    }
-
-    var description = document.createElement('div')
-    description.innerHTML = replaceNewLines(replaceManaSymbols(replaceColorCodes(raw_description_text), character))
-    
-    tooltip.appendChild(header)
-    tooltip.appendChild(description)
-    
-    return tooltip
-}
-
 
 
 function replaceColorCodes(text) {
@@ -380,7 +414,7 @@ function replaceNewLines(text) {
 }
 
 
-function sanitize(text) {
+function sanitizeHtmlTags(text) {
     if (text)
         return text.replace(/</g, '&lt;').replace(/>/g, '&gt;')
     else
@@ -458,117 +492,236 @@ CARD_TYPE = ['ATTACK', 'SKILL', 'POWER', 'STATUS', 'CURSE']
 CARD_RARITY = ['BASIC', 'SPECIAL', 'COMMON', 'UNCOMMON', 'RARE', 'CURSE']
 CARD_COLOR = ['RED', 'GREEN', 'BLUE', 'PURPLE', 'COLORLESS', 'CURSE']
 
-BOTTLE_RELICS = ['bottled_flame', 'bottled_lightning', 'bottled_tornado']
+
+class Card {
+    constructor(name, cost, type, rarity, color, description, keyword_ids, card_to_preview, upgrades, bottle_status) {
+        this.name = name
+        this.cost = cost
+        this.type = type
+        this.rarity = rarity
+        this.color = color
+        this.description = description
+        this.keyword_ids = keyword_ids
+        this.card_to_preview = card_to_preview
+        this.upgrades = upgrades
+        this.bottle_status = bottle_status
+
+        this.upgraded_version = null
+    }
+
+    static parseCard(array) {
+        // name ; bottleStatus ; cardToPreview ; cardToPreview upgraded ; nameUpgraded ; upgrades ; keyword upgraded ; descriptionUpgraded ; keywords ; cost ; cost upgraded ; type ; rarity ; color ; description
+
+        let name = array[0]
+        let card_to_preview = parseInt(array[2])
+        let card_to_preview_upgraded = parseInt(array[3])
+        let name_upgraded = this.parseUpgradedName(name, array[4])
+        let upgrades = parseInt(array[5])
+
+        let keyword_ids_upgraded = this.parseUpgradedKeywords(array[8], array[6])
+        let description_upgraded = this.parseUpgradedDesc(array[14], array[7])
+        let keyword_ids = this.parseKeywords(array[8])
+        let cost = this.parseCost(array[9])
+        let cost_upgraded = this.parseCost(array[10])
+        let type = this.parseCardType(array[11])
+        let rarity = this.parseCardRarity(array[12])
+        let color = this.parseCardColor(array[13])
+        let description = array[14]
+        let bottle_status = parseInt(array[1])
+
+        let card = new Card(name, cost, type, rarity, color, description, keyword_ids, card_to_preview, upgrades, bottle_status)
+        if (name_upgraded != null) {
+            card.upgraded_version = new Card(name_upgraded, cost_upgraded, type, rarity, color, description_upgraded, keyword_ids_upgraded, card_to_preview_upgraded, upgrades+1, 0)
+        }
+
+        return card
+    }
+
+    
+    static parseUpgradedName(name, upgName) {
+        if (upgName == 'null')
+            return null
+
+        if (upgName == '_')
+            return name
+
+        if (upgName == '+')
+            return name + '+'
+
+        return upgName
+    }
+
+    static parseUpgradedDesc(desc, upgDesc) {
+        if (upgDesc == '-')
+            return null
+
+        if (upgDesc == '_')
+            return desc
+
+        return upgDesc
+    }
+
+    static parseUpgradedKeywords(keywords, keywordsUpg) {
+        if (keywordsUpg == '_')
+            return this.parseKeywords(keywords)
+        
+        return this.parseKeywords(keywordsUpg)
+    }
+
+    static parseCardType(type) {
+        let parsed = parseInt(type)
+        return isNaN(parsed) ? type : CARD_TYPE[parsed]
+    }
+    
+    static parseCardRarity(rarity) {
+        let parsed = parseInt(rarity)
+        return isNaN(parsed) ? rarity : CARD_RARITY[parsed]
+    }
+    
+    static parseCardColor(color) {
+        let parsed = parseInt(color)
+        return isNaN(parsed) ? color : CARD_COLOR[parsed]
+    }
+
+    static parseCost(cost) {
+        if (cost == -2)
+            return null
+        else if (cost == -1)
+            return "X"
+        else
+            return parseInt(cost)
+    }
+    
+    static parseKeywords(keywords) {
+        if (keywords == '-')
+            return []
+        else {
+            return JSON.parse('[' + keywords + ']')
+        }
+    }
+}
+
 
 const CARD_BASE_WIDTH = 12.361 //rem
 const CARD_BASE_HEIGHT = 15.926 //rem
 const CARD_BASE_FONT_SIZE = 1 //rem
 
-
-function setCardWidth(card, target_width) {
-    const scale = target_width / CARD_BASE_WIDTH
-
-    const width = CARD_BASE_WIDTH * scale + 'rem'
-    const height = CARD_BASE_HEIGHT * scale + 'rem'
-    const font_size = CARD_BASE_FONT_SIZE * scale + 'rem'
-
-    card.style.width = width
-    card.style.height = height
-    card.style.fontSize = font_size
-}
+const BOTTLE_RELICS = ['bottled_flame', 'bottled_lightning', 'bottled_tornado']
 
 
-function createCardElement(name, type, rarity, color, cost, upgrades, description, character, target_width) {
+class CardElement extends CustomElement {
 
-    if (target_width == undefined)
-        target_width = CARD_BASE_WIDTH
+    constructor(card, character, target_width=12.361, colorize_upgrades=true, small_title_font=false, display_bottle=true) {
 
-    const card = document.createElement('div')
-    card.classList.add('card')
-    setCardWidth(card, target_width)
+        if (target_width == undefined)
+            target_width = CARD_BASE_WIDTH
 
-    const shadow_blur = document.createElement('div')
-    shadow_blur.className = 'card-shadow-blur'
-    card.appendChild(shadow_blur)
+        const cardElem = document.createElement('div')
+        cardElem.classList.add('card')
+        super(cardElem)
+        this.setWidth(target_width)
 
-    const shadow_drop = document.createElement('div')
-    shadow_drop.className = 'card-shadow-drop'
-    card.appendChild(shadow_drop)
+        this.shadow_blur = document.createElement('div')
+        this.shadow_blur.className = 'card-shadow-blur'
+        cardElem.appendChild(this.shadow_blur)
 
-    const bg = document.createElement('div')
-    bg.className = 'card-img'
-    bg.style.backgroundImage = getBackgroundPath(color, type)
-    bg.style.zIndex = -4
-    card.appendChild(bg)
+        this.shadow_drop = document.createElement('div')
+        this.shadow_drop.className = 'card-shadow-drop'
+        cardElem.appendChild(this.shadow_drop)
 
-    const portrait = document.createElement('div')
-    portrait.className = 'card-portrait'
-    portrait.style.backgroundImage = getPortraitPath(color, name, upgrades)
-    portrait.style.zIndex = -3
-    card.appendChild(portrait)
+        const bg = document.createElement('div')
+        bg.className = 'card-img'
+        bg.style.backgroundImage = this.getBackgroundPath(card)
+        bg.style.zIndex = -4
+        cardElem.appendChild(bg)
 
-    const frame = document.createElement('div')
-    frame.className = 'card-img'
-    frame.style.backgroundImage = getFramePath(color, type, rarity)
-    frame.style.zIndex = -2
-    card.appendChild(frame)
-    
-    if (cost != null) {
-        const energyOrb = document.createElement('div')
-        energyOrb.className = 'card-img'
-        energyOrb.style.backgroundImage = getEnergyOrbPath(color)
-        energyOrb.style.zIndex = -1
-        card.appendChild(energyOrb)
+        const portrait = document.createElement('div')
+        portrait.className = 'card-portrait'
+        portrait.style.backgroundImage = this.getPortraitPath(card)
+        portrait.style.zIndex = -3
+        cardElem.appendChild(portrait)
+
+        const frame = document.createElement('div')
+        frame.className = 'card-img'
+        frame.style.backgroundImage = this.getFramePath(card)
+        frame.style.zIndex = -2
+        cardElem.appendChild(frame)
         
-        const energyCost = document.createElement('div')
-        energyCost.className = 'card-cost outline-black'
-        energyCost.innerHTML = cost
-        energyCost.zIndex = 1
-        card.appendChild(energyCost)
+        if (card.cost != null) {
+            const energyOrb = document.createElement('div')
+            energyOrb.className = 'card-img'
+            energyOrb.style.backgroundImage = this.getEnergyOrbPath(card)
+            energyOrb.style.zIndex = -1
+            cardElem.appendChild(energyOrb)
+            
+            const energyCost = document.createElement('div')
+            energyCost.className = 'card-cost outline-black'
+            energyCost.innerHTML = card.cost
+            energyCost.zIndex = 1
+            cardElem.appendChild(energyCost)
+        }
+
+        let name_aux = card.name
+        if (card.upgrades > 0 && colorize_upgrades && card.name.indexOf("+") >= 0)
+            name_aux = colorizeString(name_aux, '#g')
+        const title = document.createElement('div')
+        title.className = 'card-title'
+        title.className += small_title_font ? ' card-title-text-small' : ' card-title-text-regular'
+        title.innerHTML = replaceColorCodes(name_aux)
+        cardElem.appendChild(title)
+
+        const bottle = document.createElement('div')
+        bottle.className = 'card-bottle'
+        cardElem.appendChild(bottle)
+
+        if(display_bottle && card.bottle_status > 0) {
+            bottle.style.backgroundImage = 'url(img/relics/' + BOTTLE_RELICS[card.bottle_status - 1] + '.png)'
+        }
+
+        const desc = document.createElement('div')
+        desc.className = 'card-description'
+        const descText = document.createElement('span')
+        descText.className = 'card-description-text'
+        descText.innerHTML = replaceNewLines(replaceManaSymbols(replaceColorCodes(card.description), character))
+        desc.appendChild(descText)
+        cardElem.appendChild(desc)
+
+        // console.log(JSON.stringify(keywords))
     }
 
-    let name_aux = name
-    if (upgrades > 0)
-        name_aux = colorizeString(name_aux, '#g')
-    const title = document.createElement('div')
-    title.className = 'card-title'
-    title.innerHTML = replaceColorCodes(name_aux)
-    card.appendChild(title)
+    getBackgroundPath(card) {return 'url("img/cards/' + card.color + '/background_' + card.type + '.png")'}
 
-    const bottle = document.createElement('div')
-    bottle.className = 'card-bottle'
-    card.appendChild(bottle)
+    getFramePath(card) {return 'url("img/cards/' + card.color + '/frame_' + card.type + '_' + card.rarity + '.png")'}
 
-    const desc = document.createElement('div')
-    desc.className = 'card-description'
-    const descText = document.createElement('span')
-    descText.className = 'card-description-text'
-    descText.innerHTML = replaceNewLines(replaceManaSymbols(replaceColorCodes(description), character))
-    desc.appendChild(descText)
-    card.appendChild(desc)
+    getEnergyOrbPath(card) {return 'url("img/cards/' + card.color + '/energy_orb.png")'}
 
-    // console.log(JSON.stringify(keywords))
-
-    return card
-
-    function getBackgroundPath(color, type) {return 'url("img/cards/' + color + '/background_' + type + '.png")'}
-    function getFramePath(color, type, rarity) {return 'url("img/cards/' + color + '/frame_' + type + '_' + rarity + '.png")'}
-    function getEnergyOrbPath(color) {return 'url("img/cards/' + color + '/energy_orb.png")'}
-    function getPortraitPath(color, name, upgrades) {
-        if (upgrades > 0 && name.lastIndexOf('+') != -1)
+    getPortraitPath(card) {
+        let name = card.name
+        if (card.upgrades > 0 && name.lastIndexOf('+') != -1)
             name = name.substring(0, name.lastIndexOf('+'))
         name = name.replace(/[\\/:*?"<>|]/g, '_')
-        return 'url("img/cards/' + color + '/portraits/' + name + '.png")'
+        return 'url("img/cards/' + card.color + '/portraits/' + name + '.png")'
     }
-}
 
-function parseCost(cost) {
-    if (cost == -2)
-        return null
-    else if (cost == -1)
-        return "X"
-    else
-        return parseInt(cost)
+    setWidth(target_width) {
+        const scale = target_width / CARD_BASE_WIDTH
+    
+        const width = CARD_BASE_WIDTH * scale + 'rem'
+        const height = CARD_BASE_HEIGHT * scale + 'rem'
+        const font_size = CARD_BASE_FONT_SIZE * scale + 'rem'
+    
+        this.root.style.width = width
+        this.root.style.height = height
+        this.root.style.fontSize = font_size
+    }
+
+    setShadowDrop(is_visible) {
+        this.shadow_drop.style.visibility = is_visible ? 'visible' : 'hidden'
+    }
+
+    setShadowBlur(is_visible) {
+        this.shadow_blur.style.visibility = is_visible ? 'visible' : 'hidden'
+    }
 }
 
 function colorizeString(str, color_prefix) {
@@ -583,25 +736,3 @@ function colorizeString(str, color_prefix) {
     return str
 }
 
-function parseCardType(type) {
-    let parsed = parseInt(type)
-    return isNaN(parsed) ? type : CARD_TYPE[parsed]
-}
-
-function parseCardRarity(rarity) {
-    let parsed = parseInt(rarity)
-    return isNaN(parsed) ? rarity : CARD_RARITY[parsed]
-}
-
-function parseCardColor(color) {
-    let parsed = parseInt(color)
-    return isNaN(parsed) ? color : CARD_COLOR[parsed]
-}
-
-function parseKeywords(keywords) {
-    if (keywords == '-')
-        return []
-    else {
-        return JSON.parse('[' + keywords + ']')
-    }
-}

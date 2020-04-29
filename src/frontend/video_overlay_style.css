@@ -87,21 +87,6 @@ div.powertip-multicol-column {
     margin-right: 0.370rem;
 }
 
-#deck_button {
-    position: absolute;
-    display: none;
-    width: 3.438%;
-    height: 8%;
-    top: 0%;
-    right: 4.427%;
-    z-index: 9;
-    background-size: contain;
-    background-position-y: -0.046rem;
-    /* border: 1px solid rgba(255,255,255,0.0); */
-    box-sizing: border-box;
-    background-repeat: no-repeat;
-}
-
 .button-border {
     border: 1px solid rgba(255,255,255,0.4);
 }
@@ -111,6 +96,228 @@ div.powertip-multicol-column {
     background-image: url(img/ui/deck.png);
 }
 
+#deck_button {
+    position: absolute;
+    display: none;
+    width: 3.438%;
+    height: 8%;
+    top: 0%;
+    right: 4.322%; /*.053*/
+    z-index: 9;
+    background-size: contain;
+    background-position-y: -0.046rem;
+    /* border: 1px solid rgba(255,255,255,0.0); */
+    box-sizing: border-box;
+    background-repeat: no-repeat;
+}
+
+#deck_view {
+    display: none;
+    position: absolute;
+    left: 0%;
+    top: 6.018%;
+    width: 100%;
+    height: 93.982%;
+    z-index: 10;
+    background-color: rgba(0,0,0,0.9);
+}
+
+#deck_view_return_btn {
+    position: absolute;
+    left: 0%;
+    top: 77.778%;
+    width: 14.323%;
+    height: 9.259%;
+    background-size: cover;
+    background-image: url('img/ui/btn_return_base.png');
+    background-repeat: no-repeat;
+    z-index: 1
+}
+
+#deck_view_return_btn:hover {
+    background-image: url('img/ui/btn_return_hover.png');
+}
+
+#deck_view_left_bar {
+    position: absolute;
+    left: 0%;
+    top: 0%;
+    width: 15.234%;
+    height: 100%;
+    z-index: -1;
+}
+
+#deck_view_right_bar {
+    position: absolute;
+    right: 0%;
+    top: 0%;
+    width: 15.234%;
+    height: 100%;
+    z-index: -1;
+}
+
+.deck-view-footer {
+    position: absolute;
+    display: block;
+    height: 10rem;
+    width: 100%;
+}
+
+#deck_view_content {
+    position: absolute;
+    top: 5%;
+    width: 100%;
+    height: 95%;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+div.card {
+    position: absolute;
+    float: left;
+    font-family: "Kreon", serif;
+    font-size: 1rem;
+    overflow: visible;
+}
+
+div.card-shadow-drop {
+    position: absolute;
+    left: 7.67%;
+    top: 5.337%;
+    width: 84.661%;
+    height: 91.991%;
+    z-index: -10;
+    visibility: hidden;
+
+    border-radius: 0.474em;
+    -moz-border-radius: 0.474em;
+    -webkit-border-radius: 0.474em;
+    
+    -webkit-box-shadow: 0.65em 0.7em 0.035em 0.105em rgba(0,0,0,0.3);
+    -moz-box-shadow: 0.65em 0.7em 0.035em 0.105em rgba(0,0,0,0.3);
+    box-shadow: 0.65em 0.7em 0.035em 0.105em rgba(0,0,0,0.3);
+}
+
+div.card-shadow-blur {
+    position: absolute;
+    left: 7.67%;
+    top: 5.337%;
+    width: 84.661%;
+    height: 91.991%;
+    z-index: -10;
+    visibility: hidden;
+
+    border-radius: 0.474em;
+    -moz-border-radius: 0.474em;
+    -webkit-border-radius: 0.474em;
+    
+    -webkit-box-shadow: 0px 0px 1.403em 1.228em rgba(0,0,0,0.45);
+    -moz-box-shadow: 0px 0px 1.403em 1.228em rgba(0,0,0,0.45);
+    box-shadow: 0px 0px 1.403em 1.228em rgba(0,0,0,0.45);
+}
+
+div.card-img {
+    position: absolute;
+    background-size: cover;
+    background-repeat: no-repeat;
+    left: 0%;
+    top: 0%;
+    width: 100%;
+    height: 100%;
+}
+
+div.card-portrait {
+    position: absolute;
+    background-size: cover;
+    background-repeat: no-repeat;
+    left: 12.979%;
+    top: 13.4%;
+    width: 73.746%;
+    height: 43.478%;
+}
+
+div.card-title {
+    position: absolute;
+    text-align: center;
+    left: 18%;
+    top: 9.4%;
+    width: 64%;
+    height: 25%;
+    overflow: hidden;
+    color: white;
+    font-weight: 700;
+    --outline-color: rgb(50,50,50);
+    text-shadow: 0.139rem 0.139rem 0px rgba(0,0,0,0.3), -1px -1px 0 var(--outline-color),
+        0   -1px 0 var(--outline-color),
+        1px -1px 0 var(--outline-color),
+        1px  0   0 var(--outline-color),
+        1px  1px 0 var(--outline-color),
+        0    1px 0 var(--outline-color),
+        -1px  1px 0 var(--outline-color),
+        -1px  0   0 var(--outline-color);
+}
+
+div.card-title-text-regular {
+    font-size: 0.984em; /* 0.948rem; */
+}
+
+div.card-title-text-small {
+    font-size: 0.839em; /* 0.948rem; */
+}
+
+div.card-bottle {
+    position: absolute;
+    right: -3.3%;
+    top: -1%;
+    width: 3.6em;
+    height: 3.6em;
+    background-size: cover;
+}
+
+div.card-cost {
+    position: absolute;
+    text-align: center;
+    vertical-align: middle;
+    left: 3.137%;
+    top: 2.075%;/*2.275%;*/
+    width: 14%;
+    height: 10%;
+    overflow: hidden;
+    font-weight: 700;
+    font-size: 1.53em;/* 1.458rem;/* 1.385rem; */
+    color: white;
+}
+
+div.card-description {
+    position: absolute;
+    left: 14%;
+    top: 62.471%;
+    width: 72%;
+    height: 4.873em; /*30.597%;*/ /*4.873rem;*/
+    line-height: 4.873em; /*30.597%*/ /*4.873rem;*/
+    font-weight: 400;
+    font-size: 0.875em;
+    overflow: hidden;
+    color: white;
+    text-align: center;
+}
+
+span.card-description-text {
+    line-height: 1.05;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.outline-black {
+    text-shadow: -1px -1px 0 #000,
+        0   -1px 0 #000,
+        1px -1px 0 #000,
+        1px  0   0 #000,
+        1px  1px 0 #000,
+        0    1px 0 #000,
+        -1px  1px 0 #000,
+        -1px  0   0 #000;
+}
 
 #card_view {
     display: none;
@@ -188,207 +395,6 @@ div.powertip-multicol-column {
     overflow-y: auto;
     display: block;
     /* border: 1px solid white; */
-}
-
-#deck_view {
-    display: none;
-    position: absolute;
-    left: 0%;
-    top: 6.018%;
-    width: 100%;
-    height: 93.982%;
-    z-index: 10;
-    background-color: rgba(0,0,0,0.9);
-}
-
-#deck_view_return_btn {
-    position: absolute;
-    left: 0%;
-    top: 77.778%;
-    width: 14.323%;
-    height: 9.259%;
-    background-size: cover;
-    background-image: url('img/ui/btn_return_base.png');
-    background-repeat: no-repeat;
-    z-index: 1
-}
-
-#deck_view_return_btn:hover {
-    background-image: url('img/ui/btn_return_hover.png');
-}
-
-#deck_view_left_bar {
-    position: absolute;
-    left: 0%;
-    top: 0%;
-    width: 15.234%;
-    height: 100%;
-    z-index: -1;
-}
-
-#deck_view_right_bar {
-    position: absolute;
-    right: 0%;
-    top: 0%;
-    width: 15.234%;
-    height: 100%;
-    z-index: -1;
-}
-
-.deck-view-footer {
-    position: absolute;
-    display: block;
-    height: 10rem;
-    width: 100%;
-}
-
-#deck_view_content {
-    position: absolute;
-    top: 5%;
-    width: 100%;
-    height: 95%;
-    overflow-x: visible;
-    overflow-y: scroll;
-}
-
-div.card {
-    position: absolute;
-    float: left;
-    font-family: "Kreon", serif;
-    font-size: 1rem;
-    overflow: visible;
-}
-
-div.card-shadow-drop {
-    position: absolute;
-    left: 7.67%;
-    top: 5.337%;
-    width: 84.661%;
-    height: 91.991%;
-    z-index: -10;
-    visibility: hidden;
-
-    border-radius: 0.474em;
-    -moz-border-radius: 0.474em;
-    -webkit-border-radius: 0.474em;
-    
-    -webkit-box-shadow: 0.65em 0.7em 0.035em 0.105em rgba(0,0,0,0.3);
-    -moz-box-shadow: 0.65em 0.7em 0.035em 0.105em rgba(0,0,0,0.3);
-    box-shadow: 0.65em 0.7em 0.035em 0.105em rgba(0,0,0,0.3);
-}
-
-div.card-shadow-blur {
-    position: absolute;
-    left: 7.67%;
-    top: 5.337%;
-    width: 84.661%;
-    height: 91.991%;
-    z-index: -10;
-    visibility: hidden;
-
-    border-radius: 0.474em;
-    -moz-border-radius: 0.474em;
-    -webkit-border-radius: 0.474em;
-    
-    -webkit-box-shadow: 0px 0px 1.403em 1.228em rgba(0,0,0,0.45);
-    -moz-box-shadow: 0px 0px 1.403em 1.228em rgba(0,0,0,0.45);
-    box-shadow: 0px 0px 1.403em 1.228em rgba(0,0,0,0.45);
-}
-
-div.card-img {
-    position: absolute;
-    background-size: cover;
-    background-repeat: no-repeat;
-    left: 0%;
-    top: 0%;
-    width: 100%;
-    height: 100%;
-}
-
-div.card-portrait {
-    position: absolute;
-    background-size: cover;
-    background-repeat: no-repeat;
-    left: 12.979%;
-    top: 13.4%;
-    width: 73.746%;
-    height: 43.478%;
-}
-
-div.card-title {
-    position: absolute;
-    text-align: center;
-    left: 18%;
-    top: 9.4%;
-    width: 64%;
-    height: 25%;
-    overflow: hidden;
-    font-weight: 700;
-    font-size: 0.984em; /* 0.948rem; */
-    color: white;
-    --outline-color: rgb(50,50,50);
-    text-shadow: 0.139rem 0.139rem 0px rgba(0,0,0,0.3), -1px -1px 0 var(--outline-color),
-        0   -1px 0 var(--outline-color),
-        1px -1px 0 var(--outline-color),
-        1px  0   0 var(--outline-color),
-        1px  1px 0 var(--outline-color),
-        0    1px 0 var(--outline-color),
-        -1px  1px 0 var(--outline-color),
-        -1px  0   0 var(--outline-color);
-}
-
-div.card-bottle {
-    position: absolute;
-    right: -3.3%;
-    top: -1%;
-    width: 3.6em;
-    height: 3.6em;
-    background-size: cover;
-}
-
-div.card-cost {
-    position: absolute;
-    text-align: center;
-    vertical-align: middle;
-    left: 3.137%;
-    top: 2.075%;/*2.275%;*/
-    width: 14%;
-    height: 10%;
-    overflow: hidden;
-    font-weight: 700;
-    font-size: 1.53em;/* 1.458rem;/* 1.385rem; */
-    color: white;
-}
-
-div.card-description {
-    position: absolute;
-    left: 14%;
-    top: 62.471%;
-    width: 72%;
-    height: 4.873em; /*30.597%;*/ /*4.873rem;*/
-    line-height: 4.873em; /*30.597%*/ /*4.873rem;*/
-    font-weight: 400;
-    font-size: 0.875em;
-    overflow: hidden;
-    color: white;
-    text-align: center;
-}
-
-span.card-description-text {
-    line-height: 1.05;
-    display: inline-block;
-    vertical-align: middle;
-}
-
-.outline-black {
-    text-shadow: -1px -1px 0 #000,
-        0   -1px 0 #000,
-        1px -1px 0 #000,
-        1px  0   0 #000,
-        1px  1px 0 #000,
-        0    1px 0 #000,
-        -1px  1px 0 #000,
-        -1px  0   0 #000;
 }
 
 .text-white {

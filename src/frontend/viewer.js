@@ -41,7 +41,6 @@ function processMessage(broadcast) {
             console.log('set deck finished')
             setCardView(deck.deck, deck.cards, deck.tips, character)
             console.log('set card view finished')
-
         }
         
     } else {
@@ -238,7 +237,7 @@ $(function() {
 
     // listen for incoming broadcast message from our EBS
     twitch.listen('broadcast', function (target, contentType, message) {
-        console.log("received message")
+        // console.log("received message")
 
         // // console.log('queuing message with delay: ' + msg_delay + 'ms');
         // window.setTimeout(function () {receiveMessage(broadcast)}, Math.max(0, msg_delay))
@@ -270,4 +269,9 @@ $(function() {
 
     initializeDeck()
     initializeCardView()
+
+    window.Twitch.ext.onError(function(e) {
+        console.log('error')
+        error(e)
+    })
 });
