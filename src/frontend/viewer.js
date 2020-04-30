@@ -34,6 +34,7 @@ function processMessage(broadcast) {
         var character = sanitizeCharacter(msg.c)
         var deck = decompressDeck(msg.k)
 
+        // TODO - check inside the functions and remove if
         if (msg.k != last_deck) {
             last_deck = msg.k
 

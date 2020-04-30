@@ -62,6 +62,12 @@ img.energy-orb-img {
     height: 1.111rem;
 }
 
+img.energy-orb-img-scalable {
+    vertical-align:top;
+    width: 1.111em;
+    height: 1.111em;
+}
+
 div.powertip-header {
     color: rgb(239, 200, 81);
     font-weight: 700;
@@ -247,7 +253,7 @@ div.card-title {
     color: white;
     font-weight: 700;
     --outline-color: rgb(50,50,50);
-    text-shadow: 0.139rem 0.139rem 0px rgba(0,0,0,0.3), -1px -1px 0 var(--outline-color),
+    text-shadow: 0.139em 0.139em 0px rgba(0,0,0,0.3), -1px -1px 0 var(--outline-color),
         0   -1px 0 var(--outline-color),
         1px -1px 0 var(--outline-color),
         1px  0   0 var(--outline-color),
@@ -308,6 +314,10 @@ span.card-description-text {
     vertical-align: middle;
 }
 
+.card-description-text-shadow {
+    text-shadow: 0.185rem 0.139rem 0px rgba(0,0,0,0.3)
+}
+
 .outline-black {
     text-shadow: -1px -1px 0 #000,
         0   -1px 0 #000,
@@ -335,7 +345,7 @@ span.card-description-text {
     width: 7.812%;
     height: 14.815%;
     left: 24.74%;
-    top: 42.13%;
+    top: 40.13%;
     background-image: url(img/ui/btn_prev_base.png);
     background-repeat: no-repeat;
     background-size: cover;
@@ -350,7 +360,7 @@ span.card-description-text {
     width: 7.812%;
     height: 14.815%;
     left: 67.813%;
-    top: 42.13%;
+    top: 40.13%;
     background-image: url(img/ui/btn_next_base.png);
     background-repeat: no-repeat;
     background-size: cover;
@@ -365,7 +375,7 @@ span.card-description-text {
     width: 13.594%;
     height: 4.907%;
     left: 43.229%;
-    top: 91.296%;
+    top: 89.296%;
     background-repeat: none;
     background-size: cover;
 }
@@ -388,13 +398,19 @@ span.card-description-text {
 
 #card_view_tips_box {
     position: absolute;
-    left: 67.708%;
-    top: 59.908%;
+    left: 68.008%;
+    top: 57.408%;
     width: 19%;
     height: 40.092%;
     overflow-y: auto;
     display: block;
     /* border: 1px solid white; */
+}
+
+.card-view-what-mod-tip {
+    position: absolute;
+    left: 68.008%;
+    top: 29.5%;
 }
 
 .text-white {

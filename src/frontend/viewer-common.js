@@ -66,6 +66,9 @@ function decompress(msg) {
 
 
 function splitSemicolonDelimited2DArray(text) {
+    if (text == '-')
+        return []
+
     array = []
     split = text.split(';;')
 
@@ -79,7 +82,10 @@ function splitSemicolonDelimited2DArray(text) {
 
 
 function parseCommaDelimitedIntegerArray(text) {
-    return JSON.parse('[' + text + ']')
+    if (text == '-')
+        return []
+    else
+        return JSON.parse('[' + text + ']')
 }
 
 
@@ -172,9 +178,9 @@ class PowerTip {
 
 class PowerTipElement extends CustomElement {
     constructor (header_text, raw_description_text, img_path, character) {
-        header_text = sanitizeHtmlTags(header_text)
-        raw_description_text = sanitizeHtmlTags(raw_description_text)
-        img_path = sanitizeHtmlTags(img_path)
+        header_text = sanitizeHtmlText(header_text)
+        raw_description_text = sanitizeHtmlText(raw_description_text)
+        img_path = sanitizeHtmlText(img_path)
 
         let root = document.createElement('div')
         root.className = 'powertip'
@@ -182,7 +188,7 @@ class PowerTipElement extends CustomElement {
         let header = document.createElement('div')
         header.classList.add('powertip-header')
         header.classList.add('outline')
-        header.innerHTML = header_text
+        header.innerHTML = replaceManaSymbols(header_text, character)
 
         let img
         if (img_path) {
@@ -372,15 +378,20 @@ function replaceColorCodes(text) {
     return parts.join(' ')
 }
 
-function replaceManaSymbols(text, character) {
+function replaceManaSymbols(text, character, scalable=false) {
     var parts = text.split(' ')
 
     for (let i = 0; i < parts.length; i++) {
         const part = parts[i];
         
-        if (part == '[E]') {
-            var imgPath = "img/orbs/orb" + character + ".png"
-            parts[i] = '<img src="' + imgPath + '" alt="[E]" class="energy-orb-img">'
+        if (part.length > 0 && part.charAt(0) == '[' && part.includes('[E]')) {
+            let imgPath = "img/orbs/orb" + character + ".png"
+            let cls = 'energy-orb-img'
+            if (scalable) {
+                cls = 'energy-orb-img-scalable'
+            }
+
+            parts[i] = part.replace('[E]', '<img src="' + imgPath + '" alt="[E]" class="' + cls + '">')
         }
     }
 
@@ -414,7 +425,7 @@ function replaceNewLines(text) {
 }
 
 
-function sanitizeHtmlTags(text) {
+function sanitizeHtmlText(text) {
     if (text)
         return text.replace(/</g, '&lt;').replace(/>/g, '&gt;')
     else
@@ -494,7 +505,7 @@ CARD_COLOR = ['RED', 'GREEN', 'BLUE', 'PURPLE', 'COLORLESS', 'CURSE']
 
 
 class Card {
-    constructor(name, cost, type, rarity, color, description, keyword_ids, card_to_preview, upgrades, bottle_status) {
+    constructor(name, cost, type, rarity, color, description, keyword_ids, card_to_preview, upgrades, bottle_status, mod_name) {
         this.name = name
         this.cost = cost
         this.type = type
@@ -505,33 +516,37 @@ class Card {
         this.card_to_preview = card_to_preview
         this.upgrades = upgrades
         this.bottle_status = bottle_status
-
+        this.mod_name = mod_name
+        
         this.upgraded_version = null
+        this.downgraded_version = null
     }
 
     static parseCard(array) {
         // name ; bottleStatus ; cardToPreview ; cardToPreview upgraded ; nameUpgraded ; upgrades ; keyword upgraded ; descriptionUpgraded ; keywords ; cost ; cost upgraded ; type ; rarity ; color ; description
 
         let name = array[0]
-        let card_to_preview = parseInt(array[2])
-        let card_to_preview_upgraded = parseInt(array[3])
-        let name_upgraded = this.parseUpgradedName(name, array[4])
-        let upgrades = parseInt(array[5])
+        let card_to_preview = parseInt(array[3])
+        let card_to_preview_upgraded = parseInt(array[4])
+        let name_upgraded = this.parseUpgradedName(name, array[5])
+        let upgrades = parseInt(array[6])
 
-        let keyword_ids_upgraded = this.parseUpgradedKeywords(array[8], array[6])
-        let description_upgraded = this.parseUpgradedDesc(array[14], array[7])
-        let keyword_ids = this.parseKeywords(array[8])
-        let cost = this.parseCost(array[9])
-        let cost_upgraded = this.parseCost(array[10])
-        let type = this.parseCardType(array[11])
-        let rarity = this.parseCardRarity(array[12])
-        let color = this.parseCardColor(array[13])
-        let description = array[14]
+        let keyword_ids_upgraded = this.parseUpgradedKeywords(array[9], array[7])
+        let description_upgraded = this.parseUpgradedDesc(array[15], array[8])
+        let keyword_ids = this.parseKeywords(array[9])
+        let cost = this.parseCost(array[10])
+        let cost_upgraded = this.parseCost(array[11])
+        let type = this.parseCardType(array[12])
+        let rarity = this.parseCardRarity(array[13])
+        let color = this.parseCardColor(array[14])
+        let description = array[15]
         let bottle_status = parseInt(array[1])
+        let mod_name = this.parseModName(array[2])
 
-        let card = new Card(name, cost, type, rarity, color, description, keyword_ids, card_to_preview, upgrades, bottle_status)
+        let card = new Card(name, cost, type, rarity, color, description, keyword_ids, card_to_preview, upgrades, bottle_status, mod_name)
         if (name_upgraded != null) {
-            card.upgraded_version = new Card(name_upgraded, cost_upgraded, type, rarity, color, description_upgraded, keyword_ids_upgraded, card_to_preview_upgraded, upgrades+1, 0)
+            card.upgraded_version = new Card(name_upgraded, cost_upgraded, type, rarity, color, description_upgraded, keyword_ids_upgraded, card_to_preview_upgraded, upgrades+1, 0, mod_name)
+            card.upgraded_version.downgraded_version = card
         }
 
         return card
@@ -539,7 +554,7 @@ class Card {
 
     
     static parseUpgradedName(name, upgName) {
-        if (upgName == 'null')
+        if (upgName == '-')
             return null
 
         if (upgName == '_')
@@ -599,6 +614,10 @@ class Card {
             return JSON.parse('[' + keywords + ']')
         }
     }
+
+    static parseModName(mod_name) {
+        return mod_name == '-' ? null : mod_name
+    }
 }
 
 
@@ -611,7 +630,7 @@ const BOTTLE_RELICS = ['bottled_flame', 'bottled_lightning', 'bottled_tornado']
 
 class CardElement extends CustomElement {
 
-    constructor(card, character, target_width=12.361, colorize_upgrades=true, small_title_font=false, display_bottle=true) {
+    constructor(card, character, target_width=12.361, colorize_upgrades=true, small_title_font=false, display_bottle=true, description_shadow=false) {
 
         if (target_width == undefined)
             target_width = CARD_BASE_WIDTH
@@ -667,7 +686,7 @@ class CardElement extends CustomElement {
         const title = document.createElement('div')
         title.className = 'card-title'
         title.className += small_title_font ? ' card-title-text-small' : ' card-title-text-regular'
-        title.innerHTML = replaceColorCodes(name_aux)
+        title.innerHTML = replaceColorCodes(sanitizeHtmlText(name_aux))
         cardElem.appendChild(title)
 
         const bottle = document.createElement('div')
@@ -682,7 +701,9 @@ class CardElement extends CustomElement {
         desc.className = 'card-description'
         const descText = document.createElement('span')
         descText.className = 'card-description-text'
-        descText.innerHTML = replaceNewLines(replaceManaSymbols(replaceColorCodes(card.description), character))
+        if (description_shadow)
+            descText.classList.add('card-description-text-shadow')
+        descText.innerHTML = replaceNewLines(replaceManaSymbols(replaceColorCodes(sanitizeHtmlText(card.description)), character, true))
         desc.appendChild(descText)
         cardElem.appendChild(desc)
 

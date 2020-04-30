@@ -119,7 +119,7 @@ function addCard(card, cards, tips, character) {
 
 function createCardView(array, card, cards, tips, character) {
 
-    const cardElem = new CardElement(card, character, CARD_VIEW_CARD_WIDTH, true, true, false)
+    const cardElem = new CardElement(card, character, CARD_VIEW_CARD_WIDTH, true, true, false, true)
 
     hitbox = {
         x: '0.1rem',
@@ -137,7 +137,7 @@ function createCardView(array, card, cards, tips, character) {
     const strip = new PowerTipStrip(card_view_tips_box, hitbox, keywords, CATEGORY_CARD_VIEW, character)
 
     cardElem.root.style.left = '32.343%'
-    cardElem.root.style.top = '9.537%'
+    cardElem.root.style.top = '7.537%'
     cardElem.root.style.display = 'none'
     cardElem.root.onclick = function (e) {e.stopPropagation()}
 
@@ -154,8 +154,8 @@ function createCardView(array, card, cards, tips, character) {
         cardPreviewElem = new CardElement(cardPreview, character, DECK_VIEW_CARD_PREVIEW_WIDTH)
         cardPreviewElem.root.style.display = 'none'
         cardPreviewElem.root.style.zIndex = 5
-        cardPreviewElem.root.style.left = '18.229%'
-        cardPreviewElem.root.style.top = '9.722%'
+        cardPreviewElem.root.style.left = '19.029%'
+        cardPreviewElem.root.style.top = '9.122%'
 
         appendChild(card_view, cardPreviewElem)
         addToCollection(CATEGORY_CARD_VIEW, cardPreviewElem)
@@ -163,7 +163,21 @@ function createCardView(array, card, cards, tips, character) {
         cardPreviewElem = placeholder
     }
 
-    array.push({cardElem: cardElem, tipsElem: strip.tipsElem, cardPreviewElem: cardPreviewElem})
+    let modNameTipElem
+    if (card.mod_name != null) {
+        modNameTipElem = new PowerTipElement('What mod is this from?', card.mod_name)
+
+        modNameTipElem.root.style.display = 'none'
+        modNameTipElem.root.style.zIndex = 5
+        modNameTipElem.root.classList.add('card-view-what-mod-tip')
+
+        appendChild(card_view, modNameTipElem)
+        addToCollection(CATEGORY_CARD_VIEW, modNameTipElem)
+    } else {
+        modNameTipElem = placeholder
+    }
+
+    array.push({cardElem: cardElem, tipsElem: strip.tipsElem, cardPreviewElem: cardPreviewElem, modNameTipElem: modNameTipElem})
 }
 
 
@@ -218,6 +232,7 @@ function showCard(index) {
     card.cardElem.root.style.display = 'block';
     card.tipsElem.style.display = 'block';
     card.cardPreviewElem.root.style.display = 'block';
+    card.modNameTipElem.root.style.display = 'block';
 
     if (view_cards_upgraded[index] == null)
         card_upgrade_checkbox.style.display = 'none'
@@ -250,12 +265,14 @@ function hideCurrentCard() {
     card.cardElem.root.style.display = 'none';
     card.tipsElem.style.display = 'none';
     card.cardPreviewElem.root.style.display = 'none';
+    card.modNameTipElem.root.style.display = 'none';
 
     card = view_cards_upgraded[current_card_index]
     if (card != null) {
         card.cardElem.root.style.display = 'none';
         card.tipsElem.style.display = 'none';
         card.cardPreviewElem.root.style.display = 'none';
+        card.modNameTipElem.root.style.display = 'none';
     }
 
     current_card_index = null
