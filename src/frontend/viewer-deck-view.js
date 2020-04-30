@@ -1,10 +1,12 @@
 
 var last_deck = ""
 
+var deck_view
+var deck_button
+var deck_button_keybinding_tip
+
 var deck_view_open = false
-
 var deck_view_contents = []
-
 var deck_view_current_hover_index = null
 
 const CATEGORY_CARDS = 'cards'
@@ -27,9 +29,6 @@ const DECK_VIEW_CARD_PREVIEW_SCALE = 0.95
 const DECK_VIEW_CARD_PREVIEW_WIDTH = CARD_BASE_WIDTH * DECK_VIEW_CARD_PREVIEW_SCALE
 const DECK_VIEW_CARD_PREVIEW_X_OFFSET = -0.8 // rem
 const DECK_VIEW_CARD_PREVIEW_Y_OFFSET = 0.15
-
-
-var deck_button
 
 
 function parseCards(cards) {
@@ -70,18 +69,26 @@ function clickDeck() {
 function openDeckView() {
     $('#deck_view').css('display', 'block')
     deck_view_open = true
+    setTimeout(function() {deck_view.focus()}, 0)
 }
 
 
 function closeDeckView() {
     $('#deck_view').css('display', 'none')
     deck_view_open = false
+    deck_view.blur()
 }
 
 
 function initializeDeck() {
+    deck_view = document.getElementById('deck_view')
+    deck_view.onkeydown = deckViewKeyDown
+
+    deck_button_keybinding_tip = document.getElementById('deck_button_keybinding_tip')
     deck_button = document.getElementById('deck_button')
     deck_button.onmousedown = clickDeck
+    deck_button.onmouseenter = function(e) {deck_button_keybinding_tip.style.display = 'block'}
+    deck_button.onmouseleave = function(e) {deck_button_keybinding_tip.style.display = 'none'}
 
     $('#deck_view_left_bar').mousedown(closeDeckView)
 
@@ -93,6 +100,14 @@ function initializeDeck() {
     // $('#deck_view').onclick = function() {
         // $('#deck_view').style.display = 'none'
     // }
+}
+
+
+function deckViewKeyDown(e) {
+    if ((e.code == "KeyQ" || e.code == "KeyD") && deck_view_open) {
+        closeDeckView()
+        e.stopImmediatePropagation()
+    }
 }
 
 

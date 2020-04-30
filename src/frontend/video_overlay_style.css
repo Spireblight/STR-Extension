@@ -6,6 +6,18 @@
     user-select: none; /* Standard */
 }
 
+.keybinding-tip {
+    position: absolute;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: white;
+    white-space: -moz-pre-wrap; /* Firefox */
+    white-space: -o-pre-wrap; /* Opera */
+    white-space: pre-wrap; /* Chrome */
+    word-wrap: break-word; /* IE */
+    overflow: visible;
+}
+
 div.hitbox {
     position: absolute;
 }
@@ -252,7 +264,7 @@ div.card-title {
     overflow: hidden;
     color: white;
     font-weight: 700;
-    --outline-color: rgb(50,50,50);
+    --outline-color: rgb(2, 2, 2);
     text-shadow: 0.139em 0.139em 0px rgba(0,0,0,0.3), -1px -1px 0 var(--outline-color),
         0   -1px 0 var(--outline-color),
         1px -1px 0 var(--outline-color),
@@ -269,6 +281,14 @@ div.card-title-text-regular {
 
 div.card-title-text-small {
     font-size: 0.839em; /* 0.948rem; */
+}
+
+#temp_card_title {
+    width: 7.911rem;
+    visibility: hidden;
+    position: absolute;
+    font-family: "Kreon", serif;
+    font-weight: 700;
 }
 
 div.card-bottle {
@@ -297,12 +317,12 @@ div.card-cost {
 div.card-description {
     position: absolute;
     left: 14%;
-    top: 62.471%;
+    top: 59.81%;
     width: 72%;
-    height: 4.873em; /*30.597%;*/ /*4.873rem;*/
-    line-height: 4.873em; /*30.597%*/ /*4.873rem;*/
+    height: 4.873em; /* 30.597%; 4.873rem; */
+    line-height: 4.873rem; /*30.597% 4.873rem; */
     font-weight: 400;
-    font-size: 0.875em;
+    /* font-size: 0.875em; */
     overflow: hidden;
     color: white;
     text-align: center;
@@ -312,6 +332,15 @@ span.card-description-text {
     line-height: 1.05;
     display: inline-block;
     vertical-align: middle;
+}
+
+#temp_card_description {
+    width: 8.9rem;
+    line-height: 1.05;
+    visibility: hidden;
+    position: absolute;
+    font-family: "Kreon", serif;
+    font-weight: 400;
 }
 
 .card-description-text-shadow {
@@ -367,6 +396,22 @@ span.card-description-text {
 }
 
 #card_view_next_btn:hover {
+    background-image: url(img/ui/btn_next_hover.png);
+}
+
+#card_view_prev_btn.card-view-prev-btn-pressed1 {
+    background-image: url(img/ui/btn_prev_base.png);
+}
+
+#card_view_prev_btn.card-view-prev-btn-pressed2 {
+    background-image: url(img/ui/btn_prev_hover.png);
+}
+
+#card_view_next_btn.card-view-next-btn-pressed1 {
+    background-image: url(img/ui/btn_next_base.png);
+}
+
+#card_view_next_btn.card-view-next-btn-pressed2 {
     background-image: url(img/ui/btn_next_hover.png);
 }
 

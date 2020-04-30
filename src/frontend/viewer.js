@@ -252,6 +252,8 @@ $(function() {
     items = document.getElementById('items')
     body = document.getElementsByTagName('body')[0]
     btn = document.getElementById('deck_button')
+    temp_card_title = document.getElementById('temp_card_title')
+    temp_card_description = document.getElementById('temp_card_description')
 
     $('#items').on('mousemove', movePowerTipStrip);
     body.onmouseenter = function(e) {
@@ -270,6 +272,12 @@ $(function() {
 
     initializeDeck()
     initializeCardView()
+
+    document.body.onkeydown = function(e) {
+        if (e.code == "KeyD") {
+            openDeckView()
+        }
+    }
 
     window.Twitch.ext.onError(function(e) {
         console.log('error')

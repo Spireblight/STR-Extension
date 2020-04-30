@@ -19,19 +19,30 @@
         <div id="temp" style="visibility: hidden"></div>
     </div>
     <div id="deck_button"></div>
-    <div id="deck_view">
+    <div id="deck_button_keybinding_tip" class="keybinding-tip outline-black" style="top: 8.7%; right: 5.02%; display: none">(D)</div>
+    <div id="deck_view" tabindex="-1">
         <div id="deck_view_content">
         </div>
         <div id="deck_view_return_btn"></div>
         <div id="deck_view_left_bar"></div>
         <div id="deck_view_right_bar"></div>
+        <div class="keybinding-tip outline-black" style="top: 2.5%; right: 3%">(Close - D/Q)</div>
     </div>
-    <div id="card_view">
-        <div id="card_view_prev_btn"></div>
-        <div id="card_view_next_btn"></div>
-        <div id="card_view_checkbox" class="card-view-checkbox-unchecked"></div>
+    <div id="card_view" tabindex="-1">
+        <div id="card_view_prev_btn" tabindex="-1">
+            <div class="keybinding-tip outline-black" style="left:37%; top: 43%;">(&larr;/A)</div>
+        </div>
+        <div id="card_view_next_btn" tabindex="-1">
+            <div class="keybinding-tip outline-black" style="left:22.4%; top: 43%;">(&rarr;/D)</div>
+        </div>
+        <div id="card_view_checkbox" tabindex="-1" class="card-view-checkbox-unchecked"></div>
         <div id="card_view_tips_box"></div>
+        <div class="keybinding-tip outline-black" style="bottom: 6.94%; left: 56.5%">(U)</div>
+        <div class="keybinding-tip outline-black" style="top: 2.5%; right: 3%">(Close - Q)</div>
+        
     </div>
     <div id="placeholder"></div>
+    <div id="temp_card_description"></div>
+    <div id="temp_card_title"></div>
 </body>
 </html>

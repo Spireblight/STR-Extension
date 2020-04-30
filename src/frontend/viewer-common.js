@@ -16,6 +16,8 @@ const MULTICOL_COLUMN_RIGHT_MARGIN = 0.469 //% - don't mess with this number or 
 
 var collections = {}
 
+var temp_card_title
+var temp_card_description
 
 class CustomElement{
     constructor(root = null) {
@@ -628,6 +630,14 @@ const CARD_BASE_FONT_SIZE = 1 //rem
 const BOTTLE_RELICS = ['bottled_flame', 'bottled_lightning', 'bottled_tornado']
 
 
+const CARD_MIN_FONT_SCALING = 0.69
+const CARD_FONT_SCALING_STEP = 0.05
+
+const CARD_TITLE_FONT_SIZE = 0.984 //em
+const CARD_TITLE_FONT_SIZE_SMALL = 0.839 //em
+const CARD_DESCRIPTION_FONT_SIZE = 0.875 //em
+
+
 class CardElement extends CustomElement {
 
     constructor(card, character, target_width=12.361, colorize_upgrades=true, small_title_font=false, display_bottle=true, description_shadow=false) {
@@ -680,14 +690,21 @@ class CardElement extends CustomElement {
             cardElem.appendChild(energyCost)
         }
 
+        const title = document.createElement('div')
+        title.className = 'card-title'
         let name_aux = card.name
         if (card.upgrades > 0 && colorize_upgrades && card.name.indexOf("+") >= 0)
             name_aux = colorizeString(name_aux, '#g')
-        const title = document.createElement('div')
-        title.className = 'card-title'
-        title.className += small_title_font ? ' card-title-text-small' : ' card-title-text-regular'
-        title.innerHTML = replaceColorCodes(sanitizeHtmlText(name_aux))
+        let title_text = replaceColorCodes(sanitizeHtmlText(name_aux))
+        let title_font_size = small_title_font ? CARD_TITLE_FONT_SIZE_SMALL : CARD_TITLE_FONT_SIZE
+        let title_scaling = this.computeFontScaling(title_text, title_font_size, temp_card_title, 1.3, 0.5)
+        title.style.fontSize = title_font_size * title_scaling + 'em'
+        title.innerHTML = title_text
         cardElem.appendChild(title)
+
+        if (title_scaling < 1) {
+            console.log(card.name, 'title scaling', title_scaling)
+        }
 
         const bottle = document.createElement('div')
         bottle.className = 'card-bottle'
@@ -700,10 +717,14 @@ class CardElement extends CustomElement {
         const desc = document.createElement('div')
         desc.className = 'card-description'
         const descText = document.createElement('span')
+        let desc_text = replaceNewLines(replaceManaSymbols(replaceColorCodes(sanitizeHtmlText(card.description)), 
+        character, true))
+        descText.innerHTML = desc_text
         descText.className = 'card-description-text'
         if (description_shadow)
             descText.classList.add('card-description-text-shadow')
-        descText.innerHTML = replaceNewLines(replaceManaSymbols(replaceColorCodes(sanitizeHtmlText(card.description)), character, true))
+        let desc_scaling = this.computeFontScaling(desc_text, CARD_DESCRIPTION_FONT_SIZE, temp_card_description, 4.873, 0.5)
+        descText.style.fontSize = CARD_DESCRIPTION_FONT_SIZE * desc_scaling + 'em'
         desc.appendChild(descText)
         cardElem.appendChild(desc)
 
@@ -725,11 +746,11 @@ class CardElement extends CustomElement {
     }
 
     setWidth(target_width) {
-        const scale = target_width / CARD_BASE_WIDTH
+        this.scale = target_width / CARD_BASE_WIDTH
     
-        const width = CARD_BASE_WIDTH * scale + 'rem'
-        const height = CARD_BASE_HEIGHT * scale + 'rem'
-        const font_size = CARD_BASE_FONT_SIZE * scale + 'rem'
+        const width = CARD_BASE_WIDTH * this.scale + 'rem'
+        const height = CARD_BASE_HEIGHT * this.scale + 'rem'
+        const font_size = CARD_BASE_FONT_SIZE * this.scale + 'rem'
     
         this.root.style.width = width
         this.root.style.height = height
@@ -742,6 +763,36 @@ class CardElement extends CustomElement {
 
     setShadowBlur(is_visible) {
         this.shadow_blur.style.visibility = is_visible ? 'visible' : 'hidden'
+    }
+
+    computeFontScaling(text, base_font_size_em, temp_element, max_height_em, min_scaling, verbose) {
+        
+        let stream_scale = document.body.offsetWidth / 1920
+        let scaling = 1.0 + CARD_FONT_SCALING_STEP
+        let max_height_px = max_height_em * REM_PX * stream_scale
+        let max_width_px = temp_element.offsetWidth
+        let height
+        let width
+
+        if (verbose)
+            console.log('stream scale', stream_scale)
+
+        do {
+            scaling -= CARD_FONT_SCALING_STEP
+
+            temp_element.innerHTML = text
+            temp_element.style.fontSize = base_font_size_em * scaling + 'rem'
+            height = temp_element.offsetHeight
+            width = temp_element.scrollWidth
+
+            if (verbose)
+                console.log('height', height, 'max height', max_height_px, 'max height em', max_height_em)
+        } 
+        while ((height > max_height_px || width > max_width_px)&& scaling - CARD_FONT_SCALING_STEP > min_scaling)
+
+        temp_element.innerHTML = ""
+
+        return scaling
     }
 }
 

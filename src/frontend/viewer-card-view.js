@@ -34,14 +34,39 @@ function initializeCardView() {
     placeholder = new PlaceholderElement()
 
     card_view.onclick = closeCardView
+    card_view.onkeydown = cardViewKeyDown
 
     card_view_prev_btn.onclick = previousCard
     card_view_next_btn.onclick = nextCard
     card_upgrade_checkbox.onclick = clickUpgradeCheckbox
+
+    card_view_prev_btn.onkeydown = cardViewKeyDown
+    card_view_next_btn.onkeydown = cardViewKeyDown
+    card_upgrade_checkbox.onkeydown = cardViewKeyDown
     // card_view_prev_btn.onclick = function(e) {e.stopImmediatePropagation()}
     // card_view_nect_btn.onclick = function(e) {e.stopImmediatePropagation()}
     // card_upgrade_checkbox.onclick = function(e) {e.stopImmediatePropagation()}
 
+}
+
+function cardViewKeyDown(e) {
+    console.log('key down pressed ' + e.code)
+
+    if ((e.code == "ArrowLeft" || e.code == "KeyA") && current_card_index > 0) {
+        previousCard(e)
+    }
+
+    if ((e.code == "ArrowRight" || e.code == "KeyD") && current_card_index < view_cards.length - 1) {
+        nextCard(e)
+    }
+
+    if (e.code == "KeyQ") {
+        closeCardView()
+    }
+
+    if (e.code == "KeyU") {
+        clickUpgradeCheckbox(e)
+    }
 }
 
 
@@ -193,21 +218,50 @@ function displayAfterUpdate() {
     }
 }
 
+const BTN_ANIMATION_TIMEOUT = 50
+function previousCardBtnAnimation() {
+    card_view_prev_btn.classList.remove('card-view-prev-btn-pressed1')
+    card_view_prev_btn.classList.remove('card-view-prev-btn-pressed2')
+    card_view_prev_btn.classList.add('card-view-prev-btn-pressed1')
+    setTimeout(function() {
+        card_view_prev_btn.classList.remove('card-view-prev-btn-pressed1')
+        card_view_prev_btn.classList.add('card-view-prev-btn-pressed2')
+
+        setTimeout(function() {
+            card_view_prev_btn.classList.remove('card-view-prev-btn-pressed2')
+        }, BTN_ANIMATION_TIMEOUT)
+    }, BTN_ANIMATION_TIMEOUT)
+}
+
+function nextCardBtnAnimation() {
+    card_view_next_btn.classList.remove('card-view-next-btn-pressed1')
+    card_view_next_btn.classList.remove('card-view-next-btn-pressed2')
+    card_view_next_btn.classList.add('card-view-next-btn-pressed1')
+    setTimeout(function() {
+        card_view_next_btn.classList.remove('card-view-next-btn-pressed1')
+        card_view_next_btn.classList.add('card-view-next-btn-pressed2')
+
+        setTimeout(function() {
+            card_view_next_btn.classList.remove('card-view-next-btn-pressed2')
+        }, BTN_ANIMATION_TIMEOUT)
+    }, BTN_ANIMATION_TIMEOUT)
+}
 
 function previousCard(e) {
     e.stopImmediatePropagation()
     showCard(current_card_index - 1)
+    previousCardBtnAnimation()
 }
-
 
 function nextCard(e) {
     e.stopImmediatePropagation()
     showCard(current_card_index + 1)
+    nextCardBtnAnimation()
 }
-
 
 function openCardView(index) {
 
+    setTimeout(function () {card_view.focus()}, 0)
     card_upgrade_checked = false
     card_view_open = true
 
@@ -216,7 +270,6 @@ function openCardView(index) {
     updateUpgradeCheckbox()
     showCard(index)
 }
-
 
 function showCard(index) {
     
@@ -282,4 +335,6 @@ function hideCurrentCard() {
 function closeCardView() {
     card_view.style.display = 'none'
     card_view_open = true
+    card_view.blur()
+    setTimeout(function() {deck_view.focus()}, 0)
 }
