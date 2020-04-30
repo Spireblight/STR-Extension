@@ -18,6 +18,33 @@
     overflow: visible;
 }
 
+#keybinding_hints_checkbox {
+    position: absolute;
+    top: 4%;
+    left: 2.5%;
+    width: 10%;
+    height: 4%;
+    background-image: url(img/ui/checkbox_unchecked.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    color: rgb(239, 200, 81);
+}
+
+#keybinding_hints_checkbox:hover {
+    color: rgb(135, 206, 235)
+}
+
+
+#keybinding_hints_checkbox span {
+    font-family: "Kreon", serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    left: 2rem;
+    position: absolute;
+    left: 30%;
+    top: 15%;
+}
+
 div.hitbox {
     position: absolute;
 }

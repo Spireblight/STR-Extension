@@ -87,7 +87,10 @@ function initializeDeck() {
     deck_button_keybinding_tip = document.getElementById('deck_button_keybinding_tip')
     deck_button = document.getElementById('deck_button')
     deck_button.onmousedown = clickDeck
-    deck_button.onmouseenter = function(e) {deck_button_keybinding_tip.style.display = 'block'}
+    deck_button.onmouseenter = function(e) {
+        if (show_keybinding_hints)
+            deck_button_keybinding_tip.style.display = 'block'
+    }
     deck_button.onmouseleave = function(e) {deck_button_keybinding_tip.style.display = 'none'}
 
     $('#deck_view_left_bar').mousedown(closeDeckView)

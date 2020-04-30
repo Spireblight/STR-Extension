@@ -8,6 +8,8 @@ var last_broadcast_secs = new Date() / 1000
 var latency = 0.0
 
 var items
+var show_keybinding_hints = false
+var show_hints
 
 const MSG_TYPE_SET_TIPS = 1
 const MSG_TYPE_SET_DECK = 4
@@ -254,6 +256,7 @@ $(function() {
     btn = document.getElementById('deck_button')
     temp_card_title = document.getElementById('temp_card_title')
     temp_card_description = document.getElementById('temp_card_description')
+    show_hints = document.getElementById('keybinding_hints_checkbox')
 
     $('#items').on('mousemove', movePowerTipStrip);
     body.onmouseenter = function(e) {
@@ -263,6 +266,24 @@ $(function() {
     body.onmouseleave = function(e) {
         if (!deck_view_open) {
             btn.classList.remove('button-border')
+        }
+    }
+
+    show_hints.onclick = function(e) {
+        show_keybinding_hints = !show_keybinding_hints
+
+        if(show_keybinding_hints) {
+            show_hints.style.backgroundImage = 'url(img/ui/checkbox_checked.png)'
+            tips = document.getElementsByClassName('keybinding-tip')
+            for (let tip of tips) {
+                tip.style.display = 'block'
+            }
+        } else {
+            show_hints.style.backgroundImage = 'url(img/ui/checkbox_unchecked.png)'
+            tips = document.getElementsByClassName('keybinding-tip')
+            for (let tip of tips) {
+                tip.style.display = 'none'
+            }
         }
     }
 
