@@ -289,7 +289,10 @@ $(function() {
 
     // window.setInterval(checkIfSourceActive, 2500);
 
-    window.setTimeout(preloadNextImageBunch, PRELOAD_INTERVAL)
+    // window.setTimeout(preloadNextImageBunch, PRELOAD_INTERVAL)
+    // window.setInterval(imagePreloadQueue.)
+    imagePreloadQueue = new ImagePreloadQueue(MAX_CONCURRENT_PRELOADS)
+    imagePreloadQueue.extendPreloadQueue(PRELOAD_IMAGES)
 
     initializeDeck()
     initializeCardView()

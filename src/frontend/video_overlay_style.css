@@ -16,6 +16,7 @@
     white-space: pre-wrap; /* Chrome */
     word-wrap: break-word; /* IE */
     overflow: visible;
+    display: none;
 }
 
 #keybinding_hints_checkbox {
@@ -347,7 +348,7 @@ div.card-description {
     top: 59.81%;
     width: 72%;
     height: 4.873em; /* 30.597%; 4.873rem; */
-    line-height: 4.873rem; /*30.597% 4.873rem; */
+    line-height: 4.873em; /*30.597% 4.873rem; */
     font-weight: 400;
     /* font-size: 0.875em; */
     overflow: hidden;

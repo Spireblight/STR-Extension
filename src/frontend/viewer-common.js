@@ -15,6 +15,9 @@ const POWERTIP_BOTTOM_MARGIN = 0.365 //%
 const MULTICOL_COLUMN_RIGHT_MARGIN = 0.469 //% - don't mess with this number or the columns won't be separated
 
 var collections = {}
+const MAX_CONCURRENT_PRELOADS = 3
+const PRELOAD_INTERVAL = 250
+var imagePreloadQueue
 
 var temp_card_title
 var temp_card_description
@@ -448,56 +451,6 @@ function parsePercentage(val) {
 
 
 
-////////////////////////////////////// IMAGE PRELOAD
-
-
-const PRELOAD_IMAGES = ['img/intents/attackBuff.png', 'img/intents/attackDebuff.png', 'img/intents/attackDefend.png', 'img/intents/buff1.png', 'img/intents/debuff1.png', 'img/intents/debuff2.png', 'img/intents/defend.png', 'img/intents/defendBuff.png', 'img/intents/escape.png', 'img/intents/magic.png', 'img/intents/sleep.png', 'img/intents/special.png', 'img/intents/stun.png', 'img/intents/tip/1.png', 'img/intents/tip/2.png', 'img/intents/tip/3.png', 'img/intents/tip/4.png', 'img/intents/tip/5.png', 'img/intents/tip/6.png', 'img/intents/tip/7.png', 'img/intents/unknown.png', 'img/magGlass2.png', 'img/orbs/orb.png', 'img/orbs/orbDefect.png', 'img/orbs/orbIronclad.png', 'img/orbs/orbTheSilent.png', 'img/orbs/orbWatcher.png', 'img/placeholder.png', 'img/powers/48/accuracy.png', 'img/powers/48/afterImage.png', 'img/powers/48/ai.png', 'img/powers/48/amplify.png', 'img/powers/48/anger.png', 'img/powers/48/armor.png', 'img/powers/48/artifact.png', 'img/powers/48/attackBurn.png', 'img/powers/48/backAttack.png', 'img/powers/48/backAttack2.png', 'img/powers/48/barricade.png', 'img/powers/48/beat.png', 'img/powers/48/berserk.png', 'img/powers/48/bias.png', 'img/powers/48/blur.png', 'img/powers/48/book.png', 'img/powers/48/brutality.png', 'img/powers/48/buffer.png', 'img/powers/48/burst.png', 'img/powers/48/carddraw.png', 'img/powers/48/cExplosion.png', 'img/powers/48/channel.png', 'img/powers/48/choke.png', 'img/powers/48/closeUp.png', 'img/powers/48/combust.png', 'img/powers/48/confusion.png', 'img/powers/48/conserve.png', 'img/powers/48/constricted.png', 'img/powers/48/controlled_change.png', 'img/powers/48/corruption.png', 'img/powers/48/curiosity.png', 'img/powers/48/darkembrace.png', 'img/powers/48/defenseNext.png', 'img/powers/48/demonForm.png', 'img/powers/48/deva.png', 'img/powers/48/deva2.png', 'img/powers/48/devotion.png', 'img/powers/48/dexterity.png', 'img/powers/48/doubleDamage.png', 'img/powers/48/doubleTap.png', 'img/powers/48/draw.png', 'img/powers/48/draw2.png', 'img/powers/48/echo.png', 'img/powers/48/end_turn_death.png', 'img/powers/48/energized_blue.png', 'img/powers/48/energized_green.png', 'img/powers/48/entangle.png', 'img/powers/48/envenom.png', 'img/powers/48/establishment.png', 'img/powers/48/evolve.png', 'img/powers/48/explosive.png', 'img/powers/48/fading.png', 'img/powers/48/fasting.png', 'img/powers/48/firebreathing.png', 'img/powers/48/flameBarrier.png', 'img/powers/48/flex.png', 'img/powers/48/flight.png', 'img/powers/48/focus.png', 'img/powers/48/forcefield.png', 'img/powers/48/frail.png', 'img/powers/48/fumes.png', 'img/powers/48/heartDef.png', 'img/powers/48/heatsink.png', 'img/powers/48/hello.png', 'img/powers/48/hex.png', 'img/powers/48/hymn.png', 'img/powers/48/infiniteBlades.png', 'img/powers/48/infinitegreen.png', 'img/powers/48/int.png', 'img/powers/48/intangible.png', 'img/powers/48/juggernaut.png', 'img/powers/48/lessdraw.png', 'img/powers/48/like_water.png', 'img/powers/48/lockon.png', 'img/powers/48/loop.png', 'img/powers/48/magnet.png', 'img/powers/48/malleable.png', 'img/powers/48/mantra.png', 'img/powers/48/mastery.png', 'img/powers/48/master_protect.png', 'img/powers/48/master_reality.png', 'img/powers/48/master_smite.png', 'img/powers/48/mayhem.png', 'img/powers/48/mental_fortress.png', 'img/powers/48/minion.png', 'img/powers/48/modeShift.png', 'img/powers/48/nightmare.png', 'img/powers/48/nirvana.png', 'img/powers/48/noattack.png', 'img/powers/48/noBlock.png', 'img/powers/48/noDraw.png', 'img/powers/48/noPain.png', 'img/powers/48/no_skill.png', 'img/powers/48/no_stance.png', 'img/powers/48/omega.png', 'img/powers/48/painfulStabs.png', 'img/powers/48/panache.png', 'img/powers/48/path_to_victory.png', 'img/powers/48/penNib.png', 'img/powers/48/phantasmal.png', 'img/powers/48/platedarmor.png', 'img/powers/48/poison.png', 'img/powers/48/pressure_points.png', 'img/powers/48/reactive.png', 'img/powers/48/rebound.png', 'img/powers/48/regen.png', 'img/powers/48/regrow.png', 'img/powers/48/repair.png', 'img/powers/48/retain.png', 'img/powers/48/ritual.png', 'img/powers/48/rupture.png', 'img/powers/48/rushdown.png', 'img/powers/48/sadistic.png', 'img/powers/48/shackle.png', 'img/powers/48/sharpHide.png', 'img/powers/48/shift.png', 'img/powers/48/skillBurn.png', 'img/powers/48/slow.png', 'img/powers/48/split.png', 'img/powers/48/sporeCloud.png', 'img/powers/48/stasis.png', 'img/powers/48/static_discharge.png', 'img/powers/48/storm.png', 'img/powers/48/strength.png', 'img/powers/48/surrounded.png', 'img/powers/48/swivel.png', 'img/powers/48/talk_to_hand.png', 'img/powers/48/the_bomb.png', 'img/powers/48/thievery.png', 'img/powers/48/thorns.png', 'img/powers/48/thousandCuts.png', 'img/powers/48/time.png', 'img/powers/48/tools.png', 'img/powers/48/unawakened.png', 'img/powers/48/vigor.png', 'img/powers/48/vulnerable.png', 'img/powers/48/wave_of_the_hand.png', 'img/powers/48/weak.png', 'img/powers/48/wireheading.png', 'img/powers/48/wraithForm.png']
-const MAX_CONCURRENT_PRELOADS = 2
-const PRELOAD_INTERVAL = 250
-preload_workers_available = MAX_CONCURRENT_PRELOADS
-image_preload_index = 0
-
-function preloadImages(array) {
-    // console.log('preloading images')
-    if (!preloadImages.list) {
-        preloadImages.list = [];
-    }
-    var list = preloadImages.list;
-    for (var i = 0; i < array.length; i++) {
-        var img = new Image();
-        preload_workers_available -= 1
-
-        img.onload = function() {
-            preload_workers_available += 1
-            var index = list.indexOf(this);
-            if (index !== -1) {
-                // remove image from the array once it's loaded
-                // for memory consumption reasons
-                list.splice(index, 1);
-            }
-        }
-        list.push(img);
-        img.src = array[i];
-    }
-}
-
-function preloadNextImageBunch() {
-    let urls = []
-    let workers = preload_workers_available
-    // console.log(workers + ' workers available')
-    for (let i = image_preload_index; i < image_preload_index + workers && i < PRELOAD_IMAGES.length; i++) {
-        urls.push(PRELOAD_IMAGES[i]);
-        // console.log('adding ' + PRELOAD_IMAGES[i])
-    }
-    image_preload_index += workers
-    preloadImages(urls)
-
-    if(image_preload_index < PRELOAD_IMAGES.length)
-        window.setTimeout(preloadNextImageBunch, PRELOAD_INTERVAL)
-}
-
-
-
 ////////////////////////////////////// CARDS
 
 // these are defaults from the base game that are integer encoded, the one from mods get sent by their full name
@@ -660,20 +613,24 @@ class CardElement extends CustomElement {
 
         const bg = document.createElement('div')
         bg.className = 'card-img'
-        bg.style.backgroundImage = this.getBackgroundPath(card)
+        // bg.style.backgroundImage = this.getBackgroundPath(card)
         bg.style.zIndex = -4
+        // let bg_path = this.getBackgroundPath(card)
+        imagePreloadQueue.highPriorityLoadImg(this.getBackgroundPath(card), imagePreloadQueue.loadBackgroundCallback, bg, this.getBackgroundPath(card))
         cardElem.appendChild(bg)
 
         const portrait = document.createElement('div')
         portrait.className = 'card-portrait'
-        portrait.style.backgroundImage = this.getPortraitPath(card)
+        // portrait.style.backgroundImage = this.getPortraitPath(card)
         portrait.style.zIndex = -3
+        imagePreloadQueue.lowPriorityLoadImg(this.getPortraitPath(card), imagePreloadQueue.loadBackgroundCallback, portrait, this.getPortraitPath(card))
         cardElem.appendChild(portrait)
 
         const frame = document.createElement('div')
         frame.className = 'card-img'
-        frame.style.backgroundImage = this.getFramePath(card)
+        // frame.style.backgroundImage = this.getFramePath(card)
         frame.style.zIndex = -2
+        imagePreloadQueue.highPriorityLoadImg(this.getFramePath(card), imagePreloadQueue.loadBackgroundCallback, frame, this.getFramePath(card))
         cardElem.appendChild(frame)
         
         if (card.cost != null) {
@@ -681,6 +638,7 @@ class CardElement extends CustomElement {
             energyOrb.className = 'card-img'
             energyOrb.style.backgroundImage = this.getEnergyOrbPath(card)
             energyOrb.style.zIndex = -1
+            imagePreloadQueue.highPriorityLoadImg(this.getEnergyOrbPath(card), imagePreloadQueue.loadBackgroundCallback, energyOrb, this.getEnergyOrbPath(card))
             cardElem.appendChild(energyOrb)
             
             const energyCost = document.createElement('div')
@@ -711,7 +669,8 @@ class CardElement extends CustomElement {
         cardElem.appendChild(bottle)
 
         if(display_bottle && card.bottle_status > 0) {
-            bottle.style.backgroundImage = 'url(img/relics/' + BOTTLE_RELICS[card.bottle_status - 1] + '.png)'
+            imagePreloadQueue.lowPriorityLoadImg(this.getBottlePath(card), imagePreloadQueue.loadBackgroundCallback, bottle, this.getBottlePath(card))
+            // bottle.style.backgroundImage = 'url(img/relics/' + BOTTLE_RELICS[card.bottle_status - 1] + '.png)'
         }
 
         const desc = document.createElement('div')
@@ -731,18 +690,28 @@ class CardElement extends CustomElement {
         // console.log(JSON.stringify(keywords))
     }
 
-    getBackgroundPath(card) {return 'url("img/cards/' + card.color + '/background_' + card.type + '.png")'}
+    getBackgroundPath(card) {return this.getBaseCardPath(card) + card.color + '/background_' + card.type + '.png'}
 
-    getFramePath(card) {return 'url("img/cards/' + card.color + '/frame_' + card.type + '_' + card.rarity + '.png")'}
+    getFramePath(card) {return this.getBaseCardPath(card) + card.color + '/frame_' + card.type + '_' + card.rarity + '.png'}
 
-    getEnergyOrbPath(card) {return 'url("img/cards/' + card.color + '/energy_orb.png")'}
+    getEnergyOrbPath(card) {return this.getBaseCardPath(card) + card.color + '/energy_orb.png'}
 
     getPortraitPath(card) {
         let name = card.name
         if (card.upgrades > 0 && name.lastIndexOf('+') != -1)
             name = name.substring(0, name.lastIndexOf('+'))
         name = name.replace(/[\\/:*?"<>|]/g, '_')
-        return 'url("img/cards/' + card.color + '/portraits/' + name + '.png")'
+        return this.getBaseCardPath(card) + card.color + '/portraits/' + name + '.png'
+    }
+
+    getBottlePath(card) {return 'img/relics/' + BOTTLE_RELICS[card.bottle_status - 1] + '.png'}
+
+    getBaseCardPath(card) {
+        if (card.mod_name) {
+            return 'https://slay-the-relics-assets.s3.eu-west-2.amazonaws.com/cards/'
+        } else {
+            return 'img/cards/'
+        }
     }
 
     setWidth(target_width) {
@@ -806,5 +775,124 @@ function colorizeString(str, color_prefix) {
             str += " "
     }
     return str
+}
+
+
+
+
+
+////////////////////////////////////// IMAGE PRELOAD
+
+
+const PRELOAD_IMAGES = ['img/magGlass2.png', 'img/orbs/orb.png', 'img/orbs/orbDefect.png', 'img/orbs/orbIronclad.png', 'img/orbs/orbTheSilent.png', 'img/orbs/orbWatcher.png', 'img/placeholder.png', 'img/ui/deck.png', 'img/ui/checkbox_upgrade_checked_hover.png', 'img/ui/checkbox_upgrade_hover.png', 'img/ui/btn_next_base.png', 'img/ui/btn_next_hover.png', 'img/ui/btn_prev_base.png', 'img/ui/btn_prev_hover.png', 'img/ui/btn_return_base.png', 'img/ui/btn_return_hover.png', 'img/ui/checkbox_checked.png', 'img/ui/checkbox_unchecked.png', 'img/ui/checkbox_upgrade.png', 'img/ui/checkbox_upgrade_checked.png', 'img/intents/attackBuff.png', 'img/intents/attackDebuff.png', 'img/intents/attackDefend.png', 'img/intents/buff1.png', 'img/intents/debuff1.png', 'img/intents/debuff2.png', 'img/intents/defend.png', 'img/intents/defendBuff.png', 'img/intents/escape.png', 'img/intents/magic.png', 'img/intents/sleep.png', 'img/intents/special.png', 'img/intents/stun.png', 'img/intents/tip/1.png', 'img/intents/tip/2.png', 'img/intents/tip/3.png', 'img/intents/tip/4.png', 'img/intents/tip/5.png', 'img/intents/tip/6.png', 'img/intents/tip/7.png', 'img/intents/unknown.png', 'img/powers/48/accuracy.png', 'img/powers/48/afterImage.png', 'img/powers/48/ai.png', 'img/powers/48/amplify.png', 'img/powers/48/anger.png', 'img/powers/48/armor.png', 'img/powers/48/artifact.png', 'img/powers/48/attackBurn.png', 'img/powers/48/backAttack.png', 'img/powers/48/backAttack2.png', 'img/powers/48/barricade.png', 'img/powers/48/beat.png', 'img/powers/48/berserk.png', 'img/powers/48/bias.png', 'img/powers/48/blur.png', 'img/powers/48/book.png', 'img/powers/48/brutality.png', 'img/powers/48/buffer.png', 'img/powers/48/burst.png', 'img/powers/48/carddraw.png', 'img/powers/48/cExplosion.png', 'img/powers/48/channel.png', 'img/powers/48/choke.png', 'img/powers/48/closeUp.png', 'img/powers/48/combust.png', 'img/powers/48/confusion.png', 'img/powers/48/conserve.png', 'img/powers/48/constricted.png', 'img/powers/48/controlled_change.png', 'img/powers/48/corruption.png', 'img/powers/48/curiosity.png', 'img/powers/48/darkembrace.png', 'img/powers/48/defenseNext.png', 'img/powers/48/demonForm.png', 'img/powers/48/deva.png', 'img/powers/48/deva2.png', 'img/powers/48/devotion.png', 'img/powers/48/dexterity.png', 'img/powers/48/doubleDamage.png', 'img/powers/48/doubleTap.png', 'img/powers/48/draw.png', 'img/powers/48/draw2.png', 'img/powers/48/echo.png', 'img/powers/48/end_turn_death.png', 'img/powers/48/energized_blue.png', 'img/powers/48/energized_green.png', 'img/powers/48/entangle.png', 'img/powers/48/envenom.png', 'img/powers/48/establishment.png', 'img/powers/48/evolve.png', 'img/powers/48/explosive.png', 'img/powers/48/fading.png', 'img/powers/48/fasting.png', 'img/powers/48/firebreathing.png', 'img/powers/48/flameBarrier.png', 'img/powers/48/flex.png', 'img/powers/48/flight.png', 'img/powers/48/focus.png', 'img/powers/48/forcefield.png', 'img/powers/48/frail.png', 'img/powers/48/fumes.png', 'img/powers/48/heartDef.png', 'img/powers/48/heatsink.png', 'img/powers/48/hello.png', 'img/powers/48/hex.png', 'img/powers/48/hymn.png', 'img/powers/48/infiniteBlades.png', 'img/powers/48/infinitegreen.png', 'img/powers/48/int.png', 'img/powers/48/intangible.png', 'img/powers/48/juggernaut.png', 'img/powers/48/lessdraw.png', 'img/powers/48/like_water.png', 'img/powers/48/lockon.png', 'img/powers/48/loop.png', 'img/powers/48/magnet.png', 'img/powers/48/malleable.png', 'img/powers/48/mantra.png', 'img/powers/48/mastery.png', 'img/powers/48/master_protect.png', 'img/powers/48/master_reality.png', 'img/powers/48/master_smite.png', 'img/powers/48/mayhem.png', 'img/powers/48/mental_fortress.png', 'img/powers/48/minion.png', 'img/powers/48/modeShift.png', 'img/powers/48/nightmare.png', 'img/powers/48/nirvana.png', 'img/powers/48/noattack.png', 'img/powers/48/noBlock.png', 'img/powers/48/noDraw.png', 'img/powers/48/noPain.png', 'img/powers/48/no_skill.png', 'img/powers/48/no_stance.png', 'img/powers/48/omega.png', 'img/powers/48/painfulStabs.png', 'img/powers/48/panache.png', 'img/powers/48/path_to_victory.png', 'img/powers/48/penNib.png', 'img/powers/48/phantasmal.png', 'img/powers/48/platedarmor.png', 'img/powers/48/poison.png', 'img/powers/48/pressure_points.png', 'img/powers/48/reactive.png', 'img/powers/48/rebound.png', 'img/powers/48/regen.png', 'img/powers/48/regrow.png', 'img/powers/48/repair.png', 'img/powers/48/retain.png', 'img/powers/48/ritual.png', 'img/powers/48/rupture.png', 'img/powers/48/rushdown.png', 'img/powers/48/sadistic.png', 'img/powers/48/shackle.png', 'img/powers/48/sharpHide.png', 'img/powers/48/shift.png', 'img/powers/48/skillBurn.png', 'img/powers/48/slow.png', 'img/powers/48/split.png', 'img/powers/48/sporeCloud.png', 'img/powers/48/stasis.png', 'img/powers/48/static_discharge.png', 'img/powers/48/storm.png', 'img/powers/48/strength.png', 'img/powers/48/surrounded.png', 'img/powers/48/swivel.png', 'img/powers/48/talk_to_hand.png', 'img/powers/48/the_bomb.png', 'img/powers/48/thievery.png', 'img/powers/48/thorns.png', 'img/powers/48/thousandCuts.png', 'img/powers/48/time.png', 'img/powers/48/tools.png', 'img/powers/48/unawakened.png', 'img/powers/48/vigor.png', 'img/powers/48/vulnerable.png', 'img/powers/48/wave_of_the_hand.png', 'img/powers/48/weak.png', 'img/powers/48/wireheading.png', 'img/powers/48/wraithForm.png', 'img/relics/bottled_flame.png', 'img/relics/bottled_lightning.png', 'img/relics/bottled_tornado.png']
+
+
+class ImagePreloadQueue {
+    constructor(nworkers=3) {
+        this.nworkers = nworkers
+        this.avaliable_workers = nworkers
+        this.load_queue = []
+        this.preload_queue = []
+        this.img_list = []
+        this.loaded = []
+    }
+
+    extendPreloadQueue(list) {
+        this.preload_queue = this.preload_queue.concat(list)
+        this.preloadNext()
+    }
+
+    highPriorityLoadImg(url, onload, ...args) {
+        if (!this.load_queue.includes(url)) {
+            this.load_queue.unshift({url:url, callback:onload, args:args})
+            this.preloadNext()
+        }
+    }
+
+    lowPriorityLoadImg(url, onload, ...args) {
+        if (!this.load_queue.includes(url)) {
+            this.load_queue.push({url:url, callback:onload, args:args})
+            this.preloadNext()
+        }
+    }
+
+    preloadNext() {
+        // console.log('loading next, avail workers ', this.avaliable_workers)
+        let this_object = this
+
+        while (this.avaliable_workers > 0) {
+            let url
+            let callback
+            let args
+
+            if (this.load_queue.length > 0) {
+                let elem = this.load_queue.shift()
+                url = elem.url
+                callback = elem.callback
+                args = elem.args
+            } else if (this.preload_queue.length > 0) {
+                url = this.preload_queue.shift()
+            }
+
+            if (url) {
+                if (this.loaded.includes(url)) {
+                    // console.log('already loaded', url)
+
+                    if (callback)
+                        if (args)
+                            callback(...args)
+                        else
+                            callback()
+                } else {
+                    // console.log('loading', url)
+
+                    this.avaliable_workers -= 1
+                    
+                    let img = new Image();
+                    img.onload = function() {
+                        this_object.avaliable_workers += 1
+                        let index = this_object.img_list.indexOf(this);
+                        if (index !== -1) {
+                            // remove image from the array once it's loaded
+                            // for memory consumption reasons
+                            this_object.img_list.splice(index, 1);
+                        }
+        
+                        // console.log('image loaded ', img.src)
+        
+                        if (callback)
+                            if (args)
+                                callback(...args)
+                            else
+                                callback()
+                        
+                        this_object.loaded.push(url)
+                        this_object.preloadNext()
+                    }
+    
+                    img.onerror = function() {
+                        this_object.avaliable_workers += 1
+                        let index = this_object.img_list.indexOf(this);
+                        if (index !== -1) {
+                            // remove image from the array once it's loaded
+                            // for memory consumption reasons
+                            this_object.img_list.splice(index, 1);
+                        }
+    
+                        console.log('image error ', img.src)
+                    }
+    
+                    this_object.img_list.push(img);
+                    img.src = url;
+                }
+            } else {
+                break
+            }
+        }
+    }
+
+    loadBackgroundCallback(elem, url) {
+        elem.style.backgroundImage = 'url("' + url + '")'
+    }
 }
 
