@@ -50,7 +50,9 @@ function initializeCardView() {
 }
 
 function cardViewKeyDown(e) {
-    console.log('key down pressed ' + e.code)
+    // console.log('key down pressed ' + e.code)
+
+    e.stopImmediatePropagation()
 
     if ((e.code == "ArrowLeft" || e.code == "KeyA") && current_card_index > 0) {
         previousCard(e)

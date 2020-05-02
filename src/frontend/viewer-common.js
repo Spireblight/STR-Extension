@@ -474,7 +474,19 @@ class Card {
         this.mod_name = mod_name
         
         this.upgraded_version = null
-        this.downgraded_version = null
+    }
+
+    equals(card) {
+        let eq = this.name == card.name && this.cost == card.cost && this.type == card.type && this.rarity == card.rarity && this.color == card.color && this.description == card.description && JSON.stringify(this.keyword_ids) == JSON.stringify(card.keyword_ids) && this.card_to_preview == card.card_to_preview && this.upgrades == card.upgrades && this.bottle_status == card.bottle_status && this.mod_name == card.mod_name
+
+        if (this.upgraded_version != null) {
+            if (card.upgraded_version == null)
+                return false;
+
+            eq = eq && this.upgraded_version.equals(card.upgraded_version)
+        }
+
+        return eq
     }
 
     static parseCard(array) {
@@ -501,7 +513,6 @@ class Card {
         let card = new Card(name, cost, type, rarity, color, description, keyword_ids, card_to_preview, upgrades, bottle_status, mod_name)
         if (name_upgraded != null) {
             card.upgraded_version = new Card(name_upgraded, cost_upgraded, type, rarity, color, description_upgraded, keyword_ids_upgraded, card_to_preview_upgraded, upgrades+1, 0, mod_name)
-            card.upgraded_version.downgraded_version = card
         }
 
         return card
@@ -616,21 +627,21 @@ class CardElement extends CustomElement {
         // bg.style.backgroundImage = this.getBackgroundPath(card)
         bg.style.zIndex = -4
         // let bg_path = this.getBackgroundPath(card)
-        imagePreloadQueue.highPriorityLoadImg(this.getBackgroundPath(card), imagePreloadQueue.loadBackgroundCallback, bg, this.getBackgroundPath(card))
+        imagePreloadQueue.highPriorityLoadImg(this.getBackgroundPath(card), this.getBackgroundPath(card, true), imagePreloadQueue.loadBackgroundCallback, bg, this.getBackgroundPath(card))
         cardElem.appendChild(bg)
 
         const portrait = document.createElement('div')
         portrait.className = 'card-portrait'
         // portrait.style.backgroundImage = this.getPortraitPath(card)
         portrait.style.zIndex = -3
-        imagePreloadQueue.lowPriorityLoadImg(this.getPortraitPath(card), imagePreloadQueue.loadBackgroundCallback, portrait, this.getPortraitPath(card))
+        imagePreloadQueue.lowPriorityLoadImg(this.getPortraitPath(card), null, imagePreloadQueue.loadBackgroundCallback, portrait, this.getPortraitPath(card))
         cardElem.appendChild(portrait)
 
         const frame = document.createElement('div')
         frame.className = 'card-img'
         // frame.style.backgroundImage = this.getFramePath(card)
         frame.style.zIndex = -2
-        imagePreloadQueue.highPriorityLoadImg(this.getFramePath(card), imagePreloadQueue.loadBackgroundCallback, frame, this.getFramePath(card))
+        imagePreloadQueue.highPriorityLoadImg(this.getFramePath(card), this.getFramePath(card, true), imagePreloadQueue.loadBackgroundCallback, frame, this.getFramePath(card))
         cardElem.appendChild(frame)
         
         if (card.cost != null) {
@@ -638,7 +649,7 @@ class CardElement extends CustomElement {
             energyOrb.className = 'card-img'
             energyOrb.style.backgroundImage = this.getEnergyOrbPath(card)
             energyOrb.style.zIndex = -1
-            imagePreloadQueue.highPriorityLoadImg(this.getEnergyOrbPath(card), imagePreloadQueue.loadBackgroundCallback, energyOrb, this.getEnergyOrbPath(card))
+            imagePreloadQueue.highPriorityLoadImg(this.getEnergyOrbPath(card), this.getEnergyOrbPath(card, true), imagePreloadQueue.loadBackgroundCallback, energyOrb, this.getEnergyOrbPath(card))
             cardElem.appendChild(energyOrb)
             
             const energyCost = document.createElement('div')
@@ -660,16 +671,16 @@ class CardElement extends CustomElement {
         title.innerHTML = title_text
         cardElem.appendChild(title)
 
-        if (title_scaling < 1) {
-            console.log(card.name, 'title scaling', title_scaling)
-        }
+        // if (title_scaling < 1) {
+        //     console.log(card.name, 'title scaling', title_scaling)
+        // }
 
         const bottle = document.createElement('div')
         bottle.className = 'card-bottle'
         cardElem.appendChild(bottle)
 
         if(display_bottle && card.bottle_status > 0) {
-            imagePreloadQueue.lowPriorityLoadImg(this.getBottlePath(card), imagePreloadQueue.loadBackgroundCallback, bottle, this.getBottlePath(card))
+            imagePreloadQueue.lowPriorityLoadImg(this.getBottlePath(card), null, imagePreloadQueue.loadBackgroundCallback, bottle, this.getBottlePath(card))
             // bottle.style.backgroundImage = 'url(img/relics/' + BOTTLE_RELICS[card.bottle_status - 1] + '.png)'
         }
 
@@ -690,27 +701,55 @@ class CardElement extends CustomElement {
         // console.log(JSON.stringify(keywords))
     }
 
-    getBackgroundPath(card) {return this.getBaseCardPath(card) + card.color + '/background_' + card.type + '.png'}
+    getBackgroundPath(card, get_default=false) {
+        if (!get_default)
+            return this.getBaseCardPath(card) + card.color + '/background_' + card.type + '.png'
+        else
+            return 'img/cards/basegame/COLORLESS/background_' + card.type + '.png'
+    }
 
-    getFramePath(card) {return this.getBaseCardPath(card) + card.color + '/frame_' + card.type + '_' + card.rarity + '.png'}
+    getFramePath(card, get_default=false) {
+        if (!get_default)
+            return this.getBaseCardPath(card) + card.color + '/frame_' + card.type + '_' + card.rarity + '.png'
+        else
+            return 'img/cards/basegame/COLORLESS/frame_' + card.type + '_' + card.rarity + '.png'
+    }
 
-    getEnergyOrbPath(card) {return this.getBaseCardPath(card) + card.color + '/energy_orb.png'}
+    getEnergyOrbPath(card, get_default=false) {
+        if (!get_default)
+            return this.getBaseCardPath(card) + card.color + '/energy_orb.png'
+        else
+            return 'img/cards/basegame/COLORLESS/energy_orb.png'
+    }
+
+    sanitizeFilename(filename) {
+        return filename.replace(/[\\/:*?"<>|]/g, '_')
+    }
+
+    getModName(card) {
+        return card.mod_name == null ? "basegame" : card.mod_name
+    }
 
     getPortraitPath(card) {
         let name = card.name
         if (card.upgrades > 0 && name.lastIndexOf('+') != -1)
             name = name.substring(0, name.lastIndexOf('+'))
-        name = name.replace(/[\\/:*?"<>|]/g, '_')
-        return this.getBaseCardPath(card) + card.color + '/portraits/' + name + '.png'
+        name = this.sanitizeFilename(name)
+
+        let subfolder = ''
+        if (card.color == 'CURSE' && card.mod_name != null) {
+            subfolder = card.mod_name + '/'
+        }
+        return this.getBaseCardPath(card) + card.color + '/portraits/' + subfolder + name + '.png'
     }
 
     getBottlePath(card) {return 'img/relics/' + BOTTLE_RELICS[card.bottle_status - 1] + '.png'}
 
     getBaseCardPath(card) {
         if (card.mod_name) {
-            return 'https://slay-the-relics-assets.s3.eu-west-2.amazonaws.com/cards/'
+            return 'https://slay-the-relics-assets.s3.eu-west-2.amazonaws.com/cards/' + this.sanitizeFilename(this.getModName(card)) + '/'
         } else {
-            return 'img/cards/'
+            return 'img/cards/basegame/'
         }
     }
 
@@ -795,6 +834,7 @@ class ImagePreloadQueue {
         this.preload_queue = []
         this.img_list = []
         this.loaded = []
+        this.not_available = []
     }
 
     extendPreloadQueue(list) {
@@ -802,16 +842,16 @@ class ImagePreloadQueue {
         this.preloadNext()
     }
 
-    highPriorityLoadImg(url, onload, ...args) {
+    highPriorityLoadImg(url, default_url, onload, ...args) {
         if (!this.load_queue.includes(url)) {
-            this.load_queue.unshift({url:url, callback:onload, args:args})
+            this.load_queue.unshift({url:url, default_url: default_url, callback:onload, args:args})
             this.preloadNext()
         }
     }
 
-    lowPriorityLoadImg(url, onload, ...args) {
+    lowPriorityLoadImg(url, default_url, onload, ...args) {
         if (!this.load_queue.includes(url)) {
-            this.load_queue.push({url:url, callback:onload, args:args})
+            this.load_queue.push({url:url, default_url: default_url, callback:onload, args:args})
             this.preloadNext()
         }
     }
@@ -824,14 +864,22 @@ class ImagePreloadQueue {
             let url
             let callback
             let args
+            let default_url
 
             if (this.load_queue.length > 0) {
                 let elem = this.load_queue.shift()
                 url = elem.url
+                default_url = elem.default_url
                 callback = elem.callback
                 args = elem.args
             } else if (this.preload_queue.length > 0) {
                 url = this.preload_queue.shift()
+            }
+
+            // try loading each image only once, then store it as not_available
+            if (url && this.not_available.includes(url)) {
+                url = default_url
+                default_url = null
             }
 
             if (url) {
@@ -839,11 +887,9 @@ class ImagePreloadQueue {
                     // console.log('already loaded', url)
 
                     if (callback)
-                        if (args)
-                            callback(...args)
-                        else
-                            callback()
+                        callback(url, ...args)
                 } else {
+
                     // console.log('loading', url)
 
                     this.avaliable_workers -= 1
@@ -861,10 +907,7 @@ class ImagePreloadQueue {
                         // console.log('image loaded ', img.src)
         
                         if (callback)
-                            if (args)
-                                callback(...args)
-                            else
-                                callback()
+                            callback(url, ...args)
                         
                         this_object.loaded.push(url)
                         this_object.preloadNext()
@@ -878,8 +921,16 @@ class ImagePreloadQueue {
                             // for memory consumption reasons
                             this_object.img_list.splice(index, 1);
                         }
-    
-                        console.log('image error ', img.src)
+                        
+                        // if (default_url) {
+                        //     console.log('image error', img.src, 'loading default', default_url)
+                        // } else {
+                        //     console.log('image error', img.src, 'no default')
+                        // }
+
+                        this_object.not_available.push(url)
+                        this_object.lowPriorityLoadImg(default_url, null, callback, ...args)
+                        this_object.preloadNext()
                     }
     
                     this_object.img_list.push(img);
@@ -891,7 +942,7 @@ class ImagePreloadQueue {
         }
     }
 
-    loadBackgroundCallback(elem, url) {
+    loadBackgroundCallback(url, elem) {
         elem.style.backgroundImage = 'url("' + url + '")'
     }
 }

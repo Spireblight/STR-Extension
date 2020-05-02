@@ -2,6 +2,7 @@
 var last_deck = ""
 
 var deck_view
+var deck_view_content
 var deck_button
 var deck_button_keybinding_tip
 
@@ -84,6 +85,8 @@ function initializeDeck() {
     deck_view = document.getElementById('deck_view')
     deck_view.onkeydown = deckViewKeyDown
 
+    deck_view_content = document.getElementById('deck_view_content')
+
     deck_button_keybinding_tip = document.getElementById('deck_button_keybinding_tip')
     deck_button = document.getElementById('deck_button')
     deck_button.onmousedown = clickDeck
@@ -126,6 +129,10 @@ function setDeck(deck, cards, tips, character) {
 
     deck_button.style.display = 'block'
 
+    let scrollpos = null
+    if (deck_view_open) {
+        scrollpos = deck_view_content.scrollTop
+    }
     // if (JSON.stringify([deck, cards, tips]) == last_deck)
     //     return
 
@@ -142,70 +149,29 @@ function setDeck(deck, cards, tips, character) {
     x = xoffset + DECK_VIEW_X_OFFSET
     y = yoffset + DECK_VIEW_Y_OFFSET
 
+    bunch_size = 5
+    bunch = []
+
+    let start = new Date().getMilliseconds()
     for (let i = 0; i < deck.length; i++) {
-        const card = cards[deck[i]];
-
-        const cardElem = new CardElement(card, character, DECK_VIEW_CARD_WIDTH)
-
-        let keywords = arraySubset(tips, card.keyword_ids)
-
-        hitbox = {
-            x: x - xoffset + 'rem',
-            y: y - yoffset - DECK_VIEW_Y_MARGIN / 2+ 'rem',
-            z: 5,
-            w: CARD_BASE_WIDTH + 'rem',
-            h: CARD_BASE_HEIGHT + DECK_VIEW_Y_MARGIN + 'rem',
-        }
-
-        appendChild(content, cardElem)
-        addToCollection(CATEGORY_CARDS, cardElem)
-        const strip = new PowerTipStrip(content, hitbox, keywords, CATEGORY_CARDS, character)
-
-        cardElem.root.style.left = x + 'rem'
-        cardElem.root.style.top = y + 'rem'
-        cardElem.root.id = strip.tipsElem.id + '_card'
-        strip.tipsElem.style.zIndex = 5
-
-        let j = i
-        // add custom card hitbox handlers
-        strip.hitboxElem.setMagnifyingGlassCursor()
-        strip.hitboxElem.root.onmouseenter = function(e) {cardMouseEnter(e, j)}
-        strip.hitboxElem.root.onmouseleave = function(e) {cardMouseExit(e, j)}
-        strip.hitboxElem.root.onclick = function(e) {cardClick(e, j)}
-
-        // add shadow to tips
-        for (powertip of strip.tipsElem.childNodes) {
-            powertip.classList.add('powertip-shadow')
-        }
-
-        // place tips beside the card
-        placeDeckViewTipStrip(cardElem, strip)
-
-        // place preview beside the card if it exists
-        let cardPreviewElem = null
-        if (card.card_to_preview != -1) {
-
-            const cardPreview = cards[card.card_to_preview]
-
-            cardPreviewElem = new CardElement(cardPreview, character, DECK_VIEW_CARD_PREVIEW_WIDTH)
-            cardPreviewElem.root.style.display = 'none'
-            cardPreviewElem.root.style.zIndex = 5
-
-            cardPreviewElem.setShadowDrop(true)
-
-            placeCardPreview(cardElem, cardPreviewElem)
-
-            appendChild(content, cardPreviewElem)
-            addToCollection(CATEGORY_CARDS, cardPreviewElem)
+        // createCard(i, x, y, deck, cards, tips, character, content)
+        bunch.push([i, x, y])
+        if (bunch.length == bunch_size || i == deck.length - 1) {
+            setTimeout(function(bunch, deck, cards, tips, character, content) {
+                for (let i = 0; i < bunch.length; i++) {
+                    const args = bunch[i];
+                    createCard(args[0], args[1], args[2], deck, cards, tips, character, content)
+                    
+                }
+            }, 0, bunch, deck, cards, tips, character, content)
+            bunch = []
         }
 
         x += CARD_BASE_WIDTH
-        if (i % ncards_row == ncards_row - 1) {
+        if (i % ncards_row == ncards_row - 1 && i < deck.length - 1) {
             x = xoffset + DECK_VIEW_X_OFFSET
             y += CARD_BASE_HEIGHT + DECK_VIEW_Y_MARGIN
         }
-
-        deck_view_contents.push({cardElem: cardElem, tipsElem: strip.tipsElem, cardPreviewElem: cardPreviewElem})
     }
 
     const footer = document.createElement('div')
@@ -215,6 +181,74 @@ function setDeck(deck, cards, tips, character) {
     appendChild(content, footer)
 
     addToCollection(CATEGORY_CARDS, footer)
+
+    let end = new Date().getMilliseconds()
+
+    console.log('deck iteration took ', end - start, 'ms')
+
+    if (scrollpos != null) {
+        deck_view_content.scrollTop = scrollpos
+    }
+}
+
+
+function createCard(i, x, y, deck, cards, tips, character, content) {
+    const card = cards[deck[i]];
+
+    const cardElem = new CardElement(card, character, DECK_VIEW_CARD_WIDTH)
+
+    let keywords = arraySubset(tips, card.keyword_ids)
+
+    hitbox = {
+        x: x - xoffset + 'rem',
+        y: y - yoffset - DECK_VIEW_Y_MARGIN / 2+ 'rem',
+        z: 5,
+        w: CARD_BASE_WIDTH + 'rem',
+        h: CARD_BASE_HEIGHT + DECK_VIEW_Y_MARGIN + 'rem',
+    }
+
+    appendChild(content, cardElem)
+    addToCollection(CATEGORY_CARDS, cardElem)
+    const strip = new PowerTipStrip(content, hitbox, keywords, CATEGORY_CARDS, character)
+
+    cardElem.root.style.left = x + 'rem'
+    cardElem.root.style.top = y + 'rem'
+    cardElem.root.id = strip.tipsElem.id + '_card'
+    strip.tipsElem.style.zIndex = 5
+
+    // add custom card hitbox handlers
+    strip.hitboxElem.setMagnifyingGlassCursor()
+    strip.hitboxElem.root.onmouseenter = function(e) {cardMouseEnter(e, i)}
+    strip.hitboxElem.root.onmouseleave = function(e) {cardMouseExit(e, i)}
+    strip.hitboxElem.root.onclick = function(e) {cardClick(e, i)}
+
+    // add shadow to tips
+    for (powertip of strip.tipsElem.childNodes) {
+        powertip.classList.add('powertip-shadow')
+    }
+
+    // place tips beside the card
+    placeDeckViewTipStrip(cardElem, strip)
+
+    // place preview beside the card if it exists
+    let cardPreviewElem = null
+    if (card.card_to_preview != -1) {
+
+        const cardPreview = cards[card.card_to_preview]
+
+        cardPreviewElem = new CardElement(cardPreview, character, DECK_VIEW_CARD_PREVIEW_WIDTH)
+        cardPreviewElem.root.style.display = 'none'
+        cardPreviewElem.root.style.zIndex = 5
+
+        cardPreviewElem.setShadowDrop(true)
+
+        placeCardPreview(cardElem, cardPreviewElem)
+
+        appendChild(content, cardPreviewElem)
+        addToCollection(CATEGORY_CARDS, cardPreviewElem)
+    }
+
+    deck_view_contents.push({cardElem: cardElem, tipsElem: strip.tipsElem, cardPreviewElem: cardPreviewElem})
 }
 
 
@@ -251,9 +285,9 @@ function showCardTipStripAndPreview(index) {
         const tips = deck_view_contents[index].tipsElem
         tips.style.display = 'block'
 
-        const preview = deck_view_contents[index].previewElem
+        const preview = deck_view_contents[index].cardPreviewElem
         if(preview) {
-            preview.style.display = 'block'
+            preview.root.style.display = 'block'
         }
     }
 }
@@ -267,7 +301,7 @@ function cardMouseExit(e, index) {
 
     const tips = deck_view_contents[index].tipsElem
     const card = deck_view_contents[index].cardElem
-    const preview = deck_view_contents[index].previewElem
+    const preview = deck_view_contents[index].cardPreviewElem
 
     let x = parseRem(card.root.style.left)
     let y = parseRem(card.root.style.top)
@@ -286,7 +320,7 @@ function cardMouseExit(e, index) {
     tips.style.display = 'none'
 
     if(preview) {
-        preview.style.display = 'none'
+        preview.root.style.display = 'none'
     }
 }
 
