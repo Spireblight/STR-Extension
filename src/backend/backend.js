@@ -34,7 +34,7 @@ const userCooldownMs = 1000;                // maximum input rate per user to pr
 const userCooldownClearIntervalMs = 60000;  // interval to reset our tracking object
 const channelCooldownMs = 1000;             // maximum broadcast rate per channel
 
-const BROADCAST_INTERVAL = 1020;
+const BROADCAST_INTERVAL = 1005;
 
 ext.
   version('1.0.0').
@@ -119,7 +119,7 @@ app.post('/', function (req, res) {
 
           let processor = msg_processors[login]
 
-          logger.info({name: 'update message', msg: req.body})
+          // logger.info({name: 'update message', msg: req.body})
           processor.update(delay, msg_type, message)
 
           // sendBroadcast(login, streamers.getChannelId(login), msg_compressed_uri)
@@ -147,7 +147,7 @@ function broadcastToTwitch() {
         sendBroadcast(login, streamers.getChannelId(login), msg)
       }
     } else {
-      logger.info("broadcaster " + login + " is no longer active, removing the processor")
+      logger.info("backend.broadcast_to_twitch.remove_inactive_broadcaster", {login: login})
       delete msg_processors[login]
     }
   }
@@ -185,8 +185,8 @@ function sendBroadcast(login, channelId, message) {
     });
     
     body_size = Buffer.byteLength(body, 'utf8') / 1024
-    logger.info("pubsub msg " + body.length + " " + body_size + "bytes")
-    logger.info(body)
+    // logger.info("pubsub msg " + body.length + " " + body_size + "bytes")
+    // logger.info(body)
 
     if (body_size > 5.0) {
       logger.warn('backend.pubsub.broadcast pubsub message exceeds 5kb', {login: login, channelId: channelId, body: body})

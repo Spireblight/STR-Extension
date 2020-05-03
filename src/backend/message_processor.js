@@ -21,7 +21,7 @@ class MessageProcessor {
     messagePartQueue = [];
   
     N_TIPS_TO_ONE_DECK_BROADCAST = 1;
-    MAX_DECK_BROADCAST_PERIOD = 10;
+    MAX_DECK_BROADCAST_PERIOD = 1;
     MAX_ALLOWED_DELAY_SINCE_LAST_UPDATE = 3000;
     MUTEX_TIMEOUT = 150;
   
@@ -29,12 +29,14 @@ class MessageProcessor {
     PART_MESSAGE_OVERHEAD = 28 // 20 should be exact characters but let's leave some safety margin
     MESSAGE_CHARACTER_LIMIT = 5 * 1024 - this.PUBSUB_MESSAGE_OVERHEAD - this.PART_MESSAGE_OVERHEAD
   
-    constructor() {
+    constructor(login) {
+      this.login = login
     }
     
     update(delay, msg_type, msg) {
 
-      logger.info('update message type: ' + msg_type + ' update message delay: ' + delay)
+      // logger.info('update message type: ' + msg_type + ' update message delay: ' + delay + ' msg: ' + msg)
+      logger.info('message_processor.update', {login: this.login, msg_type: msg_type})
 
       if (msg_type == constants.MSG_TYPE_SET_TIPS) {
         this.tipsMessage = msg;
@@ -50,28 +52,28 @@ class MessageProcessor {
     }
 
     getNextBroadcast() {
-      logger.info('get next broadcast')
+      // logger.info('get next broadcast')
       // enqueue new message if no parts are in queue
       if (this.messagePartQueue.length == 0) {
   
         if (this.tipsUpdated) {
           if (this.deckUpdated && this.lastDeckBroadcastAgo >= this.MAX_DECK_BROADCAST_PERIOD) {
-            logger.info('---->both tips and deck have been updated but last deck broadcast was ' + this.lastDeckBroadcastAgo + ' broadcasts ago, max permitted is ' + this.MAX_DECK_BROADCAST_PERIOD)
+            // logger.info('---->both tips and deck have been updated but last deck broadcast was ' + this.lastDeckBroadcastAgo + ' broadcasts ago, max permitted is ' + this.MAX_DECK_BROADCAST_PERIOD)
             this._enqueueBroadcastDeck();
           } else {
-            logger.info('---->either both tips and deck have been updated and tips have priority or just tips were updated')
+            // logger.info('---->either both tips and deck have been updated and tips have priority or just tips were updated')
             this._enqueueBroadcastTips();
           }
         } else {
           if (this.deckUpdated) {
-            logger.info('---->the deck was updated and tips not, deck is broadcasted')
+            // logger.info('---->the deck was updated and tips not, deck is broadcasted')
             this._enqueueBroadcastDeck();
           } else {
             if (this.lastDeckBroadcastAgo >= this.N_TIPS_TO_ONE_DECK_BROADCAST) {
-              logger.info('---->nothing was updated but deck was last broadcasted: ' + this.lastDeckBroadcastAgo + ' broadcasts ago, max permitted: ' + this.N_TIPS_TO_ONE_DECK_BROADCAST)
+              // logger.info('---->nothing was updated but deck was last broadcasted: ' + this.lastDeckBroadcastAgo + ' broadcasts ago, max permitted: ' + this.N_TIPS_TO_ONE_DECK_BROADCAST)
               this._enqueueBroadcastDeck()
             } else {
-              logger.info('---->nothing has been updated and tips have the priority')
+              // logger.info('---->nothing has been updated and tips have the priority')
               this._enqueueBroadcastTips();
             }
           }
@@ -90,9 +92,11 @@ class MessageProcessor {
       this.deckUpdated = false;
       if (this.deckMessage == undefined)
         return
-  
-      this.messagePartQueue = this.messagePartQueue.concat(
-        this._splitMessageToParts(this.deckDelay, constants.MSG_TYPE_SET_DECK, this.deckMessage));
+      
+      let messageParts = this._splitMessageToParts(this.deckDelay, constants.MSG_TYPE_SET_DECK, this.deckMessage)
+      this.messagePartQueue = this.messagePartQueue.concat(messageParts);
+      
+      logger.info('message_processor._enqueue_broadcast_deck', {login: this.login, nparts: messageParts.length})
     }
   
     _enqueueBroadcastTips() {
@@ -100,28 +104,30 @@ class MessageProcessor {
       this.tipsUpdated = false;
       if (this.tipsMessage == undefined)
         return
-  
-      this.messagePartQueue = this.messagePartQueue.concat(
-        this._splitMessageToParts(this.tipsDelay, constants.MSG_TYPE_SET_TIPS, this.tipsMessage));
+      
+      let messageParts = this._splitMessageToParts(this.tipsDelay, constants.MSG_TYPE_SET_TIPS, this.tipsMessage)
+      this.messagePartQueue = this.messagePartQueue.concat(messageParts);
+
+      logger.info('message_processor._enqueue_broadcast_tips', {login: this.login, nparts: messageParts.length})
     }
   
     _splitMessageToParts(delay, msg_type, message) {
-      logger.info('split message to parts')
+      // logger.info('split message to parts')
 
       var msg = [delay, msg_type, message]
       var msg_uncompressed = JSON.stringify(msg);
-      logger.info("msg uncompressed")
-      logger.info(msg_uncompressed)
+      // logger.info("msg uncompressed")
+      // logger.info(msg_uncompressed)
 
       var msg_compressed_uri = lzstring.compressToEncodedURIComponent(msg_uncompressed)
 
-      logger.info('compressed message size: ' + msg_compressed_uri.length + ', character limit: ' + this.MESSAGE_CHARACTER_LIMIT)
+      // logger.info('compressed message size: ' + msg_compressed_uri.length + ', character limit: ' + this.MESSAGE_CHARACTER_LIMIT)
   
       var n_parts = Math.ceil(msg_compressed_uri.length / this.MESSAGE_CHARACTER_LIMIT)
       var uid = this._randomId(3)
 
-      logger.info('nparts: ' + n_parts)
-      logger.info('whole message: ' + msg_compressed_uri)
+      // logger.info('nparts: ' + n_parts)
+      // logger.info('whole message: ' + msg_compressed_uri)
   
       let parts = []  
 
@@ -132,7 +138,7 @@ class MessageProcessor {
         let part = [i, n_parts, uid, part_content]
         parts.push(JSON.stringify(part))
 
-        logger.info(JSON.stringify(part))
+        // logger.info(JSON.stringify(part))
       }
       
       return parts
