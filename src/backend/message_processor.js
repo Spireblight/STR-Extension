@@ -6,30 +6,29 @@ class MessageProcessor {
     /*
     This is a class that receives updates from StR Exporter and outputs the next message for broadcast
     */
-
-    tipsMessage;
-    deckMessage;
-    lastOkayTime;
-    tipsMessage;
-    deckMessage;
-    tipsDelay;
-    deckDelay;
-    tipsUpdated = false;
-    deckUpdated = false;
-    lastDeckBroadcastAgo = 0;
-  
-    messagePartQueue = [];
-  
-    N_TIPS_TO_ONE_DECK_BROADCAST = 1;
-    MAX_DECK_BROADCAST_PERIOD = 1;
-    MAX_ALLOWED_DELAY_SINCE_LAST_UPDATE = 3000;
-    MUTEX_TIMEOUT = 150;
-  
-    PUBSUB_MESSAGE_OVERHEAD = 72 // characters
-    PART_MESSAGE_OVERHEAD = 28 // 20 should be exact characters but let's leave some safety margin
-    MESSAGE_CHARACTER_LIMIT = 5 * 1024 - this.PUBSUB_MESSAGE_OVERHEAD - this.PART_MESSAGE_OVERHEAD
   
     constructor(login) {
+      this.tipsMessage;
+      this.deckMessage;
+      this.lastOkayTime;
+      this.tipsMessage;
+      this.deckMessage;
+      this.tipsDelay;
+      this.deckDelay;
+      this.tipsUpdated = false;
+      this.deckUpdated = false;
+      this.lastDeckBroadcastAgo = 0;
+    
+      this.messagePartQueue = [];
+    
+      this.N_TIPS_TO_ONE_DECK_BROADCAST = 1;
+      this.MAX_DECK_BROADCAST_PERIOD = 1;
+      this.MAX_ALLOWED_DELAY_SINCE_LAST_UPDATE = 3000;
+      this.MUTEX_TIMEOUT = 150;
+    
+      this.PUBSUB_MESSAGE_OVERHEAD = 72 // characters
+      this.PART_MESSAGE_OVERHEAD = 28 // 20 should be exact characters but let's leave some safety margin
+      this.MESSAGE_CHARACTER_LIMIT = 5 * 1024 - this.PUBSUB_MESSAGE_OVERHEAD - this.PART_MESSAGE_OVERHEAD
       this.login = login
     }
     
