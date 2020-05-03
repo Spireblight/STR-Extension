@@ -36,14 +36,16 @@ function processMessage(broadcast) {
         var character = sanitizeCharacter(msg.c)
         var deck = decompressDeck(msg.k)
 
+        // console.log(deck)
+
         // TODO - check inside the functions and remove if
         if (msg.k != last_deck) {
             last_deck = msg.k
 
             setDeck(deck.deck, deck.cards, deck.tips, character)
-            console.log('set deck finished')
+            // console.log('set deck finished')
             setCardView(deck.deck, deck.cards, deck.tips, character)
-            console.log('set card view finished')
+            // console.log('set card view finished')
         }
         
     } else {
@@ -122,7 +124,7 @@ function checkIfSourceActive() {
     var seconds = new Date() / 1000;
 
     if (seconds - last_broadcast_secs > SECS_NOBROADCAST_REMOVE_CONTENT) {
-        msg = [
+        let msg = [
             0, // delay
             1, // message type
             {  // message
@@ -130,6 +132,16 @@ function checkIfSourceActive() {
                 r: [0, []],
                 o: [0, []],
                 w: "||",
+            }
+        ]
+        processMessage(msg)
+
+        msg = [
+            0, // delay
+            4, // message type
+            {  // message
+                c: "", 
+                k: "||-;;;-;;;-",
             }
         ]
         processMessage(msg)
@@ -227,8 +239,6 @@ function pushContent(update_id, content, nparts) {
 }
 
 
-console.log('looading')
-
 $(function() {
 
     window.Twitch.ext.onContext((ctx) => {
@@ -287,7 +297,7 @@ $(function() {
         }
     }
 
-    // window.setInterval(checkIfSourceActive, 2500);
+    window.setInterval(checkIfSourceActive, 2500);
 
     // window.setTimeout(preloadNextImageBunch, PRELOAD_INTERVAL)
     // window.setInterval(imagePreloadQueue.)

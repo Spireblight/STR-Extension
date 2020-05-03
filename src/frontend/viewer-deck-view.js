@@ -119,7 +119,7 @@ function deckViewKeyDown(e) {
 
 function setDeck(deck, cards, tips, character) {
 
-    if (deck == '-') {
+    if (deck.length == 0) {
         deck_button.style.display = 'none'
         clearCollection(CATEGORY_CARDS)
         closeDeckView()
@@ -184,7 +184,7 @@ function setDeck(deck, cards, tips, character) {
 
     let end = new Date().getMilliseconds()
 
-    console.log('deck iteration took ', end - start, 'ms')
+    // console.log('deck iteration took ', end - start, 'ms')
 
     if (scrollpos != null) {
         deck_view_content.scrollTop = scrollpos

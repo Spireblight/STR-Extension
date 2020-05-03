@@ -878,8 +878,12 @@ class ImagePreloadQueue {
 
             // try loading each image only once, then store it as not_available
             if (url && this.not_available.includes(url)) {
-                url = default_url
-                default_url = null
+                if(default_url && this.not_available.includes(default_url)) {
+                    url = null
+                } else {
+                    url = default_url
+                    default_url = null
+                }
             }
 
             if (url) {

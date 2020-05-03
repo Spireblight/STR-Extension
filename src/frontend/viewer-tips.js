@@ -106,7 +106,8 @@ function setPotions(potions, power_tips, character) {
             h: 5.556 + '%'
         }
 
-        new PowerTipStrip(items, hitbox, tips, CATEGORY_POTIONS, character)
+        let strip = new PowerTipStrip(items, hitbox, tips, CATEGORY_POTIONS, character)
+        strip.tipsElem.style.zIndex = 15
     }
 }
 
