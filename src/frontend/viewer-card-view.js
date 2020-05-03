@@ -93,12 +93,15 @@ function updateUpgradeCheckbox() {
 }
 
 
-function clearCards() {
+function resetCards(new_len) {
     view_cards = []
     view_cards_upgraded = []
+
+    for (let i = 0; i < new_len; i++) {
+        view_cards.push(null)
+        view_cards_upgraded.push(null)
+    }
 }
-
-
 
 
 function printCollection(category) {
@@ -119,32 +122,45 @@ function printCollection(category) {
 function setCardView(deck, cards, tips, character) {
 
     clearCollection(CATEGORY_CARD_VIEW)
-    clearCards()
+    resetCards()
+
+    let bunch_size = 5
+    let bunch = []
 
     for (let i = 0; i < deck.length; i++) {
-        const card = cards[deck[i]];
-        
-        addCard(card, cards, tips, character)
+
+        bunch.push([i])
+
+        if (bunch.length == bunch_size || i == deck.length - 1) {
+            setTimeout(function(bunch, deck, cards, tips, character) {
+                for (let i = 0; i < bunch.length; i++) {
+                    const args = bunch[i];
+
+                    addCard(args[0], deck, cards, tips, character)
+                }
+            }, 0, bunch, deck, cards, tips, character)
+            bunch = []
+        }
     }
 
     displayAfterUpdate()
 }
 
 
+function addCard(index, deck, cards, tips, character) {
+    let card = cards[deck[index]]
 
-function addCard(card, cards, tips, character) {
-
-    createCardView(view_cards, card, cards, tips, character)
+    view_cards[index] = createCardView(card, cards, tips, character)
 
     if (card.upgraded_version != null) {
-        createCardView(view_cards_upgraded, card.upgraded_version, cards, tips, character)
+        view_cards_upgraded[index] = createCardView(card.upgraded_version, cards, tips, character)
     } else {
-        view_cards_upgraded.push(null)
+        view_cards_upgraded[index] = null
     }
 }
 
 
-function createCardView(array, card, cards, tips, character) {
+function createCardView(card, cards, tips, character) {
 
     const cardElem = new CardElement(card, character, CARD_VIEW_CARD_WIDTH, true, true, false, true)
 
@@ -204,7 +220,7 @@ function createCardView(array, card, cards, tips, character) {
         modNameTipElem = placeholder
     }
 
-    array.push({cardElem: cardElem, tipsElem: strip.tipsElem, cardPreviewElem: cardPreviewElem, modNameTipElem: modNameTipElem})
+    return {cardElem: cardElem, tipsElem: strip.tipsElem, cardPreviewElem: cardPreviewElem, modNameTipElem: modNameTipElem}
 }
 
 

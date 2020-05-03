@@ -140,6 +140,9 @@ function setDeck(deck, cards, tips, character) {
     deck_view_current_hover_index = null
     clearCollection(CATEGORY_CARDS)
     deck_view_contents = []
+    for (let i = 0; i < deck.length; i++) {
+        deck_view_contents.push(null)
+    }
 
     const content = document.getElementById('deck_view_content')
     
@@ -157,6 +160,7 @@ function setDeck(deck, cards, tips, character) {
         // createCard(i, x, y, deck, cards, tips, character, content)
         bunch.push([i, x, y])
         if (bunch.length == bunch_size || i == deck.length - 1) {
+            // let bunch_ = bunch
             setTimeout(function(bunch, deck, cards, tips, character, content) {
                 for (let i = 0; i < bunch.length; i++) {
                     const args = bunch[i];
@@ -248,7 +252,7 @@ function createCard(i, x, y, deck, cards, tips, character, content) {
         addToCollection(CATEGORY_CARDS, cardPreviewElem)
     }
 
-    deck_view_contents.push({cardElem: cardElem, tipsElem: strip.tipsElem, cardPreviewElem: cardPreviewElem})
+    deck_view_contents[i] = {cardElem: cardElem, tipsElem: strip.tipsElem, cardPreviewElem: cardPreviewElem, cardPos: {x: x, y: y}}
 }
 
 
@@ -262,15 +266,13 @@ function cardMouseEnter(e, index) {
     deck_view_current_hover_index = index
 
     const card = deck_view_contents[index].cardElem
-
-    let x = parseRem(card.root.style.left)
-    let y = parseRem(card.root.style.top)
+    const cardPos = deck_view_contents[index].cardPos
 
     let xdiff = DECK_VIEW_CARD_WIDTH * (CARD_HOVER_SCALE - 1) / 2
     let ydiff = DECK_VIEW_CARD_HEIGHT * (CARD_HOVER_SCALE - 1) / 2
 
-    card.root.style.left = (x - xdiff) + 'rem'
-    card.root.style.top = (y - ydiff) + 'rem'
+    card.root.style.left = (cardPos.x - xdiff) + 'rem'
+    card.root.style.top = (cardPos.y - ydiff) + 'rem'
     card.root.style.zIndex = 4
 
     card.setShadowDrop(true)
@@ -301,16 +303,11 @@ function cardMouseExit(e, index) {
 
     const tips = deck_view_contents[index].tipsElem
     const card = deck_view_contents[index].cardElem
+    const cardPos = deck_view_contents[index].cardPos
     const preview = deck_view_contents[index].cardPreviewElem
-
-    let x = parseRem(card.root.style.left)
-    let y = parseRem(card.root.style.top)
-
-    let xdiff = DECK_VIEW_CARD_WIDTH * (CARD_HOVER_SCALE - 1) / 2
-    let ydiff = DECK_VIEW_CARD_HEIGHT * (CARD_HOVER_SCALE - 1) / 2
-
-    card.root.style.left = (x + xdiff) + 'rem'
-    card.root.style.top = (y + ydiff) + 'rem'
+    
+    card.root.style.left = cardPos.x + 'rem'
+    card.root.style.top = cardPos.y + 'rem'
     card.root.style.zIndex = 1
 
     card.setShadowDrop(false)
