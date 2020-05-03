@@ -9,18 +9,20 @@ const ext = require('commander')
 const jsonwebtoken = require('jsonwebtoken');
 const request = require('request')
 const logging = require('./logging')
-const lzstring = require('lz-string')
 const logger = logging.logger
 const app = express()
+const constants = require('./constants')
+const MessageProcessor = require('./message_processor').MessageProcessor
 
 ////////////// CONSTANTS
 // const PORT = 8080
 
 const BEARER_PREFIX = 'Bearer ';             // HTTP authorization headers have this prefix
 
-const MSG_TYPE_SET_CONTENT = 1 // "set_content"
-const MSG_TYPE_ADD_STREAMER = 2 // "add_streamer"
-const MSG_TYPE_STREAMER_EXISTS = 3 // "streamer_exists"
+// const MSG_TYPE_SET_TIPS = 1 // "set_tips"
+// const MSG_TYPE_SET_DECK = 4 // "set_deck"
+// const MSG_TYPE_ADD_STREAMER = 2 // "add_streamer"
+// const MSG_TYPE_STREAMER_EXISTS = 3 // "streamer_exists"
 
 const RESPONSE_SUCCESS = "Success"
 const RESPONSE_TRUE = "true"
@@ -32,6 +34,7 @@ const userCooldownMs = 1000;                // maximum input rate per user to pr
 const userCooldownClearIntervalMs = 60000;  // interval to reset our tracking object
 const channelCooldownMs = 1000;             // maximum broadcast rate per channel
 
+const BROADCAST_INTERVAL = 1005;
 
 ext.
   version('1.0.0').
@@ -72,6 +75,9 @@ const publicKeyPath = getOption('certPublicKeyPath', 'EXT_PUBLIC_KEY_PATH');
 const caPaths = getOption('certCaPaths', 'EXT_CA_PATHS');
 const port = getOption('port', 'PORT');
 
+////////////////////////////////////////////////////
+
+msg_processors = {}
 
 streamers.init()
 
@@ -88,45 +94,64 @@ app.post('/', function (req, res) {
     const secret = req.body.streamer.secret
     const channel_id = req.body.streamer.channel_id
     const message = req.body.message
-    const delay = req.body.d
+    const delay = req.body.delay
 
-    if (msg_type == MSG_TYPE_ADD_STREAMER) {
+    if (msg_type == constants.MSG_TYPE_ADD_STREAMER) {
         streamers.addStreamer(login, channel_id, secret)
         streamers.save()
 
         res.status(201).send(RESPONSE_SUCCESS)
-    } else if (msg_type == MSG_TYPE_STREAMER_EXISTS) {
+    } else if (msg_type == constants.MSG_TYPE_STREAMER_EXISTS) {
         
         if (streamers.isStreamerPresent(login)) {
             res.status(200).send(RESPONSE_TRUE)
         } else {
             res.status(200).send(RESPONSE_FALSE)
         }
-    } else if (msg_type == MSG_TYPE_SET_CONTENT) {
+    } else if (msg_type == constants.MSG_TYPE_SET_TIPS || msg_type == constants.MSG_TYPE_SET_DECK || msg_type == constants.MSG_TYPE_OKAY_STILL_ALIVE) {
 
         if (streamers.isStreamerValid(login, secret)) {
 
-            var msg = [delay, msg_type, message]
-            
-            var msg_uncompressed = JSON.stringify(msg);
-            var msg_compressed_uri = lzstring.compressToEncodedURIComponent(msg_uncompressed)
-            
-            // logger.info("msg " + msg_uncompressed.length + " " + Buffer.byteLength(msg_uncompressed, 'utf8') / 1024 + "kb")
-            // logger.info("compressed " + msg_compressed_uri.length + " " + Buffer.byteLength(msg_compressed_uri, 'utf8') / 1024 + "kb")
-            
-            sendBroadcast(login, streamers.getChannelId(login), msg_compressed_uri)
+          if (!(login in msg_processors)) {
+            let processor = new MessageProcessor(login)
+            msg_processors[login] = processor
+          }
 
-            res.status(200).send(RESPONSE_SUCCESS)
+          let processor = msg_processors[login]
+
+          // logger.info({name: 'update message', msg: req.body})
+          processor.update(delay, msg_type, message)
+
+          // sendBroadcast(login, streamers.getChannelId(login), msg_compressed_uri)
+          res.status(200).send(RESPONSE_SUCCESS)
         } else {
             logger.warn('backend.post.is_streamer_valid.false', logging.request_info(req, true))
             res.status(401).send(RESPONSE_INVALID_SECRET)
         }
-    } else {
+      } else {
         logger.warn('backend.post.invalid_msg_type.' + msg_type, logging.request_info(req, true))
 
         res.status(400).send('msg_type "' + msg_type + '" not recognized')
     }
 })
+
+
+function broadcastToTwitch() {
+  for (var login in msg_processors) {
+    let processor = msg_processors[login]
+
+    if (processor.isActive()) {
+      let msg = processor.getNextBroadcast();
+
+      if (msg != null) {
+        sendBroadcast(login, streamers.getChannelId(login), msg)
+      }
+    } else {
+      logger.info("backend.broadcast_to_twitch.remove_inactive_broadcaster", {login: login})
+      delete msg_processors[login]
+    }
+  }
+}
 
 
 function getCaPaths(caPaths) {
@@ -160,7 +185,8 @@ function sendBroadcast(login, channelId, message) {
     });
     
     body_size = Buffer.byteLength(body, 'utf8') / 1024
-    // logger.info("pubsub msg " + body.length + " " + body_size + "kb")
+    // logger.info("pubsub msg " + body.length + " " + body_size + "bytes")
+    // logger.info(body)
 
     if (body_size > 5.0) {
       logger.warn('backend.pubsub.broadcast pubsub message exceeds 5kb', {login: login, channelId: channelId, body: body})
@@ -230,3 +256,5 @@ https.createServer({
   cert: fs.readFileSync(publicKeyPath),
   ca: getCaPaths(caPaths)
 }, app).listen(port)
+
+setInterval(broadcastToTwitch, BROADCAST_INTERVAL)
