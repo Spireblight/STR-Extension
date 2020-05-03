@@ -2,8 +2,8 @@ let token, userId, channelId, login;
 
 const twitch = window.Twitch.ext;
 
-// const BACKEND_URL = 'https://localhost:8081'
-const BACKEND_URL = 'https://slaytherelics.xyz:8081'
+// const BACKEND_URL = 'https://localhost:8080'
+const BACKEND_URL = 'https://slaytherelics.xyz:8080'
 
 const MSG_TYPE_SET_RELICS = 1
 const MSG_TYPE_ADD_STREAMER = 2
