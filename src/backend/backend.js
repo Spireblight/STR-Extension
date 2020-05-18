@@ -32,10 +32,10 @@ const userCooldownMs = 1000;                // maximum input rate per user to pr
 const userCooldownClearIntervalMs = 60000;  // interval to reset our tracking object
 const channelCooldownMs = 1000;             // maximum broadcast rate per channel
 
-
 ext.
   version('1.0.0').
   option('-s, --secret <secret>', 'Extension secret').
+  option('-t, --client-secret <client_secret>', 'Extension client secret').
   option('-c, --client-id <client_id>', 'Extension client ID').
   option('-o, --owner-id <owner_id>', 'Extension owner ID').
   option('-p, --cert-private-key-path <private_key_path>').
@@ -47,6 +47,7 @@ ext.
 
 const STRINGS = {
   secretEnv: usingValue('secret'),
+  clientSecretEnv: usingValue('client-secret'),
   clientIdEnv: usingValue('client-id'),
   ownerIdEnv: usingValue('owner-id'),
   certPrivateKeyPath: usingValue('cert-private-key-path'),
@@ -55,6 +56,7 @@ const STRINGS = {
   port: usingValue('port'),
   serverStarted: 'Server running at %s',
   secretMissing: missingValue('secret', 'EXT_SECRET'),
+  clientSecretMissing: missingValue('client secret', 'EXT_CLIENT_SECRET'),
   clientIdMissing: missingValue('client ID', 'EXT_CLIENT_ID'),
   ownerIdMissing: missingValue('owner ID', 'EXT_OWNER_ID'),
   certPrivateKeyPathMissing: missingValue('certificate private key path', 'EXT_PRIVATE_KEY_PATH'),
@@ -63,15 +65,17 @@ const STRINGS = {
   portMissing: missingValue('port', 'PORT')
 };
 
-
 const ownerId = getOption('ownerId', 'EXT_OWNER_ID');
 const secret = Buffer.from(getOption('secret', 'EXT_SECRET'), 'base64');
 const clientId = getOption('clientId', 'EXT_CLIENT_ID');
+const clientSecret = getOption('clientSecret', 'EXT_CLIENT_SECRET')
 const privateKeyPath = getOption('certPrivateKeyPath', 'EXT_PRIVATE_KEY_PATH');
 const publicKeyPath = getOption('certPublicKeyPath', 'EXT_PUBLIC_KEY_PATH');
 const caPaths = getOption('certCaPaths', 'EXT_CA_PATHS');
 const port = getOption('port', 'PORT');
 
+var oauth_token = null
+var oauth_token_expires = null
 
 streamers.init()
 
@@ -84,49 +88,140 @@ app.use(logging.error_logger)
 app.post('/', function (req, res) {
 
     const msg_type = req.body.msg_type
-    const login = req.body.streamer.login.toLowerCase()
+    let login = null
+    if (req.body.streamer.login)
+      login = req.body.streamer.login
+
     const secret = req.body.streamer.secret
     const channel_id = req.body.streamer.channel_id
     const message = req.body.message
     const delay = req.body.d
 
-    if (msg_type == MSG_TYPE_ADD_STREAMER) {
-        streamers.addStreamer(login, channel_id, secret)
-        streamers.save()
+    if (login != undefined) {
+      login = login.toLowerCase()
+    }
 
-        res.status(201).send(RESPONSE_SUCCESS)
-    } else if (msg_type == MSG_TYPE_STREAMER_EXISTS) {
-        
-        if (streamers.isStreamerPresent(login)) {
-            res.status(200).send(RESPONSE_TRUE)
+    if (msg_type == MSG_TYPE_ADD_STREAMER) {
+
+      getStreamerLogin(channel_id, function(error, login) {
+        if (error) {
+          res.status(500).send(error + ' ' + new Date().toUTCString())
         } else {
-            res.status(200).send(RESPONSE_FALSE)
+          streamers.addStreamer(login, channel_id, secret)
+          streamers.save()
+    
+          res.status(201).send(RESPONSE_SUCCESS)
         }
+      })
+
+    } else if (msg_type == MSG_TYPE_STREAMER_EXISTS) {
+
+      getStreamerLogin(channel_id, function(error, login) {
+        if (error) {
+          res.status(500).send(error + ' ' + new Date().toUTCString())
+        } else {
+          if (streamers.isStreamerPresent(login)) {
+            res.status(200).send(RESPONSE_TRUE)
+          } else {
+              res.status(200).send(RESPONSE_FALSE)
+          }
+        }
+      })
+
     } else if (msg_type == MSG_TYPE_SET_CONTENT) {
 
-        if (streamers.isStreamerValid(login, secret)) {
+      login = req.body.streamer.login
 
-            var msg = [delay, msg_type, message]
-            
-            var msg_uncompressed = JSON.stringify(msg);
-            var msg_compressed_uri = lzstring.compressToEncodedURIComponent(msg_uncompressed)
-            
-            // logger.info("msg " + msg_uncompressed.length + " " + Buffer.byteLength(msg_uncompressed, 'utf8') / 1024 + "kb")
-            // logger.info("compressed " + msg_compressed_uri.length + " " + Buffer.byteLength(msg_compressed_uri, 'utf8') / 1024 + "kb")
-            
-            sendBroadcast(login, streamers.getChannelId(login), msg_compressed_uri)
+      if (streamers.isStreamerValid(login, secret)) {
 
-            res.status(200).send(RESPONSE_SUCCESS)
-        } else {
-            logger.warn('backend.post.is_streamer_valid.false', logging.request_info(req, true))
-            res.status(401).send(RESPONSE_INVALID_SECRET)
-        }
+          var msg = [delay, msg_type, message]
+          
+          var msg_uncompressed = JSON.stringify(msg);
+          var msg_compressed_uri = lzstring.compressToEncodedURIComponent(msg_uncompressed)
+          
+          // logger.info("msg " + msg_uncompressed.length + " " + Buffer.byteLength(msg_uncompressed, 'utf8') / 1024 + "kb")
+          // logger.info("compressed " + msg_compressed_uri.length + " " + Buffer.byteLength(msg_compressed_uri, 'utf8') / 1024 + "kb")
+          
+          sendBroadcast(login, streamers.getChannelId(login), msg_compressed_uri)
+
+          res.status(200).send(RESPONSE_SUCCESS)
+      } else {
+          logger.warn('backend.post.is_streamer_valid.false', logging.request_info(req, true))
+          res.status(401).send(RESPONSE_INVALID_SECRET)
+      }
     } else {
-        logger.warn('backend.post.invalid_msg_type.' + msg_type, logging.request_info(req, true))
+      logger.warn('backend.post.invalid_msg_type.' + msg_type, logging.request_info(req, true))
 
-        res.status(400).send('msg_type "' + msg_type + '" not recognized')
+      res.status(400).send('msg_type "' + msg_type + '" not recognized')
     }
 })
+
+
+//callback : function(error, login)
+function getStreamerLogin(channel_id, callback) {
+  getOauthToken(function(error, token) {
+    if (error) {
+      callback('oauth error')
+    }
+
+    request({
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Client-ID': clientId,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      uri: 'https://api.twitch.tv/helix/users?id=' + channel_id,
+      method: 'GET'
+    }, function (err, res, body) {
+      if (err || res.statusCode != 200) {
+        if (err) {
+          logger.error(err)  
+        } else {
+          logger.error('backend.get_streamer_login.get_request_not_okay_200', {res: res, body: body})
+        }
+        callback('helix error')
+      } else {
+
+        body = JSON.parse(body)
+  
+        callback(undefined, body.data[0].login)
+      }
+    });
+  })
+}
+
+
+//callback : function(error, token)
+function getOauthToken(callback) {
+  now = Date.now() / 1000
+
+  if (!oauth_token_expires || now > oauth_token_expires) {
+
+    url = 'https://id.twitch.tv/oauth2/token?client_id=' + clientId + '&client_secret=' + clientSecret + '&grant_type=client_credentials&scope='
+
+    request.post(url, '',
+      function(error, res, body) {
+        if (error || res.statusCode != 200) {
+          if (error) {
+            logger.error(error)
+          } else {
+            logger.error('backend.get_oauth_token.post_request_not_okay_200', {res: res, body: body})
+          }
+          callback('oauth token retrieval failed')
+        } else {
+
+          body = JSON.parse(body)
+  
+          oauth_token = body.access_token
+          oauth_token_expires = now + body.expires_in
+  
+          callback(undefined, oauth_token)
+        }
+      })
+  } else {
+    callback(undefined, oauth_token)
+  }
+}
 
 
 function getCaPaths(caPaths) {
@@ -212,7 +307,7 @@ function getOption(optionName, environmentName) {
       logger.info(STRINGS[optionName + 'Missing'])
       process.exit(1);
     })();
-    logger.info('Using "${option}" for ${optionName}')
+    logger.info('Using "' + option + '" for ' + optionName)
     return option;
   }
 
