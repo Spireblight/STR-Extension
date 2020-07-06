@@ -7,7 +7,6 @@ class MessageProcessor {
     This is a class that receives updates from StR Exporter and outputs the next message for broadcast
     */
 
-    tipsMessage;
     deckMessage;
     lastOkayTime;
     tipsMessage;

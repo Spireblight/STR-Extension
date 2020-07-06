@@ -36,6 +36,8 @@ const channelCooldownMs = 1000;             // maximum broadcast rate per channe
 
 const BROADCAST_INTERVAL = 1005;
 
+// -t "kl5fe0nx187ov6wblvjzrlgl53v0jn"
+
 ext.
   version('1.0.0').
   option('-s, --secret <secret>', 'Extension secret').
