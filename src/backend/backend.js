@@ -123,7 +123,7 @@ app.post('/', function (req, res) {
         }
       })
 
-    } else if (msg_type == cosntants.MSG_TYPE_STREAMER_EXISTS) {
+    } else if (msg_type == constants.MSG_TYPE_STREAMER_EXISTS) {
 
       getStreamerLogin(channel_id, function(error, login) {
         if (error) {
