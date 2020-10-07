@@ -6,3 +6,5 @@ data/
 backend/streamers.csv
 Slay\ the\ Relics.json
 Twitch\ screenshots
+src/_frontend_out
+.vscode/

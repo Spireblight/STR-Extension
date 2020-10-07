@@ -38,7 +38,7 @@ const logger = createLogger({
             datePattern: 'YYYYMMDD',
             filename: '%DATE%_info.log',
             dirname: 'logs/info',
-            maxSize: '10m',
+            maxSize: '50m',
             maxFiles: '14d',
             format: json_format
         }),
@@ -47,8 +47,8 @@ const logger = createLogger({
             datePattern: 'YYYYMMDD',
             filename: '%DATE%_full.log',
             dirname: 'logs/full',
-            maxSize: '20m',
-            maxFiles: '7d',
+            maxSize: '50m',
+            maxFiles: '4d',
             format: json_format
         })
     ]
