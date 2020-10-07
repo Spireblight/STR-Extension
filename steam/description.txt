@@ -1,0 +1,39 @@
+If this extension brings value to you no matter if you are a streamer or a viewer, please consider supporting my work and the recurring server costs through a donation to: [b]https://www.paypal.me/AdamSlayTheRelics[/b]. Thank you, this took A LOT of time to make and all support is dearly appreciated!
+
+
+This is a mod necessary to run when using Twitch extension [b][url=https://dashboard.twitch.tv/extensions/7dgfio8rek8dhju8628riism3fd11p-1.1.0]Slay the Relics[/url][/b]. It doesn't change anything about your game, all it does is take some of your game data and sends it over to Twitch. See the extension's config on Twitch for straightforward setup instructions.
+
+Slay the Relics extension: https://dashboard.twitch.tv/extensions/7dgfio8rek8dhju8628riism3fd11p-1.1.0
+
+Lower the barrier to your stream for new and intermediate StS players! The extension let's your viewers [b]see your deck and potential upgrades, display descriptions of relics, potions, player powers, monster powers and orbs on stream[/b] when [i]They[/i] want. All they need to do is click the deck button or hover over particular item as if they were playing themselves. The UI was pedantically crafted such that it looks just like the game, your viewers will probably forget most of the time that it's a Twitch extension.
+
+Your viewers no longer need to know everything in the game by heart and your chat can be freed for actual relevant discussion and memes.
+
+
+Features:
+[list]
+
+[*] Full deck view with card detail identical to the game
+
+[*] Displays descriptions of relics, potions, player powers, monster powers, orbs
+
+[*] Deck view supports mods, with card art available for majority of content mods
+
+[*] Descriptions are also compatible with with nearly all mods out-of-the-box, with some extra special support
+available for some of the modded characters that need it (The Poker Player's hand combination, Jorb's Wanderer Trilogy memories, etc.)
+
+[*] UI identical to the game
+
+[*] Allows you to set a delay for near perfect synchronization between the stream video and the extension updates for the best possible experience for your viewers (Can be set in-game in Mods -> Slay the Relics Exporter -> Config)
+
+[*] Supports all languages
+
+[*] Now should be compatible with Unix based systems (Linux + MacOS), if you have trouble making it work, please drop me an email
+[/list]
+
+
+If you're a modder and you would like to take advantage of the custom tooltips functionality in your mod, check out the documentation at https://slaytherelics.xyz/docs/index.html
+
+If you're a modder and you would like to add/update card art for your mod in the extension, follow the steps at https://github.com/avolny/sts-exporter
+
+Don't hesitate to contact me at adam@slaytherelics.xyz if you have any questions at all!

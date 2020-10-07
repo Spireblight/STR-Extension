@@ -723,7 +723,7 @@ class CardElement extends CustomElement {
     }
 
     sanitizeFilename(filename) {
-        return filename.replace(/[\\/:*?"<>|]/g, '_')
+        return filename.replace(/[\\/:*?"<>|\s]/g, '_')
     }
 
     getModName(card) {

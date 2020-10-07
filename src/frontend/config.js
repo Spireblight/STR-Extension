@@ -34,15 +34,14 @@ twitch.onAuthorized((auth) => {
   userId = auth.userId;
   channelId = auth.channelId
   // document.getElementById('userId').innerText = auth.channelId
-  setStatus('onAuthorized', 'black')
-  getChannelName(auth.clientId, auth.channelId)
+  setStatus('Ready', 'black')
 });
 
 
 function generateRandomSecret() {
   var secret = randomStr(20)
   document.getElementById("text_streamer_secret").setAttribute("value", secret)
-  document.getElementById("config_file").innerHTML = "login:" + login + "<br>secret:" + secret
+  document.getElementById("config_file").innerHTML = "login:&lt;put_your_twitch_login_here_without_the_brackets&gt;" + "<br>secret:" + secret
 }
 
 
@@ -55,56 +54,6 @@ function randomStr(len) {
   } 
   return ans; 
 } 
-
-
-function getChannelName(clientId, channelId) {
-  var xhttp = new XMLHttpRequest();
-
-  xhttp.onreadystatechange = function() {
-    // document.getElementById('userId').innerText = this.readyState + ' ' + this.status + ' ' + this.responseText
-
-    if (this.readyState == 4 && this.status == 200) {
-
-      var json = JSON.parse(this.responseText)
-
-      login = json['data'][0]['login']
-      // document.getElementById('userId').innerText = login
-
-      setStatus('channel name acquired', 'black')
-
-      var xhttp_ebs = new XMLHttpRequest()
-      xhttp_ebs.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-          if (this.responseText == RESPONSE_TRUE) {
-            setStatus(TEXT_STREAMER_EXISTS, COLOR_STREAMER_EXISTS)
-          } else {
-            setStatus(TEXT_STREAMER_NOT_EXISTS, COLOR_STREAMER_NOT_EXISTS)
-          }
-        } else {
-          setStatus('backend ' + getResponseString(this), 'black')
-        }
-      }
-      xhttp_ebs.open('post', BACKEND_URL)
-      xhttp_ebs.setRequestHeader("Content-Type", "application/json")
-
-      var msg = {
-        'msg_type': MSG_TYPE_STREAMER_EXISTS,
-        'streamer': {
-          'login': login
-        }
-      }
-      xhttp_ebs.send(JSON.stringify(msg))
-
-      // document.getElementById('userId').innerText = 'succesful'
-    }
-  };
-
-  xhttp.open("get", "https://api.twitch.tv/helix/users?id=" + channelId)
-  xhttp.setRequestHeader("Client-ID", clientId)
-  xhttp.send()
-
-  // xhttp.response
-}
 
 
 function setStatus(text, color) {

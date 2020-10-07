@@ -1,0 +1,55 @@
+This is an extension that tries to bring part of the experience of Slay the Spire to the viewer. It imitates part of the GUI of the game on stream.  It displays descriptions of various items the player owns and also of player and monster powers in combat. The data only flows one way for the viewer (from the game to the extension), they receive the data from the game and that is displayed on stream. All they have to do is to hover over various areas exactly as if they were playing the game themselves. The extension provides no further interaction for the viewer, all they can do is display info about the state of the game of the streamer, they do not have any ability to interact with the streamer or the game through the extension.
+
+The data is being extracted using a mod of Slay the Spire and through my EBS sent to the extension using PubSub messaging.
+
+Version History/Changelog:
+
+version 1.0.0
+ - displays only relic descriptions (relics are items that are acquired during a playthrough, appear right below the top panel)
+ - I accidentally whitelisted a streamer I tested with
+
+version 1.0.1
+ - same as 1.0.0 except the streamer was removed from the whitelist - thus this is a public version
+ - this version was stuck in review process for 6 weeks, my testing channel was accidentally not live during review and the extension was put into a Pending Action status. I did not know that to resolve this I had to resubmit the extension for review, so I just responded that I'm live from now on and waited. In the end, instead of going through with the review of this version, I decided to directly move on to the next version as it was already finished by the point I found out where I made the mistake.
+
+version 1.1.0 - currently released
+ - in addition to relic descriptions, displays descriptions of potions, player powers, monster powers, player orbs (special mechanic on one of the characters, can be seen on the testing stream) when the viewer hovers over them
+ - on the testing stream, you can see the areas of interest highlighted, those are all that are sensitive to mouse hover and display the descriptions as described here.
+ - some of the descriptions track and follow mouse movement over their respective hitboxes, some don't. This is intended and mimics the behavior in the game.
+
+version 1.1.1
+ - fix of a major performance issue - in version 1.1.0 I had a function that did synchronous ajax calls to check for image file existence on a CDN. This lead to blocking the main execution thread and it showed big way on Firefox. The function was removed and replaced with the much more correct onerror asynchronous callback that triggers when the image is not found and doesn't block the main thread. The issue is now resolved and it lead to significantly better user experience.
+ - also all the images used in the extension are now preloaded for caching after extension initialization, this smooths out the user experience even more (in total all the images make up only about 400kB, they are basically all just tiny icons)
+ - the hitbox for the top-bar relics was made slightly taller at the bottom, some users were unhappy that their top-bar relics were covered by the stream title in the fullscreen mode, this was only an issue for users who had twitch zoomed in. Now the relic tooltips can be seen comfortably even at 150% zoom.
+ - the config page was updated with slight rewordings following the slight issues that streamers had setting up the extension. Now it should be even more simple and straightforward for them to set it up.
+
+version 1.1.2
+ - unfortunately the preloading in the previous version v1.1.1 is implemented too "naively", it basically tries to preload all the images at once, and this causes a noticeable lag spike in Chrome after the extension is loaded as it sends many requests at once. This version patches this, now only 2 images can be loaded at once and the script waits until they are loaded to start preloading the next. Therefore leaving plenty of resources available and not producing any framerate drops in the browser.
+ - also now all js scripts are minified, saving additional bandwidth and reducing extension load time slightly
+
+version 1.2.0
+ - this is a very major update to the extension. It implements large improvements and adds new features to both the frontend and the backend side of things. Let me go through them separately
+
+DECK VIEWER:
+ - The most obvious change is that a deck viewer has been added. So the users can now view the deck of the streamer as he is playing through the game and acquiring new cards. It mimics the UI of the game nearly perfectly providing seamless experience.
+ - The deck view can be open with a button in the top right (overlaid over the in-game deck view button). I have added a light border whenever a user hovers over the stream, just so they notice it's there. It should not be too disruptive, if this gets a lot of complaints, I'll figure out a better way to do it in a future update.
+ - The button is purposefully made taller than the in-game button, since the [live] label is displayed in the top right and it also anticipates any new text/info you might add in the future that might overlay and block the button otherwise.
+ - The user can click the cards in the deck view to open a zoomed popup (card detail view) which allows them to see the upgraded version of any card (this is again a feature of the game, UI is the same).
+ - In the card detail view, there are arrows to cycle through the cards of the deck as in game. However, this naturally leads one to click in rapid succession to cycle through the deck quickly. Because it's still rendered on stream, this results in rapid full-screen enter/exit sequences, which makes for a terrible user experience. Because of this, I have implemented a complete system of keyboard shortcuts, that can do following:
+   - open/close deck view
+   - close detail view
+   - toggle upgraded checkbox in detail view
+   - next/previous card in detail view
+ - This way the viewers can easily take advantage of the full functionality of the deck viewer feature without the annoying fullscreen toggle.
+ - In the deck view, in the top left, there is a checkbox "Show Shortcuts", which displays all the shortcuts in their relevant places. It is very clearly visible so viewers won't miss it and they can use it for a while until they memorize all the relevant shortcuts. Then they can simply uncheck the checkbox to hide the tips and again make for seamless experience.
+ - To save as much bandwidth as possible, the card art is constructed from several separate images, like the card border, background, energy symbol and the portrait. Since many of these parts are shared across many cards (like background, borders, etc.), this means that usually only the different portraits are being loaded.
+ - All images are preloaded asynchronously in small batches and never hang the main render thread (learning from experience with previous versions). This has been thoroughly tested on multiple browsers and with dev tools to confirm that the extension really introduces zero lag to the viewer.
+
+BACKEND/MESSAGING/QOL
+ - The communication protocol of backend-frontend has been updated, since with the deck view, multiple message types are now employed (all the previous content + the deck data would not fit within a single pubsub 5kb message, even with double compression implemented) and each message can comprise of arbitrary number of parts. Previously, it was theoretically possible for the extension to stop working when the server would be sending more than 5kb at a time. Now it will never cross the 5kb limit and instead split the messages. The original tooltips data and deck data are sent alternatingly by the server in an optimized manner such that they provide the best user experience possible (basically they always try to update the most recent/relevant thing immediatelly but never delay any update type for too long, because of new viewers that tune into the stream, we want them to receive the full extension data (tips + deck) as soon as possible).
+
+CONFIG
+ - The config page originally used your old API that did not require authentication. Couple months ago you have disabled this API in favor of the one that requires full authentication always. This has broken the functionality slightly since it did still work but the info written on the config page was quite misleading. So it is now updated to be clear correct and the match current state of things.
+
+PREVIOUS FUNCTIONALITY AND TESTING INFO
+ - All the previously functionality remains unchanged, so if you hover over any of the highlighted areas you should see displayed tooltips that describe that particular thing. The arrow in the top right outlines the deck view button, it should open a view where you see all the cards in the deck. Clicking any card should open detail view, where you can see the upgrade if you toggle the checkbox. You can close the detail view simply by clicking into empty space. In the top left in the deck view you can toggle "Show Shortcuts" which will display all mentioned keyboard shortcuts that can be used to navigate the deck view. It should be fairly straightforward even if you don't know the game (for viewers who know it it should be completely intuitive, since it looks and behaves pretty much the same as the game deck view), please let me know if you experience any issues.

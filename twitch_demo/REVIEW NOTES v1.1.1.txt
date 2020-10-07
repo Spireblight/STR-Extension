@@ -1,0 +1,24 @@
+This is an extension that tries to bring part of the experience of Slay the Spire to the viewer. It imitates part of the GUI of the game on stream.  It displays descriptions of various items the player owns and also of player and monster powers in combat. The data only flows one way for the viewer (from the game to the extension), they receive the data from the game and that is displayed on stream. All they have to do is to hover over various areas exactly as if they were playing the game themselves. The extension provides no further interaction for the viewer, all they can do is display info about the state of the game of the streamer, they do not have any ability to interact with the streamer or the game through the extension.
+
+The data is being extracted using a mod of Slay the Spire and through my EBS sent to the extension using PubSub messaging.
+
+Version History/Changelog:
+
+version 1.0.0
+ - displays only relic descriptions (relics are items that are acquired during a playthrough, appear right below the top panel)
+ - I accidentally whitelisted a streamer I tested with
+
+version 1.0.1
+ - same as 1.0.0 except the streamer was removed from the whitelist - thus this is a public version
+ - this version was stuck in review process for 6 weeks, my testing channel was accidentally not live during review and the extension was put into a Pending Action status. I did not know that to resolve this I had to resubmit the extension for review, so I just responded that I'm live from now on and waited. In the end, instead of going through with the review of this version, I decided to directly move on to the next version as it was already finished by the point I found out where I made the mistake.
+
+version 1.1.0 - currently released
+ - in addition to relic descriptions, displays descriptions of potions, player powers, monster powers, player orbs (special mechanic on one of the characters, can be seen on the testing stream) when the viewer hovers over them
+ - on the testing stream, you can see the areas of interest highlighted, those are all that are sensitive to mouse hover and display the descriptions as described here.
+ - some of the descriptions track and follow mouse movement over their respective hitboxes, some don't. This is intended and mimics the behavior in the game.
+
+version 1.1.1
+ - fix of a major performance issue - in version 1.1.0 I had a function that did synchronous ajax calls to check for image file existence on a CDN. This lead to blocking the main execution thread and it showed big way on Firefox. The function was removed and replaced with the much more correct onerror asynchronous callback that triggers when the image is not found and doesn't block the main thread. The issue is now resolved and it lead to significantly better user experience.
+ - also all the images used in the extension are now preloaded for caching after extension initialization, this smooths out the user experience even more (in total all the images make up only about 400kB, they are basically all just tiny icons)
+ - the hitbox for the top-bar relics was made slightly taller at the bottom, some users were unhappy that their top-bar relics were covered by the stream title in the fullscreen mode, this was only an issue for users who had twitch zoomed in. Now the relic tooltips can be seen comfortably even at 150% zoom.
+ - the config page was updated with slight rewordings following the slight issues that streamers had setting up the extension. Now it should be even more simple and straightforward for them to set it up.
