@@ -309,7 +309,8 @@ $(function() {
 
     document.body.onkeydown = function(e) {
         if (e.code == "KeyD") {
-            openDeckView()
+            if (deck_view_contents.length > 0)
+                openDeckView()
         }
     }
 

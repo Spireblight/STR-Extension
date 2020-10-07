@@ -120,14 +120,23 @@ function deckViewKeyDown(e) {
 function setDeck(deck, cards, tips, character) {
 
     if (deck.length == 0) {
-        deck_button.style.display = 'none'
         clearCollection(CATEGORY_CARDS)
         closeDeckView()
         deck_view_current_hover_index = null
+        deck_view_contents = []
+        
+        deck_button.style.display = 'none'
+        if (show_keybinding_hints) {
+            document.getElementById('deck_button_keybinding_tip').style.display = 'none'
+        }
+
         return   
     }
 
     deck_button.style.display = 'block'
+    if (show_keybinding_hints) {
+        document.getElementById('deck_button_keybinding_tip').style.display = 'block'
+    }
 
     let scrollpos = null
     if (deck_view_open) {
@@ -135,6 +144,8 @@ function setDeck(deck, cards, tips, character) {
     }
     // if (JSON.stringify([deck, cards, tips]) == last_deck)
     //     return
+
+    // deck_view_content.style.height = Math.ceil(deck.length / 5) * 
 
     // last_deck = JSON.stringify([deck, cards, tips])
     deck_view_current_hover_index = null
@@ -144,7 +155,7 @@ function setDeck(deck, cards, tips, character) {
         deck_view_contents.push(null)
     }
 
-    const content = document.getElementById('deck_view_content')
+    const content = document.getElementById('deck_view_content_wrap')
     
     xoffset = DECK_VIEW_CARD_WIDTH * (1 - DECK_VIEW_CARD_SCALE) / 2
     yoffset = CARD_BASE_HEIGHT * (1 - DECK_VIEW_CARD_SCALE) / 2
@@ -178,13 +189,7 @@ function setDeck(deck, cards, tips, character) {
         }
     }
 
-    const footer = document.createElement('div')
-    footer.className = 'deck-view-footer'
-    footer.style.left = 0
-    footer.style.top = y + CARD_BASE_HEIGHT + DECK_VIEW_Y_MARGIN + 'rem'
-    appendChild(content, footer)
-
-    addToCollection(CATEGORY_CARDS, footer)
+    content.style.height = y + CARD_BASE_HEIGHT * 1.7 + 'rem'
 
     let end = new Date().getMilliseconds()
 

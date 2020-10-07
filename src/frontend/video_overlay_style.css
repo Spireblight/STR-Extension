@@ -43,7 +43,7 @@
     left: 2rem;
     position: absolute;
     left: 30%;
-    top: 15%;
+    top: -20%;
 }
 
 div.hitbox {
@@ -215,6 +215,12 @@ div.powertip-multicol-column {
     height: 100%;
     overflow-x: hidden;
     overflow-y: scroll;
+}
+
+#deck_view_content_wrap {
+    position: absolute;
+    width: 100%;
+    /* overflow: hidden; */
 }
 
 div.card {

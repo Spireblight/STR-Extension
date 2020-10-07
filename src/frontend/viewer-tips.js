@@ -1,5 +1,6 @@
 
 var last_relics = ""
+var last_relics_tips = ""
 var last_potions = ""
 var last_potion_tips = ""
 var last_player_powers = ""
@@ -34,11 +35,25 @@ function decompressPowerTips(power_tips) {
 function setRelics(relics, power_tips, character) {
     // console.log('set relics, relics: ' + JSON.stringify(relics))
 
-    if (JSON.stringify(relics)  == last_relics) // do not replace 
-        return
+    if (relics) {
+        var ids = []
+        for (let i = 1; i < relics[1].length; i++) {
+            ids = ids.concat(relics[1][i])
+        }
+        power_tips_subset = arraySubset(power_tips, ids);
+
+        if (JSON.stringify(relics) == last_relics && JSON.stringify(power_tips_subset) == last_relics_tips) {
+            return
+        }
+    }
+
+    // if (JSON.stringify(relics)  == last_relics) // do not replace 
+        // return
+
+    last_relics = JSON.stringify(relics)
+    last_relics_tips = JSON.stringify(power_tips_subset)
 
     is_relics_multipage = relics[0]
-    last_relics = JSON.stringify(relics)
 
     if (current_tooltip_id && current_tooltip_category == CATEGORY_RELICS) {
         current_tooltip_id = null
