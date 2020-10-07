@@ -10,7 +10,7 @@
     border: 1px solid black;
     min-width: 100px;
     padding: 8px;
-    width: 400px;
+    /* width: 80%; */
 }
 
 li {
