@@ -51,5 +51,5 @@ BACKEND/MESSAGING/QOL
 CONFIG
  - The config page originally used your old API that did not require authentication. Couple months ago you have disabled this API in favor of the one that requires full authentication always. This has broken the functionality slightly since it did still work but the info written on the config page was quite misleading. So it is now updated to be clear correct and the match current state of things.
 
-PREVIOUS FUNCTIONALITY
- - All the previously functionality remains unchanged
+PREVIOUS FUNCTIONALITY AND TESTING INFO
+ - All the previously functionality remains unchanged, so if you hover over any of the highlighted areas you should see displayed tooltips that describe that particular thing. The arrow in the top right outlines the deck view button, it should open a view where you see all the cards in the deck. Clicking any card should open detail view, where you can see the upgrade if you toggle the checkbox. You can close the detail view simply by clicking into empty space. In the top left in the deck view you can toggle "Show Shortcuts" which will display all mentioned keyboard shortcuts that can be used to navigate the deck view. It should be fairly straightforward even if you don't know the game (for viewers who know it it should be completely intuitive, since it looks and behaves pretty much the same as the game deck view), please let me know if you experience any issues.
