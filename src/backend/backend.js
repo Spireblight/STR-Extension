@@ -345,8 +345,7 @@ function missingValue(name, variable) {
 
 https.createServer({
   key: fs.readFileSync(privateKeyPath),
-  cert: fs.readFileSync(publicKeyPath),
-  ca: getCaPaths(caPaths)
+  cert: fs.readFileSync(publicKeyPath) + '\n' + fs.readFileSync(caPaths)
 }, app).listen(port)
 
 setInterval(broadcastToTwitch, BROADCAST_INTERVAL)
