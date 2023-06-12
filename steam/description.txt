@@ -17,6 +17,8 @@ Features:
 
 [*] Displays descriptions of relics, potions, player powers, monster powers, orbs
 
+[*] Now also features descriptions of relics and potions in shops and descriptions of relics in the boss fight relic pick
+
 [*] Deck view supports mods, with card art available for majority of content mods
 
 [*] Descriptions are also compatible with with nearly all mods out-of-the-box, with some extra special support

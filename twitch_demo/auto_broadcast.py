@@ -21,8 +21,8 @@ if __name__ == '__main__':
     msg_tips = read_message('tips_msg.txt')
     msg_deck = read_message('deck_msg.txt')
 
-    # url = 'slaytherelics.xyz:8081'
-    url = 'localhost:8080'
+    url = 'slaytherelics.xyz:8080'
+    # url = 'localhost:8080'
     # json = loads(msg)
 
     while True:
